@@ -6,7 +6,7 @@
 body {
   background-color: #080b1a;
   background-image:
-    url('https://i.imgur.com/your-image.jpg'); /* سيتم استبداله */
+    url('./assets/efootball-bg.jpg'); /* سيتم استبداله */
   background-size: cover;
   background-position: center top;
   background-attachment: fixed;

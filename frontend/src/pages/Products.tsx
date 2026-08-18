@@ -32,9 +32,18 @@ const Products = () => {
         // سحب البيانات من الـ Backend (Railway) الذي يعمل كـ proxy لتفادي CORS
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const fetch1 = fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
-        const fetch2 = fetch('https://corsproxy.io/?' + encodeURIComponent('https://efhub.com/api/public/coaches')).then(res => res.ok ? res.json() : []).catch(() => []);
+        
+        // جلب 76 صفحة من efhub
+        const efhubPromises = [];
+        for (let i = 1; i <= 76; i++) {
+          efhubPromises.push(
+            fetch('https://corsproxy.io/?' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i}`))
+              .then(res => res.ok ? res.json() : [])
+              .catch(() => [])
+          );
+        }
 
-        const [data1, data2] = await Promise.all([fetch1, fetch2]);
+        const [data1, ...efhubPagesData] = await Promise.all([fetch1, ...efhubPromises]);
 
         const extractArray = (d: any) => {
           if (Array.isArray(d)) return d;
@@ -46,7 +55,7 @@ const Products = () => {
         };
 
         const array1 = extractArray(data1);
-        const array2 = extractArray(data2);
+        const array2 = efhubPagesData.flatMap(page => extractArray(page));
 
         const mergedManagers = new Map();
         array1.forEach((m: any) => mergedManagers.set(String(m.id || m.Id || m.managerId), m));

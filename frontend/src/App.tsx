@@ -9,7 +9,7 @@ import ManagerDetails from './pages/ManagerDetails';
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="min-h-screen bg-dark overflow-hidden flex flex-col">
+      <div className="min-h-screen bg-transparent overflow-hidden flex flex-col">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />

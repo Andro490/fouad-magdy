@@ -8,17 +8,21 @@ export default {
     extend: {
       colors: {
         dark: {
-          DEFAULT: '#0a0a0a',
-          lighter: '#1a1a1a',
-          card: '#141414'
+          DEFAULT: '#080b1a',
+          lighter: '#0f1530',
+          card: '#0d1228'
         },
         primary: {
-          DEFAULT: '#FFD700', // Gold
-          glow: 'rgba(255, 215, 0, 0.5)'
+          DEFAULT: '#ff2d9b', // Neon Pink from image
+          glow: 'rgba(255, 45, 155, 0.5)'
         },
         accent: {
-          DEFAULT: '#00F0FF', // Cyan Neon
-          glow: 'rgba(0, 240, 255, 0.5)'
+          DEFAULT: '#00e5ff', // Cyan from image
+          glow: 'rgba(0, 229, 255, 0.5)'
+        },
+        purple: {
+          DEFAULT: '#7c3aed',
+          glow: 'rgba(124, 58, 237, 0.4)'
         }
       },
       fontFamily: {

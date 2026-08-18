@@ -11,7 +11,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center pt-20 relative">
+    <div className="min-h-screen flex items-center justify-center pt-20 relative px-4">
       <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2"></div>
       
       <div className="glass-panel p-10 rounded-2xl w-full max-w-md z-10">

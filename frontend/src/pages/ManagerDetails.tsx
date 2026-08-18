@@ -180,10 +180,9 @@ const ManagerDetails = () => {
         </button>
       </div>
 
-      {/* الشبكة الرئيسية — 3 أعمدة بـ LTR حتى لا تنقلب */}
       <div
-        className="max-w-6xl mx-auto grid gap-6"
-        style={{ direction: 'ltr', gridTemplateColumns: '200px 1fr 1fr' }}
+        className="max-w-6xl mx-auto grid gap-6 grid-cols-1 md:grid-cols-[200px_1fr_1fr]"
+        style={{ direction: 'ltr' }}
       >
 
         {/* ======= العمود 1: صورة + معلومات + boosts ======= */}

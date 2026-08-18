@@ -1,13 +1,27 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/authSlice';
 
 const Register = () => {
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register submitted', { email, password });
+    
+    // Save to local storage for mocked auth
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const newUser = { id: Date.now().toString(), name, phone, password, role: 'USER' };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Auto login
+    dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role }, token: 'mock-jwt-token' }));
+    navigate('/');
   };
 
   return (
@@ -18,13 +32,24 @@ const Register = () => {
         <h2 className="text-4xl font-bold mb-6 text-center text-gradient">إنشاء حساب</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">البريد الإلكتروني</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">الاسم</label>
             <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors"
-              placeholder="أدخل بريدك الإلكتروني"
+              placeholder="أدخل اسمك"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف</label>
+            <input 
+              type="tel" 
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors"
+              placeholder="أدخل رقم هاتفك"
               required
             />
           </div>

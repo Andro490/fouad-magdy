@@ -1,13 +1,37 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/authSlice';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login submitted', { email, password });
+    setError('');
+    
+    // Mock authentication
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Check if it's admin (mocked admin logic)
+    if (phone === 'admin' && password === 'admin') {
+      dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', phone: 'admin', role: 'ADMIN' }, token: 'mock-admin-token' }));
+      navigate('/admin');
+      return;
+    }
+
+    const foundUser = users.find((u: any) => u.phone === phone && u.password === password);
+    
+    if (foundUser) {
+      dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, role: foundUser.role }, token: 'mock-jwt-token' }));
+      navigate('/');
+    } else {
+      setError('رقم الهاتف أو كلمة المرور غير صحيحة');
+    }
   };
 
   return (
@@ -16,15 +40,16 @@ const Login = () => {
       
       <div className="glass-panel p-10 rounded-2xl w-full max-w-md z-10">
         <h2 className="text-4xl font-bold mb-6 text-center text-gradient">تسجيل الدخول</h2>
+        {error && <div className="bg-red-500/20 border border-red-500 text-red-500 p-3 rounded mb-4 text-center">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">البريد الإلكتروني</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف</label>
             <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text" 
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="أدخل بريدك الإلكتروني"
+              placeholder="أدخل رقم هاتفك"
               required
             />
           </div>

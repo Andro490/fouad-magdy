@@ -29,8 +29,9 @@ const Products = () => {
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        // سحب البيانات من الرابطين في نفس الوقت
-        const fetch1 = fetch('https://efhub.com/data/managers.json?v=dpl_GGgEACniQ1Rd9SUyfqHdSTxPv54a').then(res => res.ok ? res.json() : []).catch(() => []);
+        // سحب البيانات من الـ Backend (Railway) الذي يعمل كـ proxy لتفادي CORS
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const fetch1 = fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
         const fetch2 = fetch('https://corsproxy.io/?' + encodeURIComponent('https://efhub.com/api/public/coaches')).then(res => res.ok ? res.json() : []).catch(() => []);
 
         const [data1, data2] = await Promise.all([fetch1, fetch2]);
@@ -47,12 +48,8 @@ const Products = () => {
         const array1 = extractArray(data1);
         const array2 = extractArray(data2);
 
-        // دمج البيانات من المصدرين بحيث يكملوا بعض
         const mergedManagers = new Map();
-        
         array1.forEach((m: any) => mergedManagers.set(String(m.id || m.Id || m.managerId), m));
-        
-        // البيانات من الـ API الثاني (public/coaches) تحتوي على تفاصيل أكثر، ندمجها مع الأولى
         array2.forEach((m: any) => {
           const id = String(m.id || m.Id || m.managerId);
           if (mergedManagers.has(id)) {
@@ -63,9 +60,7 @@ const Products = () => {
         });
 
         const finalData = Array.from(mergedManagers.values());
-        
         if (finalData.length === 0) throw new Error('فشل في جلب البيانات من كلا المصدرين');
-        
         setManagers(finalData);
       } catch (err) {
         setError('حدث خطأ أثناء تحميل بيانات المدربين. يرجى التحقق من الرابط.');

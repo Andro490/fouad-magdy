@@ -68,7 +68,8 @@ const ManagerDetails = () => {
     // جيب البيانات الكاملة من الـ Backend أو الملف الثابت وادمجهم
     const fetchFullData = async () => {
       try {
-        const fetch1 = fetch('https://efhub.com/data/managers.json?v=dpl_GGgEACniQ1Rd9SUyfqHdSTxPv54a').then(res => res.ok ? res.json() : []).catch(() => []);
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const fetch1 = fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
         const fetch2 = fetch('https://corsproxy.io/?' + encodeURIComponent('https://efhub.com/api/public/coaches')).then(res => res.ok ? res.json() : []).catch(() => []);
         
         const [data1, data2] = await Promise.all([fetch1, fetch2]);

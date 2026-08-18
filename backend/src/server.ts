@@ -14,11 +14,21 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    process.env.FRONTEND_URL || 'https://fouad-magdy.vercel.app',
-  ],
+  origin: (origin, callback) => {
+    // السماح بطلبات بدون origin (مثل Postman) وطلبات من المصادر المسموح بها
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://fouad-magdy.vercel.app',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // مؤقتاً نسمح للكل لحين الاستقرار
+    }
+  },
   credentials: true,
 }));
 app.use(helmet());

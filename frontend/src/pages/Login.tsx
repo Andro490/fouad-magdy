@@ -24,7 +24,7 @@ const Login = () => {
       return;
     }
 
-    const foundUser = users.find((u: any) => u.phone === phone && u.password === password);
+    const foundUser = users.find((u: Record<string, any>) => u.phone === phone && u.password === password);
     
     if (foundUser) {
       dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, role: foundUser.role }, token: 'mock-jwt-token' }));

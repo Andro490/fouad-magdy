@@ -2,27 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* eFootball 2027 Global Background */
+body {
+  background-color: #080b1a;
+  background-image:
+    url('https://i.imgur.com/your-image.jpg'); /* سيتم استبداله */
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Dark overlay so content is readable */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(8, 11, 26, 0.88) 0%,
+    rgba(8, 11, 26, 0.75) 50%,
+    rgba(8, 11, 26, 0.88) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
 @layer utilities {
   .glass-panel {
-    @apply bg-dark-card/60 backdrop-blur-md border border-white/10 shadow-[0_0_15px_rgba(0,240,255,0.1)];
+    @apply backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(255,45,155,0.08)];
+    background: rgba(13, 18, 40, 0.7);
   }
-  
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
+
+  .neon-glow-pink {
+    box-shadow: 0 0 20px rgba(255, 45, 155, 0.4), 0 0 40px rgba(255, 45, 155, 0.2);
+  }
+
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), 0 0 40px rgba(0, 229, 255, 0.2);
+  }
 }
 
-/* Custom Scrollbar for a premium feel */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0a0a0a;
-}
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #080b1a; }
 ::-webkit-scrollbar-thumb {
-  background: #FFD700;
+  background: linear-gradient(#ff2d9b, #00e5ff);
   border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #00F0FF;
 }

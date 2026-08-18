@@ -6,7 +6,7 @@
 body {
   background-color: #080b1a;
   background-image:
-    url('./assets/efootball-bg.jpg'); /* سيتم استبداله */
+    url('./assets/efootball-bg.jpeg');
   background-size: cover;
   background-position: center top;
   background-attachment: fixed;

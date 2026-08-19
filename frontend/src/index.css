@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Cinematic Educational Platform Global Background */
+/* eFootball 2027 Global Background */
 body {
   background-color: #080b1a;
+  background-image:
+    url('./assets/efootball-bg.jpeg');
+  background-size: cover;
+  background-position: center top;
   background-attachment: fixed;
   background-repeat: no-repeat;
   min-height: 100vh;

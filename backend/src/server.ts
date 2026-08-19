@@ -22,72 +22,86 @@ app.use(cors({
 app.use(helmet());
 app.use(morgan('dev'));
 
-// Basic Routes Structure for Educational Platform API
+// Basic Routes Structure for StreamHub
 
 // --- AUTH & ROLES ---
 app.post('/api/auth/register', (req, res) => {
   // TODO: Create user, hash password, return JWT
-  res.json({ message: 'Student registered successfully' });
+  res.json({ message: 'User registered successfully' });
 });
 
 app.post('/api/auth/login', (req, res) => {
   // TODO: Validate credentials, return JWT & user details
-  res.json({ token: 'mock-jwt-token', user: { name: 'Student 1', role: 'STUDENT' } });
+  res.json({ token: 'mock-jwt-token', user: { name: 'Streamer 1', role: 'STREAMER' } });
 });
 
 app.get('/api/auth/me', (req, res) => {
   // TODO: Return current user based on JWT
-  res.json({ user: { name: 'Student 1', role: 'STUDENT' } });
+  res.json({ user: { name: 'Streamer 1', role: 'STREAMER', coinsBalance: 5000 } });
 });
 
 
-// --- COURSES ---
-app.get('/api/courses', (req, res) => {
+// --- COINS & WALLET ---
+app.get('/api/wallet/balance', (req, res) => {
+  res.json({ coinsBalance: 5000, cashBalance: 0 });
+});
+
+app.post('/api/wallet/convert', (req, res) => {
+  // TODO: Create a CASH_OUT_REQUEST transaction
+  res.json({ success: true, message: 'Cash out request submitted successfully.' });
+});
+
+
+// --- STREAMER DASHBOARD ---
+app.get('/api/streamer/stats', (req, res) => {
+  res.json({
+    views: 12500,
+    likes: 4300,
+    streamHours: 12.5
+  });
+});
+
+app.post('/api/streamer/upload-link', (req, res) => {
+  const { link } = req.body;
+  // TODO: Analyze the link (e.g. TikTok)
+  res.json({ success: true, message: 'Link analyzed successfully', data: { extraViews: 500 } });
+});
+
+
+// --- LEADERBOARDS & CONTESTS ---
+app.get('/api/leaderboards/top-streamers', (req, res) => {
   res.json([
-    { id: '1', title: 'React 101', description: 'Master React with TS', instructor: 'Fouad', price: 50 },
-    { id: '2', title: 'Advanced Node.js', description: 'Build scalable APIs', instructor: 'Fouad', price: 75 }
+    { id: '1', name: 'أحمد جيمنج', coins: 50000, rank: 1 },
+    { id: '2', name: 'عمر برو', coins: 42000, rank: 2 }
   ]);
 });
 
-app.get('/api/courses/:id', (req, res) => {
-  const { id } = req.params;
-  res.json({ id, title: 'Course Title', description: 'Detailed Description', modules: [] });
-});
-
-
-// --- STUDENT DASHBOARD & PROGRESS ---
-app.get('/api/student/progress', (req, res) => {
-  res.json({
-    enrolledCourses: 3,
-    completedCourses: 1,
-    recentActivity: [
-      { courseId: '1', moduleName: 'Hooks', progress: 80 }
-    ]
-  });
+app.post('/api/contests/distribute-rewards', (req, res) => {
+  // TODO: Admin or cron job to distribute coins to top users
+  res.json({ success: true, message: 'Rewards distributed.' });
 });
 
 
 // --- ADMIN DASHBOARD ---
-app.get('/api/admin/stats', (req, res) => {
-  res.json({
-    totalStudents: 1500,
-    totalRevenue: 25000,
-    activeCourses: 12
-  });
+app.get('/api/admin/transactions', (req, res) => {
+  res.json([
+    { id: 't1', userId: 'u1', amount: 1000, type: 'CASH_OUT_REQUEST', status: 'PENDING' }
+  ]);
 });
 
-app.post('/api/admin/courses', (req, res) => {
-  // TODO: Upload course details, handle video attachments
-  res.json({ success: true, message: 'Course created successfully' });
+app.put('/api/admin/transactions/:id/status', (req, res) => {
+  const { status } = req.body; // APPROVED or REJECTED
+  // TODO: Update transaction and user cashBalance
+  res.json({ success: true, message: `Transaction marked as ${status}` });
 });
 
 
 // Health Check
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Educational Platform API 🚀' });
+  res.json({ message: 'Welcome to StreamHub API 🚀' });
 });
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Educational Platform API is running on http://localhost:${PORT}`);
+  console.log(`StreamHub API is running on http://localhost:${PORT}`);
 });

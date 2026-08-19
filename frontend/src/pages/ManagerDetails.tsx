@@ -68,21 +68,6 @@ const ManagerDetails = () => {
     // جيب البيانات الكاملة من الـ Backend أو الملف الثابت وادمجهم
     const fetchFullData = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const fetch1 = fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
-        
-        // جلب 76 صفحة من efhub
-        const efhubPromises = [];
-        for (let i = 1; i <= 76; i++) {
-          efhubPromises.push(
-            fetch('https://corsproxy.io/?' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i}`))
-              .then(res => res.ok ? res.json() : [])
-              .catch(() => [])
-          );
-        }
-        
-        const [data1, ...efhubPagesData] = await Promise.all([fetch1, ...efhubPromises]);
-        
         const extractArray = (d: any) => {
           if (Array.isArray(d)) return d;
           if (typeof d === 'object' && d !== null) {
@@ -92,15 +77,49 @@ const ManagerDetails = () => {
           return [];
         };
 
-        const array1 = extractArray(data1);
-        const array2 = efhubPagesData.flatMap(page => extractArray(page));
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         
-        const found1 = array1.find((m: any) => String(m.id || m.Id || m.managerId) === String(id));
-        const found2 = array2.find((m: any) => String(m.id || m.Id || m.managerId) === String(id));
+        // 1. أولاً نبحث في الباك إند الخاص بنا
+        const localData = await fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
+        const array1 = extractArray(localData);
+        let foundManager = array1.find((m: any) => String(m.id || m.Id || m.managerId) === String(id));
         
-        // دمج بياناتهم إذا وجدوا في أي من المصدرين
-        if (found1 || found2) {
-          setManager({ ...(found1 || {}), ...(found2 || {}) });
+        // 2. إذا لم نجد المدرب أو لم يكن لديه skills كاملة، نبحث في موقع efhub صفحة بصفحة
+        if (!foundManager || !foundManager.skills || Object.keys(foundManager.skills).length === 0) {
+          
+          // نسحب البيانات في مجموعات (كل 3 صفحات مع بعض) لتسريع العملية بدون عمل ضغط على السيرفر
+          for (let i = 1; i <= 76; i += 3) {
+            const batchPromises = [];
+            for (let j = 0; j < 3 && (i + j) <= 76; j++) {
+              batchPromises.push(
+                fetch('https://corsproxy.io/?' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i + j}`))
+                  .then(res => res.ok ? res.json() : null)
+                  .catch(() => null)
+              );
+            }
+
+            const batchResults = await Promise.all(batchPromises);
+            let foundInBatch = null;
+
+            for (const pageData of batchResults) {
+              if (!pageData) continue;
+              const pageArray = extractArray(pageData);
+              const match = pageArray.find((m: any) => String(m.id || m.Id || m.managerId) === String(id));
+              if (match) {
+                foundInBatch = match;
+                break;
+              }
+            }
+
+            if (foundInBatch) {
+              foundManager = { ...(foundManager || {}), ...foundInBatch };
+              break; // توقف عن البحث بمجرد العثور على المدرب!
+            }
+          }
+        }
+        
+        if (foundManager) {
+          setManager(foundManager);
         }
       } catch (e) {
         console.warn('Could not fetch full manager data', e);

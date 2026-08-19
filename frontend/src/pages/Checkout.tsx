@@ -52,7 +52,7 @@ const Checkout = () => {
           receiptBase64: base64data
         };
 
-        const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwjMxGM_NE0uYAdWT3KuqFS_bQR0EeGKn8wXmD-Y6T3bzOA2ioTY2NX6z0jxcBMJrn6yg/exec';
+        const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxrgUBqaMnfFtdouvLqA5ba7FU6YdTUDy65gR8GjKAr2SjwjYD75mhfgd5EPBc-HYA8wA/exec';
         
         if (!GOOGLE_SCRIPT_URL) {
           alert('يرجى إضافة رابط Google Script في ملف .env');
@@ -62,17 +62,14 @@ const Checkout = () => {
 
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          // mode: 'no-cors', // قد نحتاجها إذا كان هناك مشكلة في الـ CORS في جوجل سكربت
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // جوجل سكربت يفضل text/plain أحياناً لتجنب مشاكل CORS
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload),
         });
 
-        if (response.ok || response.type === 'opaque') {
-          alert('تم إرسال طلبك بنجاح! سيتم مراجعته والتواصل معك.');
-          navigate('/store');
-        } else {
-          alert('حدث خطأ أثناء إرسال الطلب');
-        }
+        // Since it's no-cors, we can't read response.ok reliably, so if fetch didn't throw an error, we assume success
+        alert('تم إرسال طلبك بنجاح! سيتم مراجعته والتواصل معك.');
+        navigate('/store');
         setLoading(false);
       };
     } catch (err) {

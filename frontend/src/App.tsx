@@ -7,6 +7,7 @@ import Products from './pages/Products';
 import ManagerDetails from './pages/ManagerDetails';
 import Store from './pages/Store';
 import Admin from './pages/Admin';
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/manager/:id" element={<ManagerDetails />} />
           <Route path="/store" element={<Store />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

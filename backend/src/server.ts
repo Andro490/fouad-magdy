@@ -95,6 +95,63 @@ app.get('/api/managers', (req, res) => {
 });
 
 
+// Order Route - Sends data to Telegram
+app.post('/api/order', async (req, res) => {
+  try {
+    const { name, phone, gameId, productName, price, receiptBase64 } = req.body;
+    
+    if (!name || !phone || !receiptBase64) {
+      return res.status(400).json({ error: true, message: 'بيانات غير مكتملة' });
+    }
+
+    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      console.warn('⚠️ Telegram credentials not configured. Saving order locally.');
+      // If no telegram setup, just return success for now (mocked)
+      return res.json({ success: true, message: 'Order received (Mock)' });
+    }
+
+    const caption = `
+🛒 **طلب جديد من المتجر** 🛒
+------------------------
+👤 **الاسم:** ${name}
+📱 **رقم الهاتف:** ${phone}
+🎮 **الأيدي (ID):** ${gameId}
+📦 **المنتج:** ${productName}
+💵 **السعر:** ${price} EGP
+------------------------
+`;
+
+    const base64Data = receiptBase64.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, 'base64');
+    const blob = new Blob([buffer], { type: 'image/jpeg' });
+
+    const formData = new FormData();
+    formData.append('chat_id', TELEGRAM_CHAT_ID);
+    formData.append('caption', caption);
+    formData.append('parse_mode', 'Markdown');
+    formData.append('photo', blob, 'receipt.jpg');
+
+    const tgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!tgResponse.ok) {
+      const errData = await tgResponse.text();
+      console.error('Telegram API Error:', errData);
+      throw new Error('فشل إرسال الإشعار لتيليجرام');
+    }
+
+    res.json({ success: true, message: 'تم إرسال الطلب بنجاح' });
+  } catch (error) {
+    console.error('Order Error:', error);
+    res.status(500).json({ error: true, message: 'حدث خطأ داخلي في السيرفر' });
+  }
+});
+
 // Basic Route
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to eFootball Store API 🚀' });

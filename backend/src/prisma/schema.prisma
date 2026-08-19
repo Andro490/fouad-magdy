@@ -7,57 +7,85 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders    Order[]
-}
-
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  coinsAmount Int
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orders      OrderItem[]
-}
-
-model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  status      OrderStatus @default(PENDING)
-  totalAmount Float
-  gameId      String      // eFootball ID provided by user
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
-model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Float
-}
-
 enum Role {
-  USER
+  VIEWER
+  STREAMER
+  DEVELOPER
   ADMIN
 }
 
-enum OrderStatus {
+enum TransactionType {
+  EARN_COINS
+  SPEND_COINS
+  CASH_OUT_REQUEST
+  REFUND
+}
+
+enum TransactionStatus {
   PENDING
+  APPROVED
+  REJECTED
   COMPLETED
-  CANCELLED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(VIEWER)
+  coinsBalance  Float     @default(0)
+  cashBalance   Float     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  transactions  Transaction[]
+  streamStats   StreamStat[]
+  contestRanks  ContestParticipant[]
+}
+
+model Transaction {
+  id          String            @id @default(uuid())
+  userId      String
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  
+  user        User              @relation(fields: [userId], references: [id])
+}
+
+model StreamStat {
+  id            String    @id @default(uuid())
+  streamerId    String
+  views         Int       @default(0)
+  likes         Int       @default(0)
+  streamHours   Float     @default(0)
+  platformLink  String?
+  analyzedData  Json?
+  createdAt     DateTime  @default(now())
+  
+  streamer      User      @relation(fields: [streamerId], references: [id])
+}
+
+model Contest {
+  id            String    @id @default(uuid())
+  title         String
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean   @default(true)
+  
+  participants  ContestParticipant[]
+}
+
+model ContestParticipant {
+  id          String    @id @default(uuid())
+  contestId   String
+  userId      String
+  score       Float     @default(0)
+  rank        Int?
+  rewardCoins Float     @default(0)
+
+  contest     Contest   @relation(fields: [contestId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 }

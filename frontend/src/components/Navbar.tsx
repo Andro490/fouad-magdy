@@ -21,8 +21,9 @@ const Navbar = () => {
       
       <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8 w-full md:w-auto text-sm md:text-base font-semibold" style={{ direction: 'rtl' }}>
         <Link to="/" className="text-gray-300 hover:text-accent transition-colors">الرئيسية</Link>
-        <Link to="/leaderboard" className="text-gray-300 hover:text-accent transition-colors">لوحة الصدارة</Link>
-        <Link to="/store" className="text-gray-300 hover:text-accent transition-colors">المتجر</Link>
+        <Link to="/products" className="text-gray-300 hover:text-accent transition-colors">المدربين والخطط</Link>
+        <Link to="/store" className="text-gray-300 hover:text-accent transition-colors">سوق الحسابات</Link>
+        <Link to="/leaderboard" className="text-gray-300 hover:text-accent transition-colors">لوحة صناع المحتوى</Link>
         
         {isAuthenticated ? (
           <>

@@ -29,22 +29,6 @@ const Products = () => {
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        // سحب البيانات من الـ Backend (Railway) الذي يعمل كـ proxy لتفادي CORS
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const fetch1 = fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
-        
-        // جلب 76 صفحة من efhub
-        const efhubPromises = [];
-        for (let i = 1; i <= 76; i++) {
-          efhubPromises.push(
-            fetch('https://corsproxy.io/?' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i}`))
-              .then(res => res.ok ? res.json() : [])
-              .catch(() => [])
-          );
-        }
-
-        const [data1, ...efhubPagesData] = await Promise.all([fetch1, ...efhubPromises]);
-
         const extractArray = (d: any) => {
           if (Array.isArray(d)) return d;
           if (typeof d === 'object' && d !== null) {
@@ -54,25 +38,64 @@ const Products = () => {
           return [];
         };
 
-        const array1 = extractArray(data1);
-        const array2 = efhubPagesData.flatMap(page => extractArray(page));
-
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        
+        // 1. جلب البيانات المحلية أولاً وعرضها فوراً
+        const localData = await fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
+        const localArray = extractArray(localData);
+        
         const mergedManagers = new Map();
-        array1.forEach((m: any) => mergedManagers.set(String(m.id || m.Id || m.managerId), m));
-        array2.forEach((m: any) => {
-          const id = String(m.id || m.Id || m.managerId);
-          if (mergedManagers.has(id)) {
-            mergedManagers.set(id, { ...mergedManagers.get(id), ...m });
-          } else {
-            mergedManagers.set(id, m);
-          }
-        });
+        localArray.forEach((m: any) => mergedManagers.set(String(m.id || m.Id || m.managerId), m));
+        
+        if (localArray.length > 0) {
+          setManagers(Array.from(mergedManagers.values()));
+          setLoading(false);
+        }
 
-        const finalData = Array.from(mergedManagers.values());
-        if (finalData.length === 0) throw new Error('فشل في جلب البيانات من كلا المصدرين');
-        setManagers(finalData);
+        // 2. جلب بيانات efhub على دفعات (3 صفحات معاً) لتجنب حظر الـ IP (403)
+        // واستخدام allorigins بدلاً من corsproxy لثباته
+        for (let i = 1; i <= 76; i += 3) {
+            const batchPromises = [];
+            for (let j = 0; j < 3 && (i + j) <= 76; j++) {
+              batchPromises.push(
+                fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i + j}`))
+                  .then(res => res.ok ? res.json() : null)
+                  .catch(() => null)
+              );
+            }
+            
+            const batchResults = await Promise.all(batchPromises);
+            
+            let addedNew = false;
+            batchResults.forEach(pageData => {
+              if (pageData) {
+                const pageArray = extractArray(pageData);
+                pageArray.forEach((m: any) => {
+                  const id = String(m.id || m.Id || m.managerId);
+                  if (mergedManagers.has(id)) {
+                    mergedManagers.set(id, { ...mergedManagers.get(id), ...m });
+                  } else {
+                    mergedManagers.set(id, m);
+                    addedNew = true;
+                  }
+                });
+              }
+            });
+
+            // تحديث الشاشة فوراً بعد كل دفعة ليرى المستخدم المدربين وهم يظهرون تدريجياً
+            if (addedNew || i === 1) {
+              setManagers(Array.from(mergedManagers.values()));
+              setLoading(false);
+            }
+            
+            // تأخير بسيط لمدة نصف ثانية بين كل دفعة وأخرى لمنع الحظر (Rate Limit)
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
       } catch (err) {
-        setError('حدث خطأ أثناء تحميل بيانات المدربين. يرجى التحقق من الرابط.');
+        if (managers.length === 0) {
+          setError('حدث خطأ أثناء تحميل بيانات المدربين. يرجى التحقق من الرابط.');
+        }
         console.error(err);
       } finally {
         setLoading(false);

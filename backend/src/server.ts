@@ -106,6 +106,22 @@ app.get('/api/managers', (req, res) => {
   res.json([]);
 });
 
+// Proxy for EFHub API to avoid CORS issues from free proxies
+app.get('/api/proxy/coaches', async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const response = await fetch(`https://efhub.com/api/public/coaches?page=${page}`);
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Failed to fetch from EFHub' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Proxy Error:', error);
+    res.status(500).json({ error: 'Internal Server Error fetching coaches' });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

@@ -53,12 +53,12 @@ const Products = () => {
         }
 
         // 2. جلب بيانات efhub على دفعات (3 صفحات معاً) لتجنب حظر الـ IP (403)
-        // واستخدام allorigins بدلاً من corsproxy لثباته
+        // واستخدام Backend Proxy بدلاً من allorigins لتجنب أخطاء الـ CORS والـ 522
         for (let i = 1; i <= 76; i += 3) {
             const batchPromises = [];
             for (let j = 0; j < 3 && (i + j) <= 76; j++) {
               batchPromises.push(
-                fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i + j}`))
+                fetch(`${API_URL}/api/proxy/coaches?page=${i + j}`)
                   .then(res => res.ok ? res.json() : null)
                   .catch(() => null)
               );

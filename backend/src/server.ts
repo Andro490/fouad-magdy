@@ -101,6 +101,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to StreamHub API 🚀' });
 });
 
+// Managers API (Mock/Placeholder for frontend fetch)
+app.get('/api/managers', (req, res) => {
+  res.json([]);
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

@@ -92,7 +92,7 @@ const ManagerDetails = () => {
             const batchPromises = [];
             for (let j = 0; j < 3 && (i + j) <= 76; j++) {
               batchPromises.push(
-                fetch('https://corsproxy.io/?' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i + j}`))
+                fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(`https://efhub.com/api/public/coaches?page=${i + j}`))
                   .then(res => res.ok ? res.json() : null)
                   .catch(() => null)
               );

@@ -25,9 +25,13 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 76;
 
   useEffect(() => {
     const fetchManagers = async () => {
+      setLoading(true);
+      setError('');
       try {
         const extractArray = (d: any) => {
           if (Array.isArray(d)) return d;
@@ -40,62 +44,16 @@ const Products = () => {
 
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         
-        // 1. جلب البيانات المحلية أولاً وعرضها فوراً
-        const localData = await fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
-        const localArray = extractArray(localData);
+        // Fetch only the current page from EFHub via our backend proxy
+        const res = await fetch(`${API_URL}/api/proxy/coaches?page=${currentPage}`);
+        if (!res.ok) throw new Error('Failed to fetch');
         
-        const mergedManagers = new Map();
-        localArray.forEach((m: any) => mergedManagers.set(String(m.id || m.Id || m.managerId), m));
+        const pageData = await res.json();
+        const pageArray = extractArray(pageData);
         
-        if (localArray.length > 0) {
-          setManagers(Array.from(mergedManagers.values()));
-          setLoading(false);
-        }
-
-        // 2. جلب بيانات efhub على دفعات (3 صفحات معاً) لتجنب حظر الـ IP (403)
-        // واستخدام Backend Proxy بدلاً من allorigins لتجنب أخطاء الـ CORS والـ 522
-        for (let i = 1; i <= 76; i += 3) {
-            const batchPromises = [];
-            for (let j = 0; j < 3 && (i + j) <= 76; j++) {
-              batchPromises.push(
-                fetch(`${API_URL}/api/proxy/coaches?page=${i + j}`)
-                  .then(res => res.ok ? res.json() : null)
-                  .catch(() => null)
-              );
-            }
-            
-            const batchResults = await Promise.all(batchPromises);
-            
-            let addedNew = false;
-            batchResults.forEach(pageData => {
-              if (pageData) {
-                const pageArray = extractArray(pageData);
-                pageArray.forEach((m: any) => {
-                  const id = String(m.id || m.Id || m.managerId);
-                  if (mergedManagers.has(id)) {
-                    mergedManagers.set(id, { ...mergedManagers.get(id), ...m });
-                  } else {
-                    mergedManagers.set(id, m);
-                    addedNew = true;
-                  }
-                });
-              }
-            });
-
-            // تحديث الشاشة فوراً بعد كل دفعة ليرى المستخدم المدربين وهم يظهرون تدريجياً
-            if (addedNew || i === 1) {
-              setManagers(Array.from(mergedManagers.values()));
-              setLoading(false);
-            }
-            
-            // تأخير بسيط لمدة نصف ثانية بين كل دفعة وأخرى لمنع الحظر (Rate Limit)
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-        
+        setManagers(pageArray);
       } catch (err) {
-        if (managers.length === 0) {
-          setError('حدث خطأ أثناء تحميل بيانات المدربين. يرجى التحقق من الرابط.');
-        }
+        setError('حدث خطأ أثناء تحميل بيانات المدربين. يرجى المحاولة مرة أخرى.');
         console.error(err);
       } finally {
         setLoading(false);
@@ -103,7 +61,7 @@ const Products = () => {
     };
 
     fetchManagers();
-  }, []);
+  }, [currentPage]);
 
   const filteredDisplay = managers.filter(manager => {
     const name = manager.name || manager.Name || manager.managerName || manager["姓名"] || manager.title || '';
@@ -227,6 +185,48 @@ const Products = () => {
           <div className="text-center py-20 text-gray-400 glass-panel rounded-2xl flex flex-col items-center justify-center">
             <Search size={48} className="text-gray-600 mb-4" />
             <p className="text-2xl font-bold">لم يتم العثور على مدربين بهذا الاسم.</p>
+          </div>
+        )}
+
+        {/* Pagination UI */}
+        {!loading && !error && (
+          <div className="flex justify-center items-center gap-2 mt-16 flex-wrap" dir="ltr">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg bg-dark-lighter border border-gray-700 text-white disabled:opacity-50 hover:bg-primary hover:text-dark transition-colors font-bold"
+            >
+              السابق
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(page => page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2))
+              .map((page, index, array) => (
+                <React.Fragment key={page}>
+                  {index > 0 && array[index - 1] !== page - 1 && (
+                    <span className="text-gray-500">...</span>
+                  )}
+                  <button
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-lg font-bold flex items-center justify-center transition-colors ${
+                      currentPage === page 
+                        ? 'bg-primary text-dark shadow-[0_0_10px_rgba(255,215,0,0.5)]' 
+                        : 'bg-dark-lighter border border-gray-700 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                </React.Fragment>
+              ))
+            }
+
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg bg-dark-lighter border border-gray-700 text-white disabled:opacity-50 hover:bg-primary hover:text-dark transition-colors font-bold"
+            >
+              التالي
+            </button>
           </div>
         )}
       </div>

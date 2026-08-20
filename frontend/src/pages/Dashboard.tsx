@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { Loader2 } from 'lucide-react';
+import { loginSuccess } from '../store/authSlice';
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -19,6 +20,19 @@ const Dashboard = () => {
       }
     }
   }, [user]);
+
+  const dispatch = useDispatch();
+
+  const handleUpgradeToStreamer = () => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex((u: any) => u.id === user.id);
+    if (userIndex !== -1) {
+      users[userIndex].role = 'STREAMER';
+      localStorage.setItem('users', JSON.stringify(users));
+      dispatch(loginSuccess({ user: users[userIndex], token: 'mock-jwt-token' }));
+      alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
+    }
+  };
 
   const handleAnalyze = () => {
     if (!videoLink) return alert('يرجى إدخال رابط الفيديو');
@@ -127,18 +141,31 @@ const Dashboard = () => {
 
         {/* Existing dashboard stats for normal users */}
         {user.role === 'USER' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-               <h4 className="text-xl text-gray-400 mb-2">الكورسات المسجلة</h4>
-               <span className="text-4xl font-bold text-accent">3</span>
+          <div className="flex flex-col items-center mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
+              <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+                 <h4 className="text-xl text-gray-400 mb-2">الكورسات المسجلة</h4>
+                 <span className="text-4xl font-bold text-accent">3</span>
+              </div>
+              <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+                 <h4 className="text-xl text-gray-400 mb-2">الكورسات المكتملة</h4>
+                 <span className="text-4xl font-bold text-primary">1</span>
+              </div>
+              <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+                 <h4 className="text-xl text-gray-400 mb-2">معدل التقدم</h4>
+                 <span className="text-4xl font-bold text-purple">75%</span>
+              </div>
             </div>
-            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-               <h4 className="text-xl text-gray-400 mb-2">الكورسات المكتملة</h4>
-               <span className="text-4xl font-bold text-primary">1</span>
-            </div>
-            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-               <h4 className="text-xl text-gray-400 mb-2">معدل التقدم</h4>
-               <span className="text-4xl font-bold text-purple">75%</span>
+            
+            <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl w-full text-center">
+              <h3 className="text-2xl font-bold text-white mb-2">هل أنت صانع محتوى؟ 🎥</h3>
+              <p className="text-gray-300 mb-6">قم بترقية حسابك الآن إلى "ستريمر" لتتمكن من إضافة فيديوهاتك والحصول على كوينز مقابل الإعجابات والمشاهدات!</p>
+              <button 
+                onClick={handleUpgradeToStreamer}
+                className="bg-primary text-dark font-bold px-8 py-3 rounded-lg hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)]"
+              >
+                ترقية حسابي لستريمر الآن!
+              </button>
             </div>
           </div>
         )}

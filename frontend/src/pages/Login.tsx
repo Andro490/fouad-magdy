@@ -27,7 +27,7 @@ const Login = () => {
     const foundUser = users.find((u: Record<string, any>) => u.phone === phone && u.password === password);
     
     if (foundUser) {
-      dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, role: foundUser.role }, token: 'mock-jwt-token' }));
+      dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, role: foundUser.role, coins: foundUser.coins || 0 }, token: 'mock-jwt-token' }));
       navigate('/');
     } else {
       setError('رقم الهاتف أو كلمة المرور غير صحيحة');

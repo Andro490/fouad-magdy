@@ -1,32 +1,147 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { Loader2 } from 'lucide-react';
 
 const Dashboard = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [videoLink, setVideoLink] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [currentCoins, setCurrentCoins] = useState(user?.coins || 0);
+
+  React.useEffect(() => {
+    if (user?.id) {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const foundUser = users.find((u: any) => u.id === user.id);
+      if (foundUser) {
+        setCurrentCoins(foundUser.coins || 0);
+      }
+    }
+  }, [user]);
+
+  const handleAnalyze = () => {
+    if (!videoLink) return alert('يرجى إدخال رابط الفيديو');
+    
+    setIsAnalyzing(true);
+    setResult(null);
+    
+    // Simulate API analysis
+    setTimeout(() => {
+      // Mock random views and likes
+      const views = Math.floor(Math.random() * 50000) + 5000;
+      const likes = Math.floor(views * (Math.random() * 0.3 + 0.1)); // 10% to 40% of views
+      const earnedCoins = Math.floor(likes / 1000) * 50;
+
+      const submission = {
+        id: Date.now().toString(),
+        streamerId: user?.id,
+        streamerName: user?.name,
+        videoLink,
+        views,
+        likes,
+        earnedCoins,
+        status: 'PENDING', // Admin will approve it
+        createdAt: new Date().toISOString()
+      };
+
+      // Save to localStorage for Admin to see
+      const submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+      submissions.push(submission);
+      localStorage.setItem('videoSubmissions', JSON.stringify(submissions));
+
+      setResult(submission);
+      setIsAnalyzing(false);
+      setVideoLink('');
+    }, 2000);
+  };
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center text-white">الرجاء تسجيل الدخول</div>;
+  }
+
   return (
     <div className="flex-1 flex flex-col items-center pt-24 pb-12 px-4 relative min-h-screen bg-dark text-white" dir="rtl">
       <div className="z-10 w-full max-w-6xl space-y-8 glass-panel p-8 rounded-3xl">
-        <h1 className="text-4xl font-bold text-gradient mb-8">لوحة التحكم</h1>
+        <h1 className="text-4xl font-bold text-gradient mb-4">لوحة التحكم</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-             <h4 className="text-xl text-gray-400 mb-2">الكورسات المسجلة</h4>
-             <span className="text-4xl font-bold text-accent">3</span>
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-8 bg-dark-lighter p-6 rounded-2xl border border-white/5">
+          <img src={`https://ui-avatars.com/api/?name=${user.name}&background=141414&color=FFD700`} alt={user.name} className="w-20 h-20 rounded-full border-2 border-primary" />
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold">{user.name}</h2>
+            <p className="text-gray-400">{user.role === 'STREAMER' ? 'صانع محتوى معتمد' : 'مستخدم عادي'}</p>
           </div>
-          <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-             <h4 className="text-xl text-gray-400 mb-2">الكورسات المكتملة</h4>
-             <span className="text-4xl font-bold text-primary">1</span>
-          </div>
-          <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
-             <h4 className="text-xl text-gray-400 mb-2">معدل التقدم</h4>
-             <span className="text-4xl font-bold text-purple">75%</span>
+          <div className="text-center bg-dark/50 px-6 py-3 rounded-xl border border-accent/20">
+            <p className="text-sm text-gray-400 mb-1">الرصيد الحالي</p>
+            <p className="text-3xl font-bold text-accent">{currentCoins} <span className="text-sm text-gray-500">كوينز</span></p>
           </div>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-bold mb-4">نشاطاتك الأخيرة</h2>
-          <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10">
-            <p className="text-gray-300">لقد أكملت مشاهدة الدرس "Hooks" في كورس React 101.</p>
+        {user.role === 'STREAMER' && (
+          <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8">
+            <h3 className="text-xl font-bold mb-4 text-primary">تحليل أداء الفيديو</h3>
+            <p className="text-gray-400 mb-6 text-sm">أدخل رابط الفيديو الخاص بك (يوتيوب أو تيك توك). سيقوم النظام بتحليل المشاهدات والإعجابات. كل 1000 إعجاب يمنحك 50 كوينز بعد موافقة الإدارة.</p>
+            
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <input 
+                type="url" 
+                value={videoLink}
+                onChange={e => setVideoLink(e.target.value)}
+                placeholder="أدخل رابط الفيديو هنا..." 
+                className="flex-1 bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent text-left"
+                dir="ltr"
+              />
+              <button 
+                onClick={handleAnalyze}
+                disabled={isAnalyzing}
+                className="bg-accent text-dark font-bold rounded-lg px-8 py-3 hover:bg-primary transition-all disabled:opacity-50 flex items-center justify-center min-w-[150px]"
+              >
+                {isAnalyzing ? <Loader2 className="animate-spin" size={24} /> : 'تحليل وإرسال'}
+              </button>
+            </div>
+
+            {result && (
+              <div className="mt-6 bg-dark/50 p-6 rounded-xl border border-green-500/30 flex flex-col gap-4">
+                <div className="flex justify-between items-center text-green-400 font-bold text-lg">
+                  <span>تم إرسال التقرير للإدارة بنجاح!</span>
+                  <span>قيد المراجعة 🕒</span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center mt-2">
+                  <div className="bg-dark p-3 rounded-lg border border-gray-800">
+                    <p className="text-gray-400 text-xs mb-1">المشاهدات</p>
+                    <p className="font-bold text-white">{result.views.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-dark p-3 rounded-lg border border-gray-800">
+                    <p className="text-gray-400 text-xs mb-1">الإعجابات</p>
+                    <p className="font-bold text-white">{result.likes.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-dark p-3 rounded-lg border border-accent/20">
+                    <p className="text-gray-400 text-xs mb-1">الكوينز المتوقعة</p>
+                    <p className="font-bold text-accent">+{result.earnedCoins}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* Existing dashboard stats for normal users */}
+        {user.role === 'USER' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+               <h4 className="text-xl text-gray-400 mb-2">الكورسات المسجلة</h4>
+               <span className="text-4xl font-bold text-accent">3</span>
+            </div>
+            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+               <h4 className="text-xl text-gray-400 mb-2">الكورسات المكتملة</h4>
+               <span className="text-4xl font-bold text-primary">1</span>
+            </div>
+            <div className="bg-dark-lighter border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center">
+               <h4 className="text-xl text-gray-400 mb-2">معدل التقدم</h4>
+               <span className="text-4xl font-bold text-purple">75%</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

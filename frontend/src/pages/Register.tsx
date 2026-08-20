@@ -7,6 +7,7 @@ const Register = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('USER');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -15,12 +16,12 @@ const Register = () => {
     
     // Save to local storage for mocked auth
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const newUser = { id: Date.now().toString(), name, phone, password, role: 'USER' };
+    const newUser = { id: Date.now().toString(), name, phone, password, role, coins: 0 };
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
 
     // Auto login
-    dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role }, token: 'mock-jwt-token' }));
+    dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role, coins: newUser.coins }, token: 'mock-jwt-token' }));
     navigate('/');
   };
 
@@ -63,6 +64,17 @@ const Register = () => {
               placeholder="أدخل كلمة المرور"
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">نوع الحساب</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors"
+            >
+              <option value="USER">مستخدم عادي</option>
+              <option value="STREAMER">صانع محتوى (ستريمر)</option>
+            </select>
           </div>
           <button 
             type="submit" 

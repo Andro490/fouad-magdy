@@ -8,6 +8,8 @@ const Admin = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const [products, setProducts] = useState<StoreProduct[]>([]);
+  const [videoSubmissions, setVideoSubmissions] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'products' | 'videos'>('products');
   
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -20,6 +22,8 @@ const Admin = () => {
     }
     const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
     setProducts(storedProducts);
+    const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+    setVideoSubmissions(storedVideos);
   }, [isAuthenticated, user, navigate]);
 
   const handleAddProduct = (e: React.FormEvent) => {
@@ -50,6 +54,25 @@ const Admin = () => {
     localStorage.setItem('storeProducts', JSON.stringify(updatedProducts));
   };
 
+  const handleApproveVideo = (id: string) => {
+    const updatedSubmissions = videoSubmissions.map(sub => {
+      if (sub.id === id && sub.status === 'PENDING') {
+        // Also update the streamer's coins in users localStorage
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex((u: any) => u.id === sub.streamerId);
+        if (userIndex !== -1) {
+          users[userIndex].coins = (users[userIndex].coins || 0) + sub.earnedCoins;
+          localStorage.setItem('users', JSON.stringify(users));
+        }
+        return { ...sub, status: 'APPROVED' };
+      }
+      return sub;
+    });
+    setVideoSubmissions(updatedSubmissions);
+    localStorage.setItem('videoSubmissions', JSON.stringify(updatedSubmissions));
+    alert('تم الموافقة على التقرير وإضافة الكوينز للستريمر!');
+  };
+
   if (!isAuthenticated || user?.role !== 'ADMIN') return null;
 
   return (
@@ -57,6 +80,22 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         <h1 className="text-4xl font-bold text-gradient mb-10 text-center">لوحة تحكم الإدارة</h1>
         
+        <div className="flex justify-center gap-4 mb-8">
+          <button 
+            onClick={() => setActiveTab('products')} 
+            className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'products' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+          >
+            إدارة المتجر
+          </button>
+          <button 
+            onClick={() => setActiveTab('videos')} 
+            className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'videos' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+          >
+            مراجعة الفيديوهات
+          </button>
+        </div>
+        
+        {activeTab === 'products' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* إضافة منتج */}
           <div className="glass-panel p-6 rounded-2xl lg:col-span-1 h-fit">
@@ -125,6 +164,56 @@ const Admin = () => {
             )}
           </div>
         </div>
+        ) : (
+        <div className="glass-panel p-6 rounded-2xl w-full">
+          <h2 className="text-2xl font-bold mb-6 text-white">تقارير فيديوهات الستريمرز</h2>
+          {videoSubmissions.length === 0 ? (
+            <p className="text-gray-400">لا توجد تقارير جديدة.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-right">
+                <thead className="text-gray-400 border-b border-gray-700">
+                  <tr>
+                    <th className="pb-3 px-2">اسم الستريمر</th>
+                    <th className="pb-3 px-2">رابط الفيديو</th>
+                    <th className="pb-3 px-2 text-center">المشاهدات</th>
+                    <th className="pb-3 px-2 text-center">الإعجابات</th>
+                    <th className="pb-3 px-2 text-center">الكوينز</th>
+                    <th className="pb-3 px-2 text-center">الحالة / الإجراء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {videoSubmissions.map(sub => (
+                    <tr key={sub.id} className="border-b border-gray-800 hover:bg-white/5 transition-colors">
+                      <td className="py-4 px-2 font-bold text-white">{sub.streamerName}</td>
+                      <td className="py-4 px-2">
+                        <a href={sub.videoLink} target="_blank" rel="noreferrer" className="text-accent hover:underline block max-w-[200px] truncate" dir="ltr">
+                          {sub.videoLink}
+                        </a>
+                      </td>
+                      <td className="py-4 px-2 text-center">{sub.views.toLocaleString()}</td>
+                      <td className="py-4 px-2 text-center">{sub.likes.toLocaleString()}</td>
+                      <td className="py-4 px-2 text-center text-accent font-bold">+{sub.earnedCoins}</td>
+                      <td className="py-4 px-2 text-center">
+                        {sub.status === 'APPROVED' ? (
+                          <span className="text-green-500 font-bold bg-green-500/10 px-3 py-1 rounded">تمت الموافقة</span>
+                        ) : (
+                          <button 
+                            onClick={() => handleApproveVideo(sub.id)}
+                            className="bg-primary text-dark font-bold px-4 py-1 rounded hover:bg-primary/90 transition-colors"
+                          >
+                            موافقة
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        )}
       </div>
     </div>
   );

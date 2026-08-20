@@ -42,10 +42,8 @@ const Products = () => {
           return [];
         };
 
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        
-        // 1. جلب البيانات من EFHub مباشرة
-        const res = await fetch(`https://efhub.com/api/public/coaches?page=${currentPage}`);
+        // 1. جلب البيانات من خلال Vercel Proxy لحل مشكلة CORS و 403
+        const res = await fetch(`/api/efhub?page=${currentPage}`);
         if (!res.ok) throw new Error('Failed to fetch');
         
         const pageData = await res.json();

@@ -19,28 +19,40 @@ const mockStreamers: Streamer[] = [
 ];
 
 export default function Leaderboard() {
-  const [streamers, setStreamers] = useState<Streamer[]>(mockStreamers);
+  const [streamers, setStreamers] = useState<Streamer[]>([]);
 
-  // Simulate real-time rank updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStreamers(prev => {
-        let newStreamers = [...prev];
-        // randomly swap two streamers to show animation
-        const idx1 = Math.floor(Math.random() * newStreamers.length);
-        const idx2 = Math.floor(Math.random() * newStreamers.length);
-        
-        const temp = newStreamers[idx1].coins;
-        newStreamers[idx1].coins = newStreamers[idx2].coins;
-        newStreamers[idx2].coins = temp;
+    // 1. جلب صناع المحتوى الحقيقيين من LocalStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const realStreamers = users
+      .filter((u: any) => u.role === 'STREAMER')
+      .map((u: any) => ({
+        id: u.id,
+        name: u.name,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=141414&color=FFD700`,
+        coins: u.coins || 0,
+      }));
 
-        // sort again
-        newStreamers.sort((a, b) => b.coins - a.coins);
-        newStreamers = newStreamers.map((s, i) => ({ ...s, rank: i + 1 }));
-        return newStreamers;
-      });
-    }, 5000);
-    return () => clearInterval(interval);
+    // 2. دمجهم مع الداتا الوهمية إذا كان العدد قليل (اختياري، لكن هنا سنعرض الحقيقيين ثم نكمل بالوهميين لو أردنا)
+    // أو نعرض الحقيقيين فقط إذا كانوا موجودين
+    let combined = realStreamers;
+    if (combined.length === 0) {
+      combined = mockStreamers.map(({ rank, ...rest }) => rest);
+    } else {
+      // فقط لتكملة شكل القائمة إذا كان هناك ستريمر واحد حقيقي مثلاً
+      const needed = 5 - combined.length;
+      if (needed > 0) {
+        combined = [...combined, ...mockStreamers.slice(0, needed).map(({ rank, ...rest }) => rest)];
+      }
+    }
+
+    // 3. ترتيبهم حسب الكوينز
+    combined.sort((a: any, b: any) => b.coins - a.coins);
+    
+    // 4. إضافة الرتبة (Rank)
+    const finalStreamers = combined.map((s: any, i: number) => ({ ...s, rank: i + 1 }));
+    setStreamers(finalStreamers);
+
   }, []);
 
   const getRankColor = (rank: number) => {

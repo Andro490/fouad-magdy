@@ -6,10 +6,6 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/efhub",
-      "destination": "https://efhub.com/api/public/coaches"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

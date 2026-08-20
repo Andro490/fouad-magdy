@@ -42,8 +42,9 @@ const Products = () => {
           return [];
         };
 
-        // 1. جلب البيانات من خلال Vercel Proxy لحل مشكلة CORS و 403
-        const res = await fetch(`/api/efhub?page=${currentPage}`);
+        // 1. استخدام AllOrigins Proxy لحل مشكلة CORS. (الآن سيعمل بكفاءة دون أخطاء 522 لأننا نطلب صفحة واحدة فقط بدلاً من 76)
+        const targetUrl = encodeURIComponent(`https://efhub.com/api/public/coaches?page=${currentPage}`);
+        const res = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`);
         if (!res.ok) throw new Error('Failed to fetch');
         
         const pageData = await res.json();

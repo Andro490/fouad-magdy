@@ -27,10 +27,12 @@ const Navbar = () => {
         
         {isAuthenticated ? (
           <>
-            {user?.role === 'ADMIN' && (
-              <Link to="/admin" className="text-primary hover:text-white transition-colors">لوحة التحكم</Link>
+            {user?.role === 'ADMIN' ? (
+              <Link to="/admin" className="text-primary hover:text-white transition-colors">لوحة الإدارة</Link>
+            ) : (
+              <Link to="/dashboard" className="text-primary hover:text-white transition-colors">لوحة التحكم</Link>
             )}
-            <span className="text-accent font-bold px-4 border-r border-white/20">أهلاً، {user?.name}</span>
+            <Link to="/dashboard" className="text-accent font-bold px-4 border-r border-white/20 hover:text-white transition-colors">أهلاً، {user?.name}</Link>
             <button onClick={handleLogout} className="text-red-400 hover:text-red-500 transition-colors">تسجيل الخروج</button>
           </>
         ) : (

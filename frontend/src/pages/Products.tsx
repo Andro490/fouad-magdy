@@ -44,8 +44,8 @@ const Products = () => {
 
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         
-        // Fetch only the current page from EFHub via our backend proxy
-        const res = await fetch(`${API_URL}/api/proxy/coaches?page=${currentPage}`);
+        // 1. جلب البيانات من EFHub مباشرة
+        const res = await fetch(`https://efhub.com/api/public/coaches?page=${currentPage}`);
         if (!res.ok) throw new Error('Failed to fetch');
         
         const pageData = await res.json();

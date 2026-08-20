@@ -110,7 +110,15 @@ app.get('/api/managers', (req, res) => {
 app.get('/api/proxy/coaches', async (req, res) => {
   try {
     const page = req.query.page || 1;
-    const response = await fetch(`https://efhub.com/api/public/coaches?page=${page}`);
+    const response = await fetch(`https://efhub.com/api/public/coaches?page=${page}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
+        'Referer': 'https://efhub.com/',
+        'Origin': 'https://efhub.com'
+      }
+    });
     if (!response.ok) {
       return res.status(response.status).json({ error: 'Failed to fetch from EFHub' });
     }

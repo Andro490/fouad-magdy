@@ -188,45 +188,73 @@ const Products = () => {
           </div>
         )}
 
-        {/* Pagination UI */}
+        {/* Pagination UI - Google Style */}
         {!loading && !error && (
-          <div className="flex justify-center items-center gap-2 mt-16 flex-wrap" dir="ltr">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 rounded-lg bg-dark-lighter border border-gray-700 text-white disabled:opacity-50 hover:bg-primary hover:text-dark transition-colors font-bold"
-            >
-              السابق
-            </button>
+          <div className="flex flex-col items-center justify-center mt-16 mb-8" dir="ltr">
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter(page => page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2))
-              .map((page, index, array) => (
-                <React.Fragment key={page}>
-                  {index > 0 && array[index - 1] !== page - 1 && (
-                    <span className="text-gray-500">...</span>
-                  )}
-                  <button
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-10 h-10 rounded-lg font-bold flex items-center justify-center transition-colors ${
-                      currentPage === page 
-                        ? 'bg-primary text-dark shadow-[0_0_10px_rgba(255,215,0,0.5)]' 
-                        : 'bg-dark-lighter border border-gray-700 text-gray-300 hover:bg-gray-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                </React.Fragment>
-              ))
-            }
+            {/* Google Style Pagination Numbers */}
+            <div className="flex items-end gap-1 mb-2">
+              <span className="text-[#4285F4] text-4xl font-bold">S</span>
+              <span className="text-[#EA4335] text-4xl font-bold">t</span>
+              <span className="text-[#FBBC05] text-4xl font-bold">r</span>
+              <span className="text-[#4285F4] text-4xl font-bold">e</span>
+              <span className="text-[#34A853] text-4xl font-bold">a</span>
+              <span className="text-[#EA4335] text-4xl font-bold">m</span>
+              
+              {/* Generate 'u's based on visible pages to mimic Google's 'o's */}
+              {Array.from({ length: Math.min(10, totalPages) }).map((_, i) => (
+                <span key={i} className={`${i % 2 === 0 ? 'text-[#FBBC05]' : 'text-[#34A853]'} text-4xl font-bold`}>
+                  u
+                </span>
+              ))}
+              
+              <span className="text-[#4285F4] text-4xl font-bold">b</span>
+            </div>
 
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-lg bg-dark-lighter border border-gray-700 text-white disabled:opacity-50 hover:bg-primary hover:text-dark transition-colors font-bold"
-            >
-              التالي
-            </button>
+            <div className="flex items-center gap-3 mt-2 text-sm font-arial" dir="rtl">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`flex items-center gap-1 ${currentPage === 1 ? 'text-gray-500 cursor-not-allowed hidden' : 'text-[#8ab4f8] hover:underline'}`}
+              >
+                <span className="text-xl">{'<'}</span> السابقة
+              </button>
+              
+              <div className="flex items-center gap-3" dir="ltr">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show 10 pages window like Google
+                    let start = Math.max(1, currentPage - 5);
+                    let end = Math.min(totalPages, start + 9);
+                    if (end - start < 9) {
+                      start = Math.max(1, end - 9);
+                    }
+                    return page >= start && page <= end;
+                  })
+                  .map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`${
+                        currentPage === page 
+                          ? 'text-[#e8eaed] font-bold text-base cursor-default' 
+                          : 'text-[#8ab4f8] hover:underline'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))
+                }
+              </div>
+
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`flex items-center gap-1 ${currentPage === totalPages ? 'text-gray-500 cursor-not-allowed hidden' : 'text-[#8ab4f8] hover:underline'}`}
+              >
+                التالية <span className="text-xl">{'>'}</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

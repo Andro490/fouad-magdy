@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { siteConfig } from '../../config/siteConfig';
@@ -57,14 +56,6 @@ const socialStyles: Record<string, { bg: string; text: string; ring: string }> =
 
 // ===================== MOBILE PROFILE CARD =====================
 function MobileProfileCard() {
-  const [email, setEmail] = useState('');
-
-  const handleConnect = (e: React.FormEvent) => {
-    e.preventDefault();
-    const kickUrl = siteConfig.socials.find(s => s.label === 'Kick')?.url || 'https://kick.com';
-    window.open(kickUrl, '_blank');
-  };
-
   const totalFollowers = siteConfig.stats[0]?.value || '+51K';
 
   return (
@@ -75,7 +66,7 @@ function MobileProfileCard() {
       transition={{ duration: 0.5 }}
     >
         {/* ── Hero Image full width ── */}
-        <div className="relative w-full" style={{ height: '60vh', minHeight: '320px' }}>
+        <div className="relative w-full" style={{ height: '65vh', minHeight: '340px', paddingTop: '4rem' }}>
           <img
             src={fouadImg}
             alt={siteConfig.name}
@@ -163,27 +154,49 @@ function MobileProfileCard() {
           </motion.div>
 
 
-          {/* Kick logo bottom pill */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.85 }}
-            className="mt-4 flex justify-start"
+          {/* Kick Full-Width Banner */}
+          <motion.a
+            href={siteConfig.socials.find(s => s.label === 'Kick')?.url || '#'}
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="mt-4 w-full block rounded-2xl overflow-hidden relative cursor-pointer"
+            style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <a
-              href={siteConfig.socials.find(s => s.label === 'Kick')?.url || '#'}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 bg-[#0f0f0f] border border-white/10 text-white text-xs font-bold px-4 py-3 rounded-2xl hover:border-[#53fc18]/50 transition-all duration-200 shadow-md"
-            >
-              <span className="w-8 h-8 rounded-xl bg-[#53fc18] flex items-center justify-center">
-                <svg viewBox="0 0 50 50" fill="black" className="w-5 h-5">
-                  <path d="M5 5 L5 45 L15 45 L15 30 L20 25 L30 45 L42 45 L27 22 L41 5 L29 5 L15 22 L15 5 Z"/>
-                </svg>
+            {/* Kick icon top-left */}
+            <div className="absolute top-3 left-3 z-10 w-9 h-9 rounded-full bg-[#53fc18] flex items-center justify-center shadow-[0_0_12px_rgba(83,252,24,0.5)]">
+              <svg viewBox="0 0 50 50" fill="black" className="w-5 h-5">
+                <path d="M5 5 L5 45 L15 45 L15 30 L20 25 L30 45 L42 45 L27 22 L41 5 L29 5 L15 22 L15 5 Z"/>
+              </svg>
+            </div>
+
+            {/* Big KICK pixel text */}
+            <div className="flex items-center justify-center py-10 px-4">
+              <span
+                className="text-[#53fc18] font-black tracking-widest select-none"
+                style={{
+                  fontSize: 'clamp(3rem, 18vw, 5.5rem)',
+                  fontFamily: '"Courier New", Courier, monospace',
+                  textShadow: '0 0 30px rgba(83,252,24,0.6), 0 0 60px rgba(83,252,24,0.3)',
+                  letterSpacing: '0.08em',
+                  lineHeight: 1,
+                }}
+              >
+                KICK
               </span>
-              <span className="text-[#53fc18] font-black text-sm tracking-tight">Kick</span>
-            </a>
-          </motion.div>
+            </div>
+
+            {/* LIVE STREAM label */}
+            <div className="pb-4 text-center">
+              <span className="text-white font-black text-sm tracking-[0.25em] uppercase">
+                LIVE STREAM
+              </span>
+            </div>
+          </motion.a>
 
         </div>
     </motion.div>

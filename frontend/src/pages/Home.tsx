@@ -106,10 +106,6 @@ export default function Home() {
                animation: 'patternFade 5s ease-in-out infinite alternate'
              }} />
 
-        {/* Subtle grid */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{ backgroundImage: 'linear-gradient(rgba(0,180,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,255,1) 1px, transparent 1px)', backgroundSize: '70px 70px' }} />
-
         {/* Glows */}
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-700/15 rounded-full blur-[130px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />

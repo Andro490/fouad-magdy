@@ -109,21 +109,62 @@ const Admin = () => {
           reader.onerror = error => reject(error);
         });
 
-        const formData = new FormData();
-        formData.append('image', base64);
+        let isSuccess = false;
+        let uploadedUrl = '';
+        let errorMessage = '';
+
+        try {
+          const formData = new FormData();
+          formData.append('image', base64);
+          
+          const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await res.json();
+          if (data.success) {
+            isSuccess = true;
+            uploadedUrl = data.data.url;
+          } else {
+            errorMessage = data.error?.message || 'Unknown ImgBB error';
+            console.error('ImgBB Upload failed:', data);
+          }
+        } catch (e: any) {
+          console.error('ImgBB network error:', e);
+          errorMessage = e.message;
+        }
+
+        // Fallback to freeimage.host if ImgBB fails (e.g., down for maintenance)
+        if (!isSuccess) {
+          try {
+            console.log('Falling back to freeimage.host...');
+            const fallbackFormData = new FormData();
+            fallbackFormData.append('source', base64);
+            fallbackFormData.append('key', '6d207e02198a847aa98d0a2a901485a5'); // Public freeimage key
+            
+            const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
+              method: 'POST',
+              body: fallbackFormData
+            });
+            
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.status_code === 200) {
+              isSuccess = true;
+              uploadedUrl = fallbackData.image.url;
+            } else {
+              console.error('Fallback upload failed:', fallbackData);
+            }
+          } catch (fallbackError) {
+            console.error('Fallback network error:', fallbackError);
+          }
+        }
         
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const data = await res.json();
-        if (data.success) {
-          uploadedUrls.push(data.data.url);
+        if (isSuccess) {
+          uploadedUrls.push(uploadedUrl);
         } else {
-          console.error('Upload failed:', data);
-          if (data.error?.message?.toLowerCase().includes('api key')) {
-            alert('مفتاح ImgBB غير صالح (API Key). يرجى التسجيل في api.imgbb.com مجاناً وإضافة مفتاحك في إعدادات الموقع (VITE_IMGBB_API_KEY).');
+          if (errorMessage.toLowerCase().includes('api key')) {
+            alert('مفتاح ImgBB غير صالح. يرجى الحصول على مفتاح جديد وإضافته.');
             setIsUploading(false);
             e.target.value = '';
             return;

@@ -3263,5 +3263,960 @@
     "linkup": null,
     "linkupId2": 0,
     "linkup2": null
+  },
+  {
+    "id": 17609374406360,
+    "name": "Manager",
+    "accentedName": "Manager",
+    "japName": "監督",
+    "chineseName": "教练",
+    "country": 0,
+    "age": 45,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 89,
+      "longBallCounter": 89,
+      "outWide": 89,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17609097478250,
+    "name": "Antonio Conte",
+    "accentedName": "Antonio Conte",
+    "japName": "アントニオ コンテ",
+    "chineseName": "安东尼奥·孔蒂",
+    "country": 11,
+    "age": 47,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 68,
+      "quickCounter": 90,
+      "longBallCounter": 73,
+      "outWide": 89,
+      "longBall": 68,
+      "overload": 69
+    },
+    "boosts": [
+      10,
+      14
+    ],
+    "hasBoost": true,
+    "linkupId": 7,
+    "linkup": {
+      "id": 7,
+      "name": "Over-the-Top Pass C",
+      "japName": "Over-the-Top Pass C",
+      "centerPiece": 15,
+      "centerPiecePositions": [
+        1
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 12,
+    "linkup2": {
+      "id": 12,
+      "name": "1-2 Cut-in B",
+      "japName": "1-2 Cut-in B",
+      "centerPiece": 4,
+      "centerPiecePositions": [
+        9,
+        10
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    }
+  },
+  {
+    "id": 17608292273375,
+    "name": "Frank Lampard",
+    "accentedName": "Frank Lampard",
+    "japName": "フランク ランパード",
+    "chineseName": "弗兰克·兰帕德",
+    "country": 5,
+    "age": 47,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 75,
+      "quickCounter": 60,
+      "longBallCounter": 58,
+      "outWide": 69,
+      "longBall": 89,
+      "overload": 89
+    },
+    "boosts": [
+      4,
+      11
+    ],
+    "hasBoost": true,
+    "linkupId": 16,
+    "linkup": {
+      "id": 16,
+      "name": "1-2 Cut-in A",
+      "japName": "1-2 Cut-in A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17607755300893,
+    "name": "V. Montella",
+    "accentedName": "V. Montella",
+    "japName": "ヴィンチェンツォ モンテッラ",
+    "chineseName": "文森佐·蒙特拉",
+    "country": 16,
+    "age": 51,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 61,
+      "quickCounter": 89,
+      "longBallCounter": 58,
+      "outWide": 89,
+      "longBall": 68,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      2
+    ],
+    "hasBoost": true,
+    "linkupId": 8,
+    "linkup": {
+      "id": 8,
+      "name": "Breakthrough Pass B",
+      "japName": "Breakthrough Pass B",
+      "centerPiece": 7,
+      "centerPiecePositions": [
+        5
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17607218430302,
+    "name": "Ronald Koeman",
+    "accentedName": "Ronald Koeman",
+    "japName": "ロナルド クーマン",
+    "chineseName": "罗纳德·库曼",
+    "country": 14,
+    "age": 62,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 65,
+      "longBallCounter": 89,
+      "outWide": 89,
+      "longBall": 69,
+      "overload": 0
+    },
+    "boosts": [
+      14,
+      19
+    ],
+    "hasBoost": true,
+    "linkupId": 2,
+    "linkup": {
+      "id": 2,
+      "name": "Over-the-Top Pass B",
+      "japName": "Over-the-Top Pass B",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        5
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17606950096730,
+    "name": "J. Nagelsmann",
+    "accentedName": "J. Nagelsmann",
+    "japName": "ユリアン ナゲルスマン",
+    "chineseName": "尤利安·纳格尔斯曼",
+    "country": 4,
+    "age": 38,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 62,
+      "quickCounter": 68,
+      "longBallCounter": 89,
+      "outWide": 59,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      3,
+      18
+    ],
+    "hasBoost": true,
+    "linkupId": 7,
+    "linkup": {
+      "id": 7,
+      "name": "Over-the-Top Pass C",
+      "japName": "Over-the-Top Pass C",
+      "centerPiece": 15,
+      "centerPiecePositions": [
+        1
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17606681559180,
+    "name": "D. Deschamps",
+    "accentedName": "D. Deschamps",
+    "japName": "ディディエ デシャン",
+    "chineseName": "迪迪埃·德尚",
+    "country": 15,
+    "age": 57,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 68,
+      "longBallCounter": 89,
+      "outWide": 59,
+      "longBall": 63,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      1
+    ],
+    "hasBoost": true,
+    "linkupId": 10,
+    "linkup": {
+      "id": 10,
+      "name": "Breakthrough Pass A",
+      "japName": "Breakthrough Pass A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        8
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17606413224402,
+    "name": "Thomas Tuchel",
+    "accentedName": "Thomas Tuchel",
+    "japName": "トーマス トゥヘル",
+    "chineseName": "托马斯·图赫尔",
+    "country": 5,
+    "age": 52,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 90,
+      "quickCounter": 89,
+      "longBallCounter": 59,
+      "outWide": 70,
+      "longBall": 58,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      25
+    ],
+    "hasBoost": true,
+    "linkupId": 1,
+    "linkup": {
+      "id": 1,
+      "name": "Over-the-Top Pass A",
+      "japName": "Over-the-Top Pass A",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        4
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17606144688129,
+    "name": "R. Martinez",
+    "accentedName": "R. Martínez",
+    "japName": "ロベルト マルティネス",
+    "chineseName": "罗伯托·马丁内斯",
+    "country": 7,
+    "age": 52,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 58,
+      "quickCounter": 90,
+      "longBallCounter": 70,
+      "outWide": 64,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      6,
+      0
+    ],
+    "hasBoost": true,
+    "linkupId": 3,
+    "linkup": {
+      "id": 3,
+      "name": "Diagonal Long Pass B",
+      "japName": "Diagonal Long Pass B",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        9,
+        10
+      ],
+      "keyMan": 11,
+      "keyManPositions": [
+        2,
+        3
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17605876354558,
+    "name": "Johan Cruyff",
+    "accentedName": "Johan Cruyff",
+    "japName": "ヨハン クライフ",
+    "chineseName": "约翰·克鲁伊夫",
+    "country": 16,
+    "age": 47,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 65,
+      "longBallCounter": 54,
+      "outWide": 89,
+      "longBall": 54,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      17
+    ],
+    "hasBoost": true,
+    "linkupId": 16,
+    "linkup": {
+      "id": 16,
+      "name": "1-2 Cut-in A",
+      "japName": "1-2 Cut-in A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17605607920019,
+    "name": "F. Beckenbauer",
+    "accentedName": "F. Beckenbauer",
+    "japName": "フランツ ベッケンバウアー",
+    "chineseName": "弗朗茨·贝肯鲍尔",
+    "country": 4,
+    "age": 45,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 57,
+      "longBallCounter": 89,
+      "outWide": 60,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      3,
+      10
+    ],
+    "hasBoost": true,
+    "linkupId": 8,
+    "linkup": {
+      "id": 8,
+      "name": "Breakthrough Pass B",
+      "japName": "Breakthrough Pass B",
+      "centerPiece": 7,
+      "centerPiecePositions": [
+        5
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17605339484373,
+    "name": "Xabi Alonso",
+    "accentedName": "Xabi Alonso",
+    "japName": "シャビ アロンソ",
+    "chineseName": "哈维·阿隆索",
+    "country": 2,
+    "age": 44,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 71,
+      "quickCounter": 89,
+      "longBallCounter": 54,
+      "outWide": 89,
+      "longBall": 56,
+      "overload": 0
+    },
+    "boosts": [
+      1,
+      6
+    ],
+    "hasBoost": true,
+    "linkupId": 10,
+    "linkup": {
+      "id": 10,
+      "name": "Breakthrough Pass A",
+      "japName": "Breakthrough Pass A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        8
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17605071047055,
+    "name": "Jurgen Klopp",
+    "accentedName": "Jürgen Klopp",
+    "japName": "ユルゲン クロップ",
+    "chineseName": "尤尔根·克洛普",
+    "country": 15,
+    "age": 45,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 89,
+      "longBallCounter": 59,
+      "outWide": 70,
+      "longBall": 57,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      13
+    ],
+    "hasBoost": true,
+    "linkupId": 7,
+    "linkup": {
+      "id": 7,
+      "name": "Over-the-Top Pass C",
+      "japName": "Over-the-Top Pass C",
+      "centerPiece": 15,
+      "centerPiecePositions": [
+        1
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17604802510874,
+    "name": "Gennaro Gattuso",
+    "accentedName": "Gennaro Gattuso",
+    "japName": "ジェンナーロ ガットゥーゾ",
+    "chineseName": "詹纳罗·加图索",
+    "country": 12,
+    "age": 47,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 53,
+      "quickCounter": 65,
+      "longBallCounter": 57,
+      "outWide": 89,
+      "longBall": 71,
+      "overload": 0
+    },
+    "boosts": [
+      12,
+      5
+    ],
+    "hasBoost": true,
+    "linkupId": 4,
+    "linkup": {
+      "id": 4,
+      "name": "Diagonal Long Pass A",
+      "japName": "Diagonal Long Pass A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        8
+      ],
+      "keyMan": 6,
+      "keyManPositions": [
+        6,
+        7
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17604534075742,
+    "name": "Ronald Koeman",
+    "accentedName": "Ronald Koeman",
+    "japName": "ロナルド クーマン",
+    "chineseName": "罗纳德·库曼",
+    "country": 5,
+    "age": 57,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 88,
+      "longBallCounter": 55,
+      "outWide": 68,
+      "longBall": 61,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      9
+    ],
+    "hasBoost": true,
+    "linkupId": 5,
+    "linkup": {
+      "id": 5,
+      "name": "Aggressive Centring A",
+      "japName": "Aggressive Centring A",
+      "centerPiece": 19,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17603997307931,
+    "name": "Cesc Fabregas",
+    "accentedName": "Cesc Fàbregas",
+    "japName": "セスク ファブレガス",
+    "chineseName": "塞斯克·法布雷加斯",
+    "country": 6,
+    "age": 38,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 65,
+      "longBallCounter": 56,
+      "outWide": 68,
+      "longBall": 57,
+      "overload": 0
+    },
+    "boosts": [
+      5,
+      11
+    ],
+    "hasBoost": true,
+    "linkupId": 1,
+    "linkup": {
+      "id": 1,
+      "name": "Over-the-Top Pass A",
+      "japName": "Over-the-Top Pass A",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        4
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17603728769159,
+    "name": "Niko Kovac",
+    "accentedName": "Niko Kovač",
+    "japName": "ニコ コヴァッチ",
+    "chineseName": "尼科·科瓦奇",
+    "country": 14,
+    "age": 53,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 63,
+      "longBallCounter": 89,
+      "outWide": 89,
+      "longBall": 56,
+      "overload": 0
+    },
+    "boosts": [
+      14,
+      2
+    ],
+    "hasBoost": true,
+    "linkupId": 1,
+    "linkup": {
+      "id": 1,
+      "name": "Over-the-Top Pass A",
+      "japName": "Over-the-Top Pass A",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        4
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17603460437385,
+    "name": "Cristian Chivu",
+    "accentedName": "Cristian Chivu",
+    "japName": "クリスティアン キヴ",
+    "chineseName": "克里斯蒂安·齐沃",
+    "country": 15,
+    "age": 44,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 58,
+      "quickCounter": 89,
+      "longBallCounter": 62,
+      "outWide": 89,
+      "longBall": 55,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      25
+    ],
+    "hasBoost": true,
+    "linkupId": 5,
+    "linkup": {
+      "id": 5,
+      "name": "Aggressive Centring A",
+      "japName": "Aggressive Centring A",
+      "centerPiece": 19,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17602923564765,
+    "name": "Mikel Arteta",
+    "accentedName": "Mikel Arteta",
+    "japName": "ミケル アルテタ",
+    "chineseName": "迈克尔·阿特塔",
+    "country": 16,
+    "age": 42,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 64,
+      "longBallCounter": 88,
+      "outWide": 57,
+      "longBall": 54,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      7
+    ],
+    "hasBoost": true,
+    "linkupId": 2,
+    "linkup": {
+      "id": 2,
+      "name": "Over-the-Top Pass B",
+      "japName": "Over-the-Top Pass B",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        5
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17602655027637,
+    "name": "M. Allegri",
+    "accentedName": "M. Allegri",
+    "japName": "マッシミリアーノ アッレグリ",
+    "chineseName": "马西米利亚诺·阿莱格里",
+    "country": 1,
+    "age": 57,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 58,
+      "quickCounter": 67,
+      "longBallCounter": 89,
+      "outWide": 63,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      0,
+      1
+    ],
+    "hasBoost": true,
+    "linkupId": 5,
+    "linkup": {
+      "id": 5,
+      "name": "Aggressive Centring A",
+      "japName": "Aggressive Centring A",
+      "centerPiece": 19,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17602386693824,
+    "name": "Hansi Flick",
+    "accentedName": "Hansi Flick",
+    "japName": "ハンジ フリック",
+    "chineseName": "汉斯·弗里克",
+    "country": 5,
+    "age": 60,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 88,
+      "longBallCounter": 69,
+      "outWide": 57,
+      "longBall": 45,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      3
+    ],
+    "hasBoost": true,
+    "linkupId": 4,
+    "linkup": {
+      "id": 4,
+      "name": "Diagonal Long Pass A",
+      "japName": "Diagonal Long Pass A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        8
+      ],
+      "keyMan": 6,
+      "keyManPositions": [
+        6,
+        7
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17602118258602,
+    "name": "Ruben Amorim",
+    "accentedName": "Ruben Amorim",
+    "japName": "ルベン アモリム",
+    "chineseName": "鲁本·阿莫里姆",
+    "country": 17,
+    "age": 40,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 62,
+      "quickCounter": 81,
+      "longBallCounter": 54,
+      "outWide": 89,
+      "longBall": 46,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      5
+    ],
+    "hasBoost": true,
+    "linkupId": 5,
+    "linkup": {
+      "id": 5,
+      "name": "Aggressive Centring A",
+      "japName": "Aggressive Centring A",
+      "centerPiece": 19,
+      "centerPiecePositions": [
+        6,
+        7
+      ],
+      "keyMan": 3,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17601849721048,
+    "name": "Pep Guardiola",
+    "accentedName": "Pep Guardiola",
+    "japName": "ペップ グアルディオラ",
+    "chineseName": "何塞普·瓜迪奥拉",
+    "country": 14,
+    "age": 42,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 63,
+      "longBallCounter": 54,
+      "outWide": 89,
+      "longBall": 51,
+      "overload": 0
+    },
+    "boosts": [
+      14,
+      13
+    ],
+    "hasBoost": true,
+    "linkupId": 3,
+    "linkup": {
+      "id": 3,
+      "name": "Diagonal Long Pass B",
+      "japName": "Diagonal Long Pass B",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        9,
+        10
+      ],
+      "keyMan": 11,
+      "keyManPositions": [
+        2,
+        3
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17601581388990,
+    "name": "Frank Rijkaard",
+    "accentedName": "Frank Rijkaard",
+    "japName": "フランク ライカールト",
+    "chineseName": "弗兰克·里杰卡尔德",
+    "country": 3,
+    "age": 43,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 70,
+      "quickCounter": 89,
+      "longBallCounter": 48,
+      "outWide": 89,
+      "longBall": 46,
+      "overload": 0
+    },
+    "boosts": [
+      2,
+      17
+    ],
+    "hasBoost": true,
+    "linkupId": 2,
+    "linkup": {
+      "id": 2,
+      "name": "Over-the-Top Pass B",
+      "japName": "Over-the-Top Pass B",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        5
+      ],
+      "keyMan": 4,
+      "keyManPositions": [
+        9,
+        10
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
   }
 ]

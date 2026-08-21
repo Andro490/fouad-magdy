@@ -7,7 +7,7 @@ import Footer from '../components/Footer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#030510] text-gray-100 font-sans overflow-hidden">
+    <div className="min-h-screen bg-black md:bg-[#030510] text-gray-100 font-sans overflow-hidden">
       <HeroSection />
       <div className="hidden md:block">
         <ExperienceSection />

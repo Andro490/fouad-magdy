@@ -102,8 +102,15 @@ const Admin = () => {
       const uploadedUrls: string[] = [];
       
       for (const file of files) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve((reader.result as string).split(',')[1]);
+          reader.onerror = error => reject(error);
+        });
+
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('image', base64);
         
         const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
           method: 'POST',
@@ -115,6 +122,12 @@ const Admin = () => {
           uploadedUrls.push(data.data.url);
         } else {
           console.error('Upload failed:', data);
+          if (data.error?.message?.toLowerCase().includes('api key')) {
+            alert('مفتاح ImgBB غير صالح (API Key). يرجى التسجيل في api.imgbb.com مجاناً وإضافة مفتاحك في إعدادات الموقع (VITE_IMGBB_API_KEY).');
+            setIsUploading(false);
+            e.target.value = '';
+            return;
+          }
         }
       }
       

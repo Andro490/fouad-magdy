@@ -56,7 +56,7 @@ const Products = () => {
             const res = await fetch(proxyUrl);
             if (res.ok) {
               const data = await res.json();
-              if (!data.error && !data.error === "Forbidden") {
+              if (!data.error && data.error !== "Forbidden") {
                 pageData = data;
                 break; // نجحنا في جلب البيانات
               }

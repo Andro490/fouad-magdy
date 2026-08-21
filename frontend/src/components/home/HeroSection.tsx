@@ -198,7 +198,63 @@ function MobileProfileCard() {
             </div>
           </motion.a>
 
+          {/* MY SOCIALS Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="mt-6"
+          >
+            <h2 className="text-white font-black text-sm tracking-[0.25em] uppercase text-center mb-4">
+              MY SOCIALS
+            </h2>
+
+            <div className="grid grid-cols-2 gap-3">
+              {siteConfig.socials.map((social, idx) => {
+                const icon = SocialIcons[social.label];
+                if (!icon) return null;
+                const style = socialStyles[social.label];
+                return (
+                  <motion.a
+                    key={social.label}
+                    href={social.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.95 + idx * 0.07 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="relative rounded-2xl overflow-hidden cursor-pointer"
+                    style={{ aspectRatio: '4/3' }}
+                  >
+                    {/* FOUAD.png as background */}
+                    <img
+                      src={fouadImg}
+                      alt={social.label}
+                      className="absolute inset-0 w-full h-full object-cover object-top"
+                    />
+                    {/* Dark overlay */}
+                    <div className="absolute inset-0 bg-black/45" />
+
+                    {/* Platform icon — top left */}
+                    <div className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center ${style?.bg ?? 'bg-gray-700'} ${style?.text ?? 'text-white'} shadow-md`}>
+                      {icon}
+                    </div>
+
+                    {/* Platform name — bottom left */}
+                    <div className="absolute bottom-2.5 left-3 right-3">
+                      <span className="text-white font-black text-sm drop-shadow-lg">
+                        {social.label}
+                      </span>
+                    </div>
+                  </motion.a>
+                );
+              })}
+            </div>
+          </motion.div>
+
         </div>
+
     </motion.div>
   );
 }

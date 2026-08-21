@@ -70,13 +70,13 @@ export default function HeroSection() {
           {/* CTA Buttons */}
           <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-end gap-4">
             <a
-              href={siteConfig.socials.find(s => s.label === 'YouTube')?.url || "#"}
+              href={siteConfig.socials.find(s => s.label === 'Kick')?.url || "#"}
               target="_blank"
               rel="noreferrer"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-white hover:bg-gray-200 text-[#030510] transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] hover:-translate-y-1"
+              className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-[#53fc18] hover:bg-[#53fc18]/80 text-black transition-all duration-300 shadow-[0_0_20px_rgba(83,252,24,0.3)] hover:shadow-[0_0_25px_rgba(83,252,24,0.5)] hover:-translate-y-1"
             >
-              <span className="text-xl group-hover:scale-110 transition-transform">▶</span>
-              Watch Channel
+              <span className="text-xl font-black group-hover:scale-110 transition-transform">k</span>
+              Follow on Kick
               <span className="group-hover:translate-x-[4px] transition-transform">→</span>
             </a>
             <Link

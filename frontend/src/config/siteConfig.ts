@@ -8,10 +8,13 @@ export const siteConfig = {
     subtitle: "Welcome to the world of Fouad F9 — eFootball content, challenges, gameplay, and premium experiences for football and gaming enthusiasts.",
   },
   socials: [
+    { label: 'Kick', url: 'https://kick.com/fouadf9', color: 'hover:text-green-400', icon: 'k' },
+    { label: 'WhatsApp', url: 'https://whatsapp.com/channel/0029Vb8D3mREgGfJywUMPh32', color: 'hover:text-green-500', icon: 'w' },
+    { label: 'Telegram', url: 'https://t.me/fouadmgdym', color: 'hover:text-blue-400', icon: '✈' },
+    { label: 'TikTok', url: 'https://www.tiktok.com/@fouadf999?_r=1&_t=ZS-994S1cy5NZZ', color: 'hover:text-white', icon: '♪' },
+    { label: 'Instagram', url: 'https://www.instagram.com/fouadmagdym?igsi=MjUzbmJuc3VoYXRr&utm_source=qr', color: 'hover:text-pink-500', icon: 'i' },
+    { label: 'Facebook', url: 'https://www.facebook.com/share/1Etz9hEsrJ/?mibextid=wwXIfr', color: 'hover:text-blue-500', icon: 'f' },
     { label: 'YouTube', url: 'https://www.youtube.com/@fouadf9/', color: 'hover:text-red-500', icon: '▶' },
-    { label: 'TikTok', url: 'https://www.tiktok.com/@fouadf9', color: 'hover:text-white', icon: '♪' },
-    { label: 'Telegram', url: 'https://t.me/fouadf9', color: 'hover:text-blue-400', icon: '✈' },
-    { label: 'Facebook', url: 'https://facebook.com', color: 'hover:text-blue-500', icon: 'f' },
   ],
   stats: [
     { value: '+50K', label: 'Subscribers', sub: 'YouTube' },

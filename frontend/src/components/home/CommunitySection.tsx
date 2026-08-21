@@ -3,7 +3,7 @@ import { siteConfig } from '../../config/siteConfig';
 
 export default function CommunitySection() {
   const tgUrl = siteConfig.socials.find(s => s.label === 'Telegram')?.url || "#";
-  const ytUrl = siteConfig.socials.find(s => s.label === 'YouTube')?.url || "#";
+  const kickUrl = siteConfig.socials.find(s => s.label === 'Kick')?.url || "#";
 
   return (
     <section className="relative py-32 px-4 bg-gray-950/50 border-t border-gray-900 overflow-hidden">
@@ -40,10 +40,10 @@ export default function CommunitySection() {
           <motion.a 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            href={ytUrl} target="_blank" rel="noreferrer"
-            className="px-8 py-4 rounded-xl bg-gray-900/80 backdrop-blur-sm border-2 border-red-900/50 text-red-500 font-bold hover:bg-red-900/20 hover:border-red-500 shadow-sm hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300"
+            href={kickUrl} target="_blank" rel="noreferrer"
+            className="px-8 py-4 rounded-xl bg-gray-900/80 backdrop-blur-sm border-2 border-[#53fc18]/30 text-[#53fc18] font-bold hover:bg-[#53fc18]/10 hover:border-[#53fc18] shadow-sm hover:shadow-[0_0_15px_rgba(83,252,24,0.2)] transition-all duration-300"
           >
-            ▶ Subscribe on YouTube
+            <span className="font-black mr-2">k</span> Follow on Kick
           </motion.a>
         </div>
       </motion.div>

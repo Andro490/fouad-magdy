@@ -42,7 +42,7 @@ export default function HeroSection() {
           variants={staggerContainer}
           initial="hidden"
           animate="show"
-          className="w-full md:w-1/2 text-left"
+          className="w-full md:w-1/2 text-right"
         >
           {/* Badge */}
           <motion.div variants={itemUp} className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-blue-900/30 border border-blue-800 shadow-sm backdrop-blur-md">
@@ -68,7 +68,7 @@ export default function HeroSection() {
           </motion.div>
 
           {/* CTA Buttons */}
-          <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-start gap-4">
+          <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-end gap-4">
             <a
               href={siteConfig.socials.find(s => s.label === 'YouTube')?.url || "#"}
               target="_blank"

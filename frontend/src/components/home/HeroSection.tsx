@@ -68,27 +68,25 @@ function MobileProfileCard() {
   const totalFollowers = siteConfig.stats[0]?.value || '+51K';
 
   return (
-    <div className="md:hidden min-h-screen bg-black flex items-center justify-center px-4 py-6">
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(83,252,24,0.15)] border border-white/10"
-        style={{ background: 'linear-gradient(180deg, #111 0%, #0a0a0a 100%)' }}
-      >
-        {/* ── Hero Image ── */}
-        <div className="relative w-full" style={{ aspectRatio: '4/5' }}>
+    <motion.div
+      className="md:hidden min-h-screen w-full bg-black flex flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+        {/* ── Hero Image full width ── */}
+        <div className="relative w-full" style={{ height: '60vh', minHeight: '320px' }}>
           <img
             src={fouadImg}
             alt={siteConfig.name}
             className="w-full h-full object-cover object-top"
           />
-          {/* gradient fade into card body */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#111] to-transparent" />
+          {/* gradient fade into body */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent" />
         </div>
 
-        {/* ── Card Body ── */}
-        <div className="px-6 pb-6 -mt-6 relative z-10">
+        {/* ── Body ── */}
+        <div className="flex-1 px-5 pb-8 -mt-8 relative z-10 bg-black">
 
           {/* Name + Verified */}
           <motion.div
@@ -214,8 +212,7 @@ function MobileProfileCard() {
           </motion.div>
 
         </div>
-      </motion.div>
-    </div>
+    </motion.div>
   );
 }
 

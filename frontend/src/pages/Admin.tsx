@@ -98,7 +98,10 @@ const Admin = () => {
     
     try {
       const uploadedUrls: string[] = [];
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      // Use Vercel serverless function (same origin, no CORS)
+      const UPLOAD_URL = window.location.hostname === 'localhost'
+        ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload`
+        : '/api/upload';
       
       for (const file of files) {
         const base64 = await new Promise<string>((resolve, reject) => {
@@ -108,7 +111,7 @@ const Admin = () => {
           reader.onerror = error => reject(error);
         });
 
-        const res = await fetch(`${API_URL}/api/upload`, {
+        const res = await fetch(UPLOAD_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64 })

@@ -162,32 +162,6 @@ function MobileProfileCard() {
             </svg>
           </motion.div>
 
-          {/* Email + Kick CTA */}
-          <motion.form
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            onSubmit={handleConnect}
-            className="flex items-center gap-0 rounded-full overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm pr-1 pl-4 py-1"
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="flex-1 bg-transparent text-white placeholder-gray-500 text-sm outline-none py-2"
-            />
-            <button
-              type="submit"
-              className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#222] text-white text-xs font-bold px-4 py-3 rounded-full transition-all duration-200 border border-white/10 flex-shrink-0"
-            >
-              Connect with
-              {/* Kick avatar mini */}
-              <span className="w-7 h-7 rounded-full bg-[#53fc18] flex items-center justify-center text-black font-black text-xs">
-                K
-              </span>
-            </button>
-          </motion.form>
 
           {/* Kick logo bottom pill */}
           <motion.div

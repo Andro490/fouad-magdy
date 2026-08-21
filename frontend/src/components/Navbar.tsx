@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
@@ -9,59 +8,35 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
-
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
   };
 
   return (
-    <nav className="w-full min-h-[5rem] py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm transition-all">
-      <Link to="/" className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mx-auto md:mx-0">
-        FOUAD<span className="text-green-600 dark:text-green-500">F9</span>
+    <nav className="w-full min-h-[5rem] py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm transition-all">
+      <Link to="/" className="text-2xl md:text-3xl font-black text-white mx-auto md:mx-0">
+        FOUAD<span className="text-green-500">F9</span>
       </Link>
       
-      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8 w-full md:w-auto text-sm md:text-base font-bold text-gray-600 dark:text-gray-300" style={{ direction: 'rtl' }}>
-        
-        {/* Theme Toggle Button */}
-        <button 
-          onClick={() => setDarkMode(!darkMode)} 
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-700"
-          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-
-        <Link to="/" className="hover:text-green-600 dark:hover:text-green-400 transition-colors">الرئيسية</Link>
-        <Link to="/products" className="hover:text-green-600 dark:hover:text-green-400 transition-colors">المدربين والخطط</Link>
-        <Link to="/store" className="hover:text-green-600 dark:hover:text-green-400 transition-colors">سوق الحسابات</Link>
-        <Link to="/leaderboard" className="hover:text-green-600 dark:hover:text-green-400 transition-colors">لوحة صناع المحتوى</Link>
+      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8 w-full md:w-auto text-sm md:text-base font-bold text-gray-300" style={{ direction: 'rtl' }}>
+        <Link to="/" className="hover:text-green-400 transition-colors">الرئيسية</Link>
+        <Link to="/products" className="hover:text-green-400 transition-colors">المدربين والخطط</Link>
+        <Link to="/store" className="hover:text-green-400 transition-colors">سوق الحسابات</Link>
+        <Link to="/leaderboard" className="hover:text-green-400 transition-colors">لوحة صناع المحتوى</Link>
         
         {isAuthenticated ? (
           <>
             {user?.role === 'ADMIN' ? (
-              <Link to="/admin" className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors">لوحة الإدارة</Link>
+              <Link to="/admin" className="text-green-400 hover:text-green-300 transition-colors">لوحة الإدارة</Link>
             ) : (
-              <Link to="/dashboard" className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors">لوحة التحكم</Link>
+              <Link to="/dashboard" className="text-green-400 hover:text-green-300 transition-colors">لوحة التحكم</Link>
             )}
-            <Link to="/dashboard" className="text-gray-900 dark:text-white px-4 border-r border-gray-300 dark:border-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-colors">أهلاً، {user?.name}</Link>
+            <Link to="/dashboard" className="text-white px-4 border-r border-gray-700 hover:text-green-400 transition-colors">أهلاً، {user?.name}</Link>
             <button onClick={handleLogout} className="text-red-500 hover:text-red-600 transition-colors">تسجيل الخروج</button>
           </>
         ) : (
-          <Link to="/login" className="px-6 py-2 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 rounded-lg text-white dark:text-gray-900 transition-all shadow-sm hover:shadow-md">
+          <Link to="/login" className="px-6 py-2 bg-white hover:bg-gray-200 rounded-lg text-gray-900 transition-all shadow-sm hover:shadow-md">
             تسجيل الدخول
           </Link>
         )}

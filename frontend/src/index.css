@@ -4,15 +4,9 @@
 
 /* Global Layout */
 body {
-  background-color: #f9fafb; /* gray-50 */
-  color: #111827; /* gray-900 */
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html.dark body {
   background-color: #030712; /* gray-950 */
   color: #f9fafb; /* gray-50 */
+  min-height: 100vh;
 }
 
 #root {

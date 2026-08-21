@@ -42,12 +42,32 @@ const Products = () => {
           return [];
         };
 
-        // 1. استخدام AllOrigins Proxy لحل مشكلة CORS. (الآن سيعمل بكفاءة دون أخطاء 522 لأننا نطلب صفحة واحدة فقط بدلاً من 76)
-        const targetUrl = encodeURIComponent(`https://efhub.com/api/public/coaches?page=${currentPage}`);
-        const res = await fetch(`https://api.allorigins.win/raw?url=${targetUrl}`);
-        if (!res.ok) throw new Error('Failed to fetch');
+        // 1. تجربة أكثر من Proxy للهروب من حظر Cloudflare القوي جداً الخاص بـ EFHub
+        const originalUrl = `https://efhub.com/api/public/coaches?page=${currentPage}`;
+        const proxies = [
+          `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`,
+          `https://api.codetabs.com/v1/proxy?quest=${originalUrl}`,
+          `https://thingproxy.freeboard.io/fetch/${originalUrl}`
+        ];
+
+        let pageData = null;
+        for (const proxyUrl of proxies) {
+          try {
+            const res = await fetch(proxyUrl);
+            if (res.ok) {
+              const data = await res.json();
+              if (!data.error && !data.error === "Forbidden") {
+                pageData = data;
+                break; // نجحنا في جلب البيانات
+              }
+            }
+          } catch (e) {
+            // تجاهل الخطأ وجرب البروكسي التالي
+          }
+        }
+
+        if (!pageData) throw new Error('جميع البروكسيات محظورة حالياً من قبل EFHub');
         
-        const pageData = await res.json();
         const pageArray = extractArray(pageData);
         
         setManagers(pageArray);

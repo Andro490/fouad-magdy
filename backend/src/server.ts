@@ -101,13 +101,38 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to StreamHub API 🚀' });
 });
 
-// Managers API (Mock/Placeholder for frontend fetch)
-app.get('/api/managers', (req, res) => {
-  res.json([]);
-});
+import fs from 'fs';
+import path from 'path';
 
-// Proxy for EFHub API to avoid CORS issues from free proxies
-app.get('/api/proxy/coaches', async (req, res) => {
+// Managers API (Serve from local JSON to bypass all blocks!)
+app.get('/api/managers', (req, res) => {
+  try {
+    const dataPath = path.join(__dirname, 'data', 'coaches.json');
+    if (!fs.existsSync(dataPath)) {
+      return res.json({ coaches: [] });
+    }
+    
+    const rawData = fs.readFileSync(dataPath, 'utf-8');
+    const allCoaches = JSON.parse(rawData);
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 15; // same limit as EFHub
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    
+    const paginatedCoaches = allCoaches.slice(startIndex, endIndex);
+    
+    res.json({
+      page,
+      totalPages: Math.ceil(allCoaches.length / limit),
+      totalCoaches: allCoaches.length,
+      coaches: paginatedCoaches
+    });
+  } catch (err) {
+    console.error('Error reading coaches.json:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
   try {
     const page = req.query.page || 1;
     const response = await fetch(`https://efhub.com/api/public/coaches?page=${page}`, {

@@ -42,32 +42,12 @@ const Products = () => {
           return [];
         };
 
-        // 1. تجربة أكثر من Proxy للهروب من حظر Cloudflare القوي جداً الخاص بـ EFHub
-        const originalUrl = `https://efhub.com/api/public/coaches?page=${currentPage}`;
-        const proxies = [
-          `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`,
-          `https://api.codetabs.com/v1/proxy?quest=${originalUrl}`,
-          `https://thingproxy.freeboard.io/fetch/${originalUrl}`
-        ];
-
-        let pageData = null;
-        for (const proxyUrl of proxies) {
-          try {
-            const res = await fetch(proxyUrl);
-            if (res.ok) {
-              const data = await res.json();
-              if (!data.error && data.error !== "Forbidden") {
-                pageData = data;
-                break; // نجحنا في جلب البيانات
-              }
-            }
-          } catch (e) {
-            // تجاهل الخطأ وجرب البروكسي التالي
-          }
-        }
-
-        if (!pageData) throw new Error('جميع البروكسيات محظورة حالياً من قبل EFHub');
+        // 1. جلب البيانات من السيرفر الخاص بنا مباشرة (من ملف coaches.json السريع جداً وبدون أي حظر)
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${API_URL}/api/managers?page=${currentPage}`);
+        if (!res.ok) throw new Error('Failed to fetch from local API');
         
+        const pageData = await res.json();
         const pageArray = extractArray(pageData);
         
         setManagers(pageArray);

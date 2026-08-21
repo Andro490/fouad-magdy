@@ -106,7 +106,8 @@ app.get('/', (req, res) => {
 // Managers API - reads from local coaches.json file (no CORS, no 403 issues!)
 app.get('/api/managers', (req, res) => {
   try {
-    const dataPath = path.join(__dirname, 'data', 'coaches.json');
+    // استخدم process.cwd() بدلاً من __dirname لكي يقرأ الملف الصحيح بعد عمل build (dist) على Railway
+    const dataPath = path.join(process.cwd(), 'src', 'data', 'coaches.json');
     if (!fs.existsSync(dataPath)) {
       return res.json({ coaches: [] });
     }

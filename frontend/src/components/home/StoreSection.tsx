@@ -17,14 +17,14 @@ export default function StoreSection() {
   return (
     <section className="relative py-24 px-4 bg-gray-950/50 border-t border-gray-900 overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <SectionTitle en="PREMIUM STORE" ar="المتجر الحصري" accent="STORE" />
+        <SectionTitle en="PREMIUM STORE" ar="STORE" accent="STORE" />
         <motion.p 
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center text-gray-400 text-sm -mt-8 mb-12 max-w-xl mx-auto"
         >
-          اكتشف منتجات وخدمات المتجر واستمتع بتجربة eFootball بشكل مختلف.
+          Discover our store products and services and enjoy a different eFootball experience.
         </motion.p>
         <motion.div 
           variants={staggerContainer}
@@ -50,7 +50,7 @@ export default function StoreSection() {
                 <p className="text-gray-400 text-xs mb-4 line-clamp-2">{p.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 font-black text-lg">{p.price} EGP</span>
-                  <Link to="/store" className="text-xs font-bold px-4 py-2 rounded-lg bg-green-900/30 text-green-400 hover:bg-green-600 hover:text-white transition-colors">عرض</Link>
+                  <Link to="/store" className="text-xs font-bold px-4 py-2 rounded-lg bg-green-900/30 text-green-400 hover:bg-green-600 hover:text-white transition-colors">View</Link>
                 </div>
               </div>
             </motion.div>
@@ -64,7 +64,7 @@ export default function StoreSection() {
           className="text-center mt-12"
         >
           <Link to="/store" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white hover:bg-gray-200 text-[#030510] font-bold shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:-translate-y-1 transition-all duration-300">
-            عرض جميع المنتجات ←
+            View all products →
           </Link>
         </motion.div>
       </div>

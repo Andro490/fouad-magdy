@@ -42,7 +42,7 @@ export default function HeroSection() {
           variants={staggerContainer}
           initial="hidden"
           animate="show"
-          className="w-full md:w-1/2 text-right"
+          className="w-full md:w-1/2 text-left"
         >
           {/* Badge */}
           <motion.div variants={itemUp} className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-blue-900/30 border border-blue-800 shadow-sm backdrop-blur-md">
@@ -68,7 +68,7 @@ export default function HeroSection() {
           </motion.div>
 
           {/* CTA Buttons */}
-          <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-end gap-4">
+          <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-start gap-4">
             <a
               href={siteConfig.socials.find(s => s.label === 'YouTube')?.url || "#"}
               target="_blank"
@@ -76,15 +76,15 @@ export default function HeroSection() {
               className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-white hover:bg-gray-200 text-[#030510] transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] hover:-translate-y-1"
             >
               <span className="text-xl group-hover:scale-110 transition-transform">▶</span>
-              شاهد القناة
-              <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
+              Watch Channel
+              <span className="group-hover:translate-x-[4px] transition-transform">→</span>
             </a>
             <Link
               to="/store"
               className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-gray-900/60 backdrop-blur-md border border-gray-700 text-gray-200 hover:border-blue-500 hover:text-blue-400 transition-all duration-300 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:-translate-y-1"
             >
-              🛒 المتجر الحصري
-              <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
+              🛒 Premium Store
+              <span className="group-hover:translate-x-[4px] transition-transform">→</span>
             </Link>
           </motion.div>
         </motion.div>

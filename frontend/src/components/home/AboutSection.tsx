@@ -34,7 +34,7 @@ export default function AboutSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="order-1 md:order-2 text-right"
+            className="order-1 md:order-2 text-left"
           >
             <p className="text-blue-400 text-xs font-bold tracking-[0.3em] uppercase mb-3 opacity-80">WHO IS {siteConfig.name.split(' ')[0]}?</p>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-2">

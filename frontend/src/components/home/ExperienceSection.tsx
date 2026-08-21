@@ -6,7 +6,7 @@ export default function ExperienceSection() {
   return (
     <section className="relative py-24 px-4 bg-[#030510] border-t border-gray-900 overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <SectionTitle en="THE F9 EXPERIENCE" ar="تجربة مميزة" accent="EXPERIENCE" />
+        <SectionTitle en="THE F9 EXPERIENCE" ar="FEATURES" accent="EXPERIENCE" />
         <motion.div 
           variants={staggerContainer}
           initial="hidden"

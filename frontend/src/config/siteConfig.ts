@@ -1,11 +1,11 @@
 export const siteConfig = {
   name: "FOUAD F9",
   shortName: "F9",
-  description: "فواد F9 هو صانع محتوى متخصص في eFootball، يقدم محتوى احترافيًا يشمل مراجعات اللاعبين، التكتيكات، الـ Gameplay، والتحديات الحصرية.",
+  description: "Fouad F9 is a specialized eFootball content creator, providing professional content including player reviews, tactics, gameplay, and exclusive challenges.",
   hero: {
     badge: "Official Website",
     titleLines: ["PLAY.", "WIN.", "DOMINATE."],
-    subtitle: "مرحبًا بك في عالم Fouad F9 — محتوى eFootball، تحديات، Gameplay وتجارب مميزة لعشاق كرة القدم والألعاب.",
+    subtitle: "Welcome to the world of Fouad F9 — eFootball content, challenges, gameplay, and premium experiences for football and gaming enthusiasts.",
   },
   socials: [
     { label: 'YouTube', url: 'https://www.youtube.com/@fouadf9/', color: 'hover:text-red-500', icon: '▶' },
@@ -20,16 +20,16 @@ export const siteConfig = {
     { value: '#1', label: 'Creator', sub: 'eFootball' },
   ],
   experiences: [
-    { num: '01', icon: '⚽', title: 'eFootball', desc: 'أفضل محتوى eFootball في المنطقة العربية مع تحليل عميق للعبة والتكتيكات.' },
-    { num: '02', icon: '🎮', title: 'Gameplay', desc: 'مباريات حصرية، مهارات ومراجعات لأحدث تحديثات اللعبة أول بأول.' },
-    { num: '03', icon: '🏆', title: 'Challenges', desc: 'تحديات ومسابقات حصرية مع جوائز قيمة لأعضاء مجتمع F9.' },
-    { num: '04', icon: '📺', title: 'Football', desc: 'تحليل كرة القدم الحقيقية وربطها بعالم eFootball بأسلوب مميز.' },
+    { num: '01', icon: '⚽', title: 'eFootball', desc: 'The best eFootball content in the MENA region with deep analysis of the game and tactics.' },
+    { num: '02', icon: '🎮', title: 'Gameplay', desc: 'Exclusive matches, skills, and reviews for the latest game updates as they happen.' },
+    { num: '03', icon: '🏆', title: 'Challenges', desc: 'Exclusive challenges and tournaments with valuable prizes for the F9 community.' },
+    { num: '04', icon: '📺', title: 'Football', desc: 'Real-world football analysis connected to the eFootball universe in a unique style.' },
   ],
   footerLinks: [
-    { label: 'الرئيسية', path: '/' },
-    { label: 'المتجر', path: '/store' },
-    { label: 'المدربين', path: '/products' },
-    { label: 'لوحة المحتوى', path: '/leaderboard' },
-    { label: 'تسجيل الدخول', path: '/login' }
+    { label: 'Home', path: '/' },
+    { label: 'Store', path: '/store' },
+    { label: 'Coaches', path: '/products' },
+    { label: 'Leaderboard', path: '/leaderboard' },
+    { label: 'Login', path: '/login' }
   ]
 };

@@ -14,16 +14,16 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full min-h-[5rem] py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm transition-all">
+    <nav className="w-full min-h-[5rem] py-3 bg-[#030510]/80 backdrop-blur-md border-b border-gray-900 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm transition-all">
       <Link to="/" className="text-2xl md:text-3xl font-black text-white mx-auto md:mx-0">
-        FOUAD<span className="text-green-500">F9</span>
+        FOUAD<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">F9</span>
       </Link>
       
-      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8 w-full md:w-auto text-sm md:text-base font-bold text-gray-300" style={{ direction: 'rtl' }}>
-        <Link to="/" className="hover:text-green-400 transition-colors">الرئيسية</Link>
-        <Link to="/products" className="hover:text-green-400 transition-colors">المدربين والخطط</Link>
-        <Link to="/store" className="hover:text-green-400 transition-colors">سوق الحسابات</Link>
-        <Link to="/leaderboard" className="hover:text-green-400 transition-colors">لوحة صناع المحتوى</Link>
+      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8 w-full md:w-auto text-sm md:text-base font-bold text-gray-400" style={{ direction: 'rtl' }}>
+        <Link to="/" className="hover:text-blue-400 transition-colors">الرئيسية</Link>
+        <Link to="/products" className="hover:text-blue-400 transition-colors">المدربين والخطط</Link>
+        <Link to="/store" className="hover:text-blue-400 transition-colors">سوق الحسابات</Link>
+        <Link to="/leaderboard" className="hover:text-blue-400 transition-colors">لوحة صناع المحتوى</Link>
         
         {isAuthenticated ? (
           <>

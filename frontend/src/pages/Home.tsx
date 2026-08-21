@@ -9,10 +9,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#030510] text-gray-100 font-sans overflow-hidden">
       <HeroSection />
-      <ExperienceSection />
+      <div className="hidden md:block">
+        <ExperienceSection />
+      </div>
       <StoreSection />
-      <AboutSection />
-      <CommunitySection />
+      <div className="hidden md:block">
+        <AboutSection />
+        <CommunitySection />
+      </div>
       <Footer />
 
       {/* Animations CSS for floating image since CSS keyframes are slightly smoother for continuous float than react-spring sometimes */}

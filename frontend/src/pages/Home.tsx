@@ -3,7 +3,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import fouadImg from '../assets/FOUAD.png';
-import patternImg from '../assets/pattern.png';
 import backgrondImg from '../assets/backgrond.png';
 import type { StoreProduct } from './Store';
 
@@ -102,15 +101,6 @@ export default function Home() {
         
         {/* Dark Overlay over the background to make text readable */}
         <div className="absolute inset-0 bg-gray-950/70 z-0 pointer-events-none" />
-
-        {/* Pattern Background with fade animation */}
-        <div className="absolute inset-0 z-0 pointer-events-none mix-blend-screen opacity-5"
-             style={{
-               backgroundImage: `url(${patternImg})`,
-               backgroundSize: 'cover',
-               backgroundPosition: 'center',
-               animation: 'patternFade 5s ease-in-out infinite alternate'
-             }} />
 
         {/* Soft glow accents */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-green-900/20 rounded-full blur-[120px] pointer-events-none" />
@@ -351,10 +341,6 @@ export default function Home() {
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;
-        }
-        @keyframes patternFade {
-          0% { opacity: 0.05; }
-          100% { opacity: 0.25; }
         }
       `}</style>
     </div>

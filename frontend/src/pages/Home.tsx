@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
-import fouadImg from '../assets/backgrond.png';
+import fouadImg from '../assets/FOUAD.png';
 import patternImg from '../assets/pattern.png';
+import backgrondImg from '../assets/backgrond.png';
 import type { StoreProduct } from './Store';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -92,7 +93,15 @@ export default function Home() {
     <div className="min-h-screen bg-gray-950 text-gray-100 font-sans" dir="rtl">
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 bg-gray-900">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20"
+               style={{
+                 backgroundImage: `url(${backgrondImg})`,
+                 backgroundSize: 'cover',
+                 backgroundPosition: 'center'
+               }}>
+        
+        {/* Dark Overlay over the background to make text readable */}
+        <div className="absolute inset-0 bg-gray-950/70 z-0 pointer-events-none" />
 
         {/* Pattern Background with fade animation */}
         <div className="absolute inset-0 z-0 pointer-events-none mix-blend-screen opacity-5"

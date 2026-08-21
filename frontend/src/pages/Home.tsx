@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
-import ThreeBackground from '../components/ThreeBackground';
+import fouadImg from '../assets/FOUAD.png';
 import type { StoreProduct } from './Store';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -94,71 +94,83 @@ export default function Home() {
     <div className="min-h-screen bg-[#080b1a] text-white" dir="rtl">
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
-        <ThreeBackground />
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20"
+        style={{ background: 'linear-gradient(135deg, #060c1f 0%, #091428 30%, #0a1a3a 55%, #060c1f 100%)' }}>
+
+        {/* Subtle grid */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          style={{ backgroundImage: 'linear-gradient(rgba(0,180,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,255,1) 1px, transparent 1px)', backgroundSize: '70px 70px' }} />
 
         {/* Glows */}
-        <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-cyan-500/5 blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-700/15 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Grid overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{ backgroundImage: 'linear-gradient(rgba(0,229,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        {/* Two-column hero layout */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-6" dir="rtl">
 
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/5 border border-cyan-500/20 backdrop-blur-sm">
-            <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-            <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase">Official Website</span>
+          {/* LEFT — Fouad Image */}
+          <div className="w-full md:w-1/2 flex justify-center md:justify-start relative">
+            {/* Glow behind image */}
+            <div className="absolute inset-0 bg-blue-500/10 blur-[80px] rounded-full scale-75" />
+            <img
+              src={fouadImg}
+              alt="Fouad F9"
+              className="relative z-10 w-72 sm:w-96 md:w-full max-w-md object-contain drop-shadow-[0_0_60px_rgba(0,180,255,0.3)]"
+              style={{ filter: 'drop-shadow(0 0 40px rgba(0,150,255,0.25))' }}
+            />
           </div>
 
-          {/* Main heading */}
-          <div ref={headingRef}>
-            <p className="text-gray-400 text-lg md:text-xl font-semibold tracking-[0.2em] uppercase mb-2">FOUAD F9</p>
-            <h1 className="text-6xl sm:text-7xl md:text-9xl font-black leading-none tracking-tighter mb-2">
-              PLAY.
-            </h1>
-            <h1 className="text-6xl sm:text-7xl md:text-9xl font-black leading-none tracking-tighter mb-2">
-              WIN.
-            </h1>
-            <h1 className="text-6xl sm:text-7xl md:text-9xl font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">
-              DOMINATE.
-            </h1>
+          {/* RIGHT — Text */}
+          <div className="w-full md:w-1/2 text-right">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-white/5 border border-cyan-500/20 backdrop-blur-sm">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="text-cyan-400 text-xs font-bold tracking-widest uppercase">Official Website</span>
+            </div>
+
+            {/* Main heading */}
+            <div ref={headingRef}>
+              <p className="text-gray-400 text-base md:text-lg font-semibold tracking-[0.2em] uppercase mb-3">FOUAD F9</p>
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-black leading-none tracking-tighter mb-1">PLAY.</h1>
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-black leading-none tracking-tighter mb-1">WIN.</h1>
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 mb-6">
+                DOMINATE.
+              </h1>
+            </div>
+
+            {/* Subtitle */}
+            <div ref={subRef} className="mb-8">
+              <p className="text-gray-300 text-sm md:text-base max-w-lg leading-relaxed">
+                مرحبًا بك في عالم Fouad F9 — محتوى eFootball، تحديات، Gameplay<br />
+                وتجارب مميزة لعشاق كرة القدم والألعاب.
+              </p>
           </div>
 
-          {/* Subtitle */}
-          <div ref={subRef} className="mt-6 mb-10">
-            <p className="text-gray-300 text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
-              مرحبًا بك في عالم Fouad F9 — محتوى eFootball، تحديات، Gameplay<br className="hidden md:block" />
-              وتجارب مميزة لعشاق كرة القدم والألعاب.
-            </p>
-          </div>
-
-          {/* CTA Buttons */}
-          <div ref={btnsRef} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="https://www.youtube.com/@fouadf9/"
-              target="_blank"
-              rel="noreferrer"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white transition-all duration-300 hover:shadow-[0_0_40px_rgba(220,38,38,0.5)] hover:-translate-y-1"
-            >
-              <span className="text-xl">▶</span>
-              شاهد القناة على YouTube
-              <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
-            </a>
-            <Link
-              to="/store"
-              className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-white/5 border border-cyan-500/30 text-cyan-300 backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all duration-300 hover:-translate-y-1"
-            >
-              🛒 استكشف المتجر
-              <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
-            </Link>
+            {/* CTA Buttons */}
+            <div ref={btnsRef} className="flex flex-col sm:flex-row items-center md:justify-end gap-4">
+              <a
+                href="https://www.youtube.com/@fouadf9/"
+                target="_blank"
+                rel="noreferrer"
+                className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white transition-all duration-300 hover:shadow-[0_0_40px_rgba(220,38,38,0.5)] hover:-translate-y-1"
+              >
+                <span className="text-xl">▶</span>
+                شاهد القناة على YouTube
+                <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
+              </a>
+              <Link
+                to="/store"
+                className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base bg-white/5 border border-cyan-500/30 text-cyan-300 backdrop-blur-sm hover:bg-cyan-500/10 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all duration-300 hover:-translate-y-1"
+              >
+                🛒 استكشف المتجر
+                <span className="group-hover:translate-x-[-4px] transition-transform">←</span>
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div ref={statsRef} className="relative z-10 mt-16 md:mt-20 flex flex-wrap justify-center gap-3 px-4">
+        <div ref={statsRef} className="relative z-10 mt-12 md:mt-16 flex flex-wrap justify-center gap-3 px-4">
           {STATS.map(s => <StatCard key={s.label} {...s} />)}
         </div>
 

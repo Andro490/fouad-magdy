@@ -25,6 +25,7 @@ const Admin = () => {
   const [price, setPrice] = useState('');
   const [imagesInput, setImagesInput] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'ADMIN') {
@@ -87,6 +88,53 @@ const Admin = () => {
       setAdminReply('');
       fetchAdminMessages(selectedUserId);
     } catch (e) {}
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setIsUploading(true);
+    const files = Array.from(e.target.files);
+    
+    const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY || '64893796dcb70764722c0d575faeb0a9';
+    
+    try {
+      const uploadedUrls: string[] = [];
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          uploadedUrls.push(data.data.url);
+        } else {
+          console.error('Upload failed:', data);
+        }
+      }
+      
+      if (uploadedUrls.length > 0) {
+        setImagesInput(prev => {
+          const current = prev.trim();
+          const newUrls = uploadedUrls.join('\n');
+          return current ? `${current}\n${newUrls}` : newUrls;
+        });
+        alert(`تم رفع ${uploadedUrls.length} صور بنجاح!`);
+      } else {
+        alert('فشل رفع الصور. يرجى المحاولة مرة أخرى.');
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      alert('حدث خطأ أثناء الاتصال بخادم رفع الصور.');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
   };
 
   const handleAddProduct = (e: React.FormEvent) => {
@@ -233,8 +281,15 @@ const Admin = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">روابط الصور (رابط في كل سطر)</label>
+                <div className="mb-2">
+                  <label className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm font-bold ${isUploading ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-dark-lighter border border-gray-600 text-white hover:bg-white/10'}`}>
+                    {isUploading ? 'جاري الرفع...' : 'رفع صور من الجهاز 📷'}
+                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
+                  </label>
+                </div>
                 <textarea value={imagesInput} onChange={e => setImagesInput(e.target.value)} required placeholder="https://..."
                   className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none text-left h-24" dir="ltr" />
+                <p className="text-xs text-gray-400 mt-1">يمكنك إدخال الروابط يدوياً أو استخدام الزر لرفع الصور من جهازك ليتم إضافتها تلقائياً.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">رقم هاتف تليجرام (اختياري)</label>

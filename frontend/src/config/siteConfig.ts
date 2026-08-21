@@ -17,7 +17,7 @@ export const siteConfig = {
     { label: 'YouTube', url: 'https://www.youtube.com/@fouadf9/', color: 'hover:text-red-500', icon: '▶' },
   ],
   stats: [
-    { value: '+50K', label: 'Total followers on social media', sub: ' ' },
+    { value: '+51K', label: 'Total followers on social media', sub: ' ' },
     { value: '+200', label: 'Videos', sub: 'Published' },
     { value: 'F9', label: 'Community', sub: 'eFootball' },
     { value: '#1', label: 'Creator', sub: 'eFootball' },

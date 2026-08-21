@@ -53,7 +53,7 @@ export default function HeroSection() {
           {/* Main heading */}
           <motion.div variants={staggerContainer}>
             <motion.p variants={itemUp} className="text-gray-400 text-base md:text-lg font-semibold tracking-[0.2em] uppercase mb-3">{siteConfig.name}</motion.p>
-            {siteConfig.hero.titleLines.map((line, idx) => (
+            {siteConfig.hero.titleLines.map((line: string, idx: number) => (
               <motion.h1 key={idx} variants={itemUp} className={`text-5xl sm:text-6xl md:text-8xl font-black leading-none tracking-tighter ${idx === siteConfig.hero.titleLines.length - 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-400 drop-shadow-lg mb-6' : 'mb-1 text-white'}`}>
                 {line}
               </motion.h1>
@@ -98,7 +98,7 @@ export default function HeroSection() {
         viewport={{ once: true, margin: "-50px" }}
         className="relative z-10 mt-12 md:mt-16 flex flex-wrap justify-center gap-4 px-4"
       >
-        {siteConfig.stats.map(s => (
+        {siteConfig.stats.map((s: { value: string, label: string, sub: string }) => (
           <motion.div key={s.label} variants={itemUp}
             className="group flex flex-col items-center gap-1 px-6 py-4 rounded-2xl bg-gray-900/80 backdrop-blur-md border border-gray-800 shadow-sm hover:border-blue-500/40 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300">
             <span className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">

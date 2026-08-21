@@ -9,7 +9,10 @@ const Admin = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [videoSubmissions, setVideoSubmissions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'products' | 'videos'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches'>('products');
+  
+  const [jsonInput, setJsonInput] = useState('');
+  const [isSubmittingJson, setIsSubmittingJson] = useState(false);
   
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -73,6 +76,33 @@ const Admin = () => {
     alert('تم الموافقة على التقرير وإضافة الكوينز للستريمر!');
   };
 
+  const handleAddCoaches = async () => {
+    if (!jsonInput.trim()) return alert('الرجاء إدخال البيانات بصيغة JSON');
+    try {
+      setIsSubmittingJson(true);
+      const parsedData = JSON.parse(jsonInput);
+      
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/managers/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsedData)
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setJsonInput('');
+      } else {
+        alert(data.error || 'حدث خطأ أثناء الإضافة');
+      }
+    } catch (err: any) {
+      alert('صيغة JSON غير صحيحة! يرجى التأكد من الأقواس والعلامات.');
+    } finally {
+      setIsSubmittingJson(false);
+    }
+  };
+
   if (!isAuthenticated || user?.role !== 'ADMIN') return null;
 
   return (
@@ -92,6 +122,12 @@ const Admin = () => {
             className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'videos' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
           >
             مراجعة الفيديوهات
+          </button>
+          <button 
+            onClick={() => setActiveTab('coaches')} 
+            className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'coaches' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+          >
+            إضافة مدربين (JSON)
           </button>
         </div>
         
@@ -164,7 +200,7 @@ const Admin = () => {
             )}
           </div>
         </div>
-        ) : (
+        ) : activeTab === 'videos' ? (
         <div className="glass-panel p-6 rounded-2xl w-full">
           <h2 className="text-2xl font-bold mb-6 text-white">تقارير فيديوهات الستريمرز</h2>
           {videoSubmissions.length === 0 ? (
@@ -212,6 +248,28 @@ const Admin = () => {
               </table>
             </div>
           )}
+        </div>
+        ) : (
+        <div className="glass-panel p-6 rounded-2xl w-full max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6 text-white text-center">إضافة مدربين عن طريق كود JSON</h2>
+          <p className="text-gray-400 mb-4 text-center">
+            يمكنك نسخ كود JSON الذي يحتوي على مدرب واحد أو قائمة من المدربين ولصقه هنا.
+            المدربون الجدد سيظهرون تلقائياً في الصفحة الأولى (رقم 1) بالموقع.
+          </p>
+          <textarea 
+            value={jsonInput}
+            onChange={(e) => setJsonInput(e.target.value)}
+            placeholder="انسخ كود JSON هنا..."
+            className="w-full h-96 bg-dark/50 border border-gray-700 rounded-lg p-4 text-white focus:border-primary focus:outline-none mb-4"
+            dir="ltr"
+          />
+          <button 
+            onClick={handleAddCoaches}
+            disabled={isSubmittingJson}
+            className="w-full py-3 bg-accent text-dark font-bold rounded-lg hover:bg-primary transition-colors shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50"
+          >
+            {isSubmittingJson ? 'جاري الإضافة...' : 'إضافة المدربين الآن'}
+          </button>
         </div>
         )}
       </div>

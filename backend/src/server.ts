@@ -134,6 +134,49 @@ app.get('/api/managers', (req, res) => {
   }
 });
 
+// Add New Coaches API
+app.post('/api/managers/add', (req, res) => {
+  try {
+    const dataPath = path.join(process.cwd(), 'src', 'data', 'coaches.json');
+    let existingCoaches = [];
+    if (fs.existsSync(dataPath)) {
+      existingCoaches = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+    }
+
+    let inputData = req.body;
+    let newCoaches = [];
+    if (inputData.coaches && Array.isArray(inputData.coaches)) {
+      newCoaches = inputData.coaches;
+    } else if (Array.isArray(inputData)) {
+      newCoaches = inputData;
+    } else if (typeof inputData === 'object' && inputData !== null) {
+      newCoaches = [inputData];
+    }
+
+    if (newCoaches.length === 0) {
+      return res.status(400).json({ error: 'لم يتم العثور على مدربين في البيانات المرسلة' });
+    }
+
+    const map = new Map();
+    // نضع الجدد أولاً ليكونوا في أعلى الصفحة 1
+    newCoaches.forEach((c: any) => { if(c.id) map.set(c.id, c) });
+    // نضع القدامى
+    existingCoaches.forEach((c: any) => {
+      if (c.id && !map.has(c.id)) {
+        map.set(c.id, c);
+      }
+    });
+
+    const merged = Array.from(map.values());
+    fs.writeFileSync(dataPath, JSON.stringify(merged, null, 2));
+
+    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح!`, totalCoaches: merged.length });
+  } catch (err: any) {
+    console.error('Error adding coaches:', err);
+    res.status(500).json({ error: 'حدث خطأ أثناء معالجة البيانات: ' + err.message });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

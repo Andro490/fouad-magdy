@@ -11,6 +11,7 @@ export interface StoreProduct {
   price: number;
   image: string;
   isSoldOut?: boolean;
+  adminPhone?: string;
 }
 
 const Store = () => {
@@ -32,6 +33,16 @@ const Store = () => {
       navigate('/login');
       return;
     }
+    
+    if (product.adminPhone) {
+      let formattedPhone = product.adminPhone.replace(/[^\d+]/g, '');
+      if (!formattedPhone.startsWith('+')) {
+        formattedPhone = `+${formattedPhone}`;
+      }
+      window.open(`https://t.me/${formattedPhone}`, '_blank');
+      return;
+    }
+
     navigate('/checkout', { state: { product } });
   };
 

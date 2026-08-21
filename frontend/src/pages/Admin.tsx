@@ -24,6 +24,7 @@ const Admin = () => {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
+  const [adminPhone, setAdminPhone] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'ADMIN') {
@@ -95,7 +96,8 @@ const Admin = () => {
       name,
       description,
       price: Number(price),
-      image
+      image,
+      adminPhone: adminPhone.trim() || undefined
     };
     
     const updatedProducts = [...products, newProduct];
@@ -106,6 +108,7 @@ const Admin = () => {
     setDescription('');
     setPrice('');
     setImage('');
+    setAdminPhone('');
     alert('تم إضافة المنتج بنجاح');
   };
 
@@ -228,6 +231,11 @@ const Admin = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">رابط الصورة (URL)</label>
                 <input type="url" value={image} onChange={e => setImage(e.target.value)} required
+                  className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none text-left" dir="ltr" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">رقم هاتف تليجرام (اختياري)</label>
+                <input type="text" value={adminPhone} onChange={e => setAdminPhone(e.target.value)} placeholder="+201xxxxxxxxx"
                   className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none text-left" dir="ltr" />
               </div>
               <button type="submit" className="w-full py-3 bg-accent text-dark font-bold rounded-lg hover:bg-primary transition-colors mt-4 shadow-[0_0_15px_rgba(0,240,255,0.3)]">

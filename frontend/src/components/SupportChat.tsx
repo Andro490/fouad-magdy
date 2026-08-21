@@ -21,13 +21,25 @@ const SupportChat = () => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+  const [guestId] = useState(() => {
+    let id = localStorage.getItem('guestId');
+    if (!id) {
+      id = 'guest_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('guestId', id);
+    }
+    return id;
+  });
+
+  const activeUserId = user?.id || guestId;
+  const activeUserName = user?.name || (user?.id ? 'مستخدم' : 'زائر');
+
   useEffect(() => {
-    if (isOpen && isAuthenticated && user) {
+    if (isOpen) {
       fetchMessages();
       const interval = setInterval(fetchMessages, 3000); // Polling for new messages
       return () => clearInterval(interval);
     }
-  }, [isOpen, isAuthenticated, user]);
+  }, [isOpen, activeUserId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,7 +47,7 @@ const SupportChat = () => {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/chat/messages?userId=${user?.id}`);
+      const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}`);
       if (res.ok) {
         const data = await res.json();
         setMessages(data);
@@ -47,11 +59,11 @@ const SupportChat = () => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || !user) return;
+    if (!message.trim()) return;
 
     const newMessage = {
-      userId: user.id,
-      userName: user.name || 'مستخدم',
+      userId: activeUserId,
+      userName: activeUserName,
       text: message,
       sender: 'USER'
     };
@@ -73,8 +85,7 @@ const SupportChat = () => {
     }
   };
 
-  if (!isAuthenticated || user?.role === 'ADMIN') return null; // Admin has a different view in dashboard
-
+  // الزر سيظهر للجميع، حتى للأدمن لكي يتمكن من رؤيته وتجربته
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (

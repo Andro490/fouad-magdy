@@ -3,7 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-// import { PrismaClient } from '@prisma/client'; // Uncomment when prisma client is generated
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -101,10 +102,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to StreamHub API 🚀' });
 });
 
-import fs from 'fs';
-import path from 'path';
 
-// Managers API (Serve from local JSON to bypass all blocks!)
+// Managers API - reads from local coaches.json file (no CORS, no 403 issues!)
 app.get('/api/managers', (req, res) => {
   try {
     const dataPath = path.join(__dirname, 'data', 'coaches.json');
@@ -131,27 +130,6 @@ app.get('/api/managers', (req, res) => {
   } catch (err) {
     console.error('Error reading coaches.json:', err);
     res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-  try {
-    const page = req.query.page || 1;
-    const response = await fetch(`https://efhub.com/api/public/coaches?page=${page}`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
-        'Referer': 'https://efhub.com/',
-        'Origin': 'https://efhub.com'
-      }
-    });
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Failed to fetch from EFHub' });
-    }
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Proxy Error:', error);
-    res.status(500).json({ error: 'Internal Server Error fetching coaches' });
   }
 });
 

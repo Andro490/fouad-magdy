@@ -1,0 +1,3267 @@
+[
+  {
+    "id": 17601312850052,
+    "name": "Fabio Capello",
+    "accentedName": "Fabio Capello",
+    "japName": "ファビオ カペッロ",
+    "chineseName": "法比奥·卡佩罗",
+    "country": 7,
+    "age": 45,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 46,
+      "quickCounter": 57,
+      "longBallCounter": 89,
+      "outWide": 64,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      6,
+      10
+    ],
+    "hasBoost": true,
+    "linkupId": 1,
+    "linkup": {
+      "id": 1,
+      "name": "Over-the-Top Pass A",
+      "japName": "Over-the-Top Pass A",
+      "centerPiece": 20,
+      "centerPiecePositions": [
+        4
+      ],
+      "keyMan": 1,
+      "keyManPositions": [
+        12
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17601044514701,
+    "name": "Jose Mourinho",
+    "accentedName": "José Mourinho",
+    "japName": "ジョゼ モウリーニョ",
+    "chineseName": "何塞·穆里尼奥",
+    "country": 17,
+    "age": 46,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 59,
+      "quickCounter": 89,
+      "longBallCounter": 62,
+      "outWide": 68,
+      "longBall": 80,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      25
+    ],
+    "hasBoost": true,
+    "linkupId": 4,
+    "linkup": {
+      "id": 4,
+      "name": "Diagonal Long Pass A",
+      "japName": "Diagonal Long Pass A",
+      "centerPiece": 14,
+      "centerPiecePositions": [
+        8
+      ],
+      "keyMan": 6,
+      "keyManPositions": [
+        6,
+        7
+      ]
+    },
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17600776082342,
+    "name": "P. Kluivert",
+    "accentedName": "P. Kluivert",
+    "japName": "パトリック クライファート",
+    "chineseName": "帕特里克·克鲁伊维特",
+    "country": 5,
+    "age": 49,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 80,
+      "longBallCounter": 64,
+      "outWide": 51,
+      "longBall": 48,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      11
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17600507543553,
+    "name": "R. Martinez",
+    "accentedName": "R. Martínez",
+    "japName": "ロベルト マルティネス",
+    "chineseName": "罗伯托·马丁内斯",
+    "country": 2,
+    "age": 51,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 64,
+      "quickCounter": 46,
+      "longBallCounter": 89,
+      "outWide": 80,
+      "longBall": 53,
+      "overload": 0
+    },
+    "boosts": [
+      1,
+      13
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17600239209395,
+    "name": "Okan Buruk",
+    "accentedName": "Okan Buruk",
+    "japName": "オカン ブルク",
+    "chineseName": "奥坎·布鲁克",
+    "country": 18,
+    "age": 51,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 55,
+      "quickCounter": 80,
+      "longBallCounter": 43,
+      "outWide": 89,
+      "longBall": 63,
+      "overload": 0
+    },
+    "boosts": [
+      17,
+      5
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17599970775443,
+    "name": "F. Beckenbauer",
+    "accentedName": "F. Beckenbauer",
+    "japName": "フランツ ベッケンバウアー",
+    "chineseName": "弗朗茨·贝肯鲍尔",
+    "country": 7,
+    "age": 45,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 53,
+      "quickCounter": 67,
+      "longBallCounter": 80,
+      "outWide": 54,
+      "longBall": 89,
+      "overload": 0
+    },
+    "boosts": [
+      6,
+      14
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17599702337955,
+    "name": "L. Spalletti",
+    "accentedName": "L. Spalletti",
+    "japName": "ルチアーノ スパレッティ",
+    "chineseName": "卢西亚诺·斯帕莱蒂",
+    "country": 11,
+    "age": 65,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 82,
+      "quickCounter": 56,
+      "longBallCounter": 89,
+      "outWide": 61,
+      "longBall": 46,
+      "overload": 0
+    },
+    "boosts": [
+      10,
+      25
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17599433801745,
+    "name": "Rudi Garcia",
+    "accentedName": "Rudi Garcia",
+    "japName": "リュディ ガルシア",
+    "chineseName": "鲁迪·加西亚",
+    "country": 2,
+    "age": 61,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 52,
+      "quickCounter": 89,
+      "longBallCounter": 58,
+      "outWide": 80,
+      "longBall": 69,
+      "overload": 0
+    },
+    "boosts": [
+      1,
+      0
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17599165366362,
+    "name": "Stale Solbakken",
+    "accentedName": "Ståle Solbakken",
+    "japName": "ストーレ ソルバッケン",
+    "chineseName": "斯塔勒·索尔巴肯",
+    "country": 10,
+    "age": 56,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 47,
+      "quickCounter": 56,
+      "longBallCounter": 64,
+      "outWide": 89,
+      "longBall": 80,
+      "overload": 0
+    },
+    "boosts": [
+      9,
+      18
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17598897033429,
+    "name": "Xabi Alonso",
+    "accentedName": "Xabi Alonso",
+    "japName": "シャビ アロンソ",
+    "chineseName": "哈维·阿隆索",
+    "country": 16,
+    "age": 43,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 88,
+      "longBallCounter": 46,
+      "outWide": 59,
+      "longBall": 42,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17598360161790,
+    "name": "Johan Cruyff",
+    "accentedName": "Johan Cruyff",
+    "japName": "ヨハン クライフ",
+    "chineseName": "约翰·克鲁伊夫",
+    "country": 3,
+    "age": 45,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 89,
+      "quickCounter": 67,
+      "longBallCounter": 54,
+      "outWide": 81,
+      "longBall": 43,
+      "overload": 0
+    },
+    "boosts": [
+      2,
+      19
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17598091725265,
+    "name": "Simone Inzaghi",
+    "accentedName": "Simone Inzaghi",
+    "japName": "シモーネ インザーギ",
+    "chineseName": "西蒙尼·因扎吉",
+    "country": 15,
+    "age": 48,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 78,
+      "longBallCounter": 88,
+      "outWide": 51,
+      "longBall": 43,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      6
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17597823189022,
+    "name": "G. P. Gasperini",
+    "accentedName": "G. P. Gasperini",
+    "japName": "ジャン ピエーロ ガスペリーニ",
+    "chineseName": "吉安·皮埃罗·加斯佩里尼",
+    "country": 17,
+    "age": 66,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 57,
+      "quickCounter": 88,
+      "longBallCounter": 88,
+      "outWide": 52,
+      "longBall": 41,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17597554855616,
+    "name": "Hansi Flick",
+    "accentedName": "Hansi Flick",
+    "japName": "ハンジ フリック",
+    "chineseName": "汉斯·弗里克",
+    "country": 5,
+    "age": 59,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 75,
+      "longBallCounter": 45,
+      "outWide": 64,
+      "longBall": 31,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      15
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17597286420066,
+    "name": "Vincent Kompany",
+    "accentedName": "Vincent Kompany",
+    "japName": "ヴァンサン コンパニ",
+    "chineseName": "文森特·孔帕尼",
+    "country": 16,
+    "age": 38,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 56,
+      "longBallCounter": 58,
+      "outWide": 76,
+      "longBall": 54,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      14
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17597017982861,
+    "name": "Jose Mourinho",
+    "accentedName": "José Mourinho",
+    "japName": "ジョゼ モウリーニョ",
+    "chineseName": "何塞·穆里尼奥",
+    "country": 12,
+    "age": 61,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 49,
+      "quickCounter": 45,
+      "longBallCounter": 88,
+      "outWide": 88,
+      "longBall": 66,
+      "overload": 0
+    },
+    "boosts": [
+      12,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17596749549482,
+    "name": "Ruben Amorim",
+    "accentedName": "Ruben Amorim",
+    "japName": "ルベン アモリム",
+    "chineseName": "鲁本·阿莫里姆",
+    "country": 15,
+    "age": 40,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 74,
+      "quickCounter": 88,
+      "longBallCounter": 54,
+      "outWide": 43,
+      "longBall": 38,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      0
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17596481012062,
+    "name": "Ronald Koeman",
+    "accentedName": "Ronald Koeman",
+    "japName": "ロナルド クーマン",
+    "chineseName": "罗纳德·库曼",
+    "country": 2,
+    "age": 61,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 64,
+      "quickCounter": 56,
+      "longBallCounter": 88,
+      "outWide": 72,
+      "longBall": 45,
+      "overload": 0
+    },
+    "boosts": [
+      1,
+      25
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17596212679870,
+    "name": "Frank Rijkaard",
+    "accentedName": "Frank Rijkaard",
+    "japName": "フランク ライカールト",
+    "chineseName": "弗兰克·里杰卡尔德",
+    "country": 5,
+    "age": 44,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 57,
+      "longBallCounter": 88,
+      "outWide": 68,
+      "longBall": 35,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17595944242399,
+    "name": "Frank Lampard",
+    "accentedName": "Frank Lampard",
+    "japName": "フランク ランパード",
+    "chineseName": "弗兰克·兰帕德",
+    "country": 18,
+    "age": 42,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 56,
+      "quickCounter": 88,
+      "longBallCounter": 54,
+      "outWide": 88,
+      "longBall": 45,
+      "overload": 0
+    },
+    "boosts": [
+      17,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17595675705641,
+    "name": "Paulo Fonseca",
+    "accentedName": "Paulo Fonseca",
+    "japName": "パウロ フォンセカ",
+    "chineseName": "保罗·丰塞卡",
+    "country": 17,
+    "age": 51,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 36,
+      "quickCounter": 88,
+      "longBallCounter": 73,
+      "outWide": 50,
+      "longBall": 63,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      14
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17595407371499,
+    "name": "Patrick Vieira",
+    "accentedName": "Patrick Vieira",
+    "japName": "パトリック ヴィエラ",
+    "chineseName": "帕特里克·维埃拉",
+    "country": 12,
+    "age": 44,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 35,
+      "quickCounter": 67,
+      "longBallCounter": 35,
+      "outWide": 88,
+      "longBall": 88,
+      "overload": 0
+    },
+    "boosts": [
+      12,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17595138936066,
+    "name": "Steven Gerrard",
+    "accentedName": "Steven Gerrard",
+    "japName": "スティーヴン ジェラード",
+    "chineseName": "史蒂文·杰拉德",
+    "country": 4,
+    "age": 41,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 35,
+      "longBallCounter": 55,
+      "outWide": 68,
+      "longBall": 88,
+      "overload": 0
+    },
+    "boosts": [
+      3,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594870501085,
+    "name": "Mikel Arteta",
+    "accentedName": "Mikel Arteta",
+    "japName": "ミケル アルテタ",
+    "chineseName": "迈克尔·阿特塔",
+    "country": 16,
+    "age": 42,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 72,
+      "quickCounter": 68,
+      "longBallCounter": 88,
+      "outWide": 67,
+      "longBall": 30,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      2
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594333631255,
+    "name": "L. de la Fuente",
+    "accentedName": "L. de la Fuente",
+    "japName": "ルイス デ ラ フエンテ",
+    "chineseName": "路易斯·德拉富恩特",
+    "country": 16,
+    "age": 63,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 61,
+      "longBallCounter": 27,
+      "outWide": 88,
+      "longBall": 22,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594333629521,
+    "name": "D. Stojkovic",
+    "accentedName": "D. Stojković",
+    "japName": "ドラガン ストイコヴィッチ",
+    "chineseName": "德拉甘·斯托伊科维奇",
+    "country": 14,
+    "age": 56,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 63,
+      "quickCounter": 88,
+      "longBallCounter": 58,
+      "outWide": 88,
+      "longBall": 53,
+      "overload": 0
+    },
+    "boosts": [
+      14,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594073481737,
+    "name": "Olympio H.",
+    "accentedName": "Olympio H.",
+    "japName": "オリンピオ エンリケス",
+    "chineseName": "奥林匹奥·恩里克斯",
+    "country": 14,
+    "age": 61,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 67,
+      "quickCounter": 87,
+      "longBallCounter": 52,
+      "outWide": 45,
+      "longBall": 86,
+      "overload": 0
+    },
+    "boosts": [
+      14,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594065194415,
+    "name": "Lionel Scaloni",
+    "accentedName": "Lionel Scaloni",
+    "japName": "リオネル スカローニ",
+    "chineseName": "利昂内尔·斯卡洛尼",
+    "country": 5,
+    "age": 45,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 87,
+      "quickCounter": 86,
+      "longBallCounter": 55,
+      "outWide": 38,
+      "longBall": 37,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594065193592,
+    "name": "G. Southgate",
+    "accentedName": "G. Southgate",
+    "japName": "ギャレス サウスゲイト",
+    "chineseName": "加雷思·索思盖特",
+    "country": 16,
+    "age": 53,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 44,
+      "quickCounter": 86,
+      "longBallCounter": 87,
+      "outWide": 69,
+      "longBall": 32,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594065092748,
+    "name": "D. Deschamps",
+    "accentedName": "D. Deschamps",
+    "japName": "ディディエ デシャン",
+    "chineseName": "迪迪埃·德尚",
+    "country": 15,
+    "age": 55,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 69,
+      "quickCounter": 62,
+      "longBallCounter": 88,
+      "outWide": 75,
+      "longBall": 67,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594065092637,
+    "name": "V. Montella",
+    "accentedName": "V. Montella",
+    "japName": "ヴィンチェンツォ モンテッラ",
+    "chineseName": "文森佐·蒙特拉",
+    "country": 20,
+    "age": 49,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 64,
+      "quickCounter": 45,
+      "longBallCounter": 74,
+      "outWide": 88,
+      "longBall": 57,
+      "overload": 0
+    },
+    "boosts": [
+      25,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17594065092609,
+    "name": "R. Martinez",
+    "accentedName": "R. Martínez",
+    "japName": "ロベルト マルティネス",
+    "chineseName": "罗伯托·马丁内斯",
+    "country": 17,
+    "age": 50,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 72,
+      "quickCounter": 68,
+      "longBallCounter": 52,
+      "outWide": 69,
+      "longBall": 88,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593796759765,
+    "name": "Xabi Alonso",
+    "accentedName": "Xabi Alonso",
+    "japName": "シャビ アロンソ",
+    "chineseName": "哈维·阿隆索",
+    "country": 16,
+    "age": 43,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 72,
+      "quickCounter": 88,
+      "longBallCounter": 35,
+      "outWide": 51,
+      "longBall": 28,
+      "overload": 0
+    },
+    "boosts": [
+      16,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593796657368,
+    "name": "Pep Guardiola",
+    "accentedName": "Pep Guardiola",
+    "japName": "ペップ グアルディオラ",
+    "chineseName": "何塞普·瓜迪奥拉",
+    "country": 3,
+    "age": 43,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 88,
+      "quickCounter": 74,
+      "longBallCounter": 37,
+      "outWide": 68,
+      "longBall": 32,
+      "overload": 0
+    },
+    "boosts": [
+      2,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593528325190,
+    "name": "Zico",
+    "accentedName": "Zico",
+    "japName": "ジーコ",
+    "chineseName": "济科",
+    "country": 4,
+    "age": 53,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 83,
+      "quickCounter": 60,
+      "longBallCounter": 34,
+      "outWide": 75,
+      "longBall": 20,
+      "overload": 0
+    },
+    "boosts": [
+      3,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593259887058,
+    "name": "Thomas Tuchel",
+    "accentedName": "Thomas Tuchel",
+    "japName": "トーマス トゥヘル",
+    "chineseName": "托马斯·图赫尔",
+    "country": 17,
+    "age": 50,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 45,
+      "longBallCounter": 70,
+      "outWide": 85,
+      "longBall": 24,
+      "overload": 0
+    },
+    "boosts": [
+      18,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593259887057,
+    "name": "Simone Inzaghi",
+    "accentedName": "Simone Inzaghi",
+    "japName": "シモーネ インザーギ",
+    "chineseName": "西蒙尼·因扎吉",
+    "country": 20,
+    "age": 47,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 41,
+      "quickCounter": 85,
+      "longBallCounter": 70,
+      "outWide": 64,
+      "longBall": 29,
+      "overload": 0
+    },
+    "boosts": [
+      25,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17593259786612,
+    "name": "Stefano Pioli",
+    "accentedName": "Stefano Pioli",
+    "japName": "ステファノ ピオーリ",
+    "chineseName": "斯特凡诺·皮奥利",
+    "country": 12,
+    "age": 58,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 51,
+      "quickCounter": 85,
+      "longBallCounter": 59,
+      "outWide": 75,
+      "longBall": 45,
+      "overload": 0
+    },
+    "boosts": [
+      12,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592991452928,
+    "name": "Xavi Hernandez",
+    "accentedName": "Xavi Hernández",
+    "japName": "シャビ エルナンデス",
+    "chineseName": "哈维",
+    "country": 2,
+    "age": 43,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 85,
+      "quickCounter": 70,
+      "longBallCounter": 18,
+      "outWide": 42,
+      "longBall": 25,
+      "overload": 0
+    },
+    "boosts": [
+      1,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592991452893,
+    "name": "Mikel Arteta",
+    "accentedName": "Mikel Arteta",
+    "japName": "ミケル アルテタ",
+    "chineseName": "迈克尔·阿特塔",
+    "country": 5,
+    "age": 41,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 85,
+      "quickCounter": 71,
+      "longBallCounter": 68,
+      "outWide": 73,
+      "longBall": 20,
+      "overload": 0
+    },
+    "boosts": [
+      4,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592991451474,
+    "name": "Erik ten Hag",
+    "accentedName": "Erik ten Hag",
+    "japName": "エリク テン ハフ",
+    "chineseName": "埃里克·滕哈赫",
+    "country": 15,
+    "age": 53,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 51,
+      "quickCounter": 66,
+      "longBallCounter": 85,
+      "outWide": 70,
+      "longBall": 40,
+      "overload": 0
+    },
+    "boosts": [
+      15,
+      -1
+    ],
+    "hasBoost": true,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592454480088,
+    "name": "Pep Guardiola",
+    "accentedName": "Pep Guardiola",
+    "japName": "ペップ グアルディオラ",
+    "chineseName": "何塞普·瓜迪奥拉",
+    "country": 0,
+    "age": 37,
+    "affinity": 5,
+    "skills": {
+      "possessionGame": 87,
+      "quickCounter": 66,
+      "longBallCounter": 74,
+      "outWide": 75,
+      "longBall": 28,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592186147465,
+    "name": "Claudio Soucek",
+    "accentedName": "Claudio Soucek",
+    "japName": "クラウディオ ソチェック",
+    "chineseName": "克劳迪奥·索切克",
+    "country": 0,
+    "age": 50,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 70,
+      "quickCounter": 70,
+      "longBallCounter": 70,
+      "outWide": 70,
+      "longBall": 70,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592186146302,
+    "name": "Johan Cruyff",
+    "accentedName": "Johan Cruyff",
+    "japName": "ヨハン クライフ",
+    "chineseName": "约翰·克鲁伊夫",
+    "country": 0,
+    "age": 44,
+    "affinity": 3,
+    "skills": {
+      "possessionGame": 86,
+      "quickCounter": 72,
+      "longBallCounter": 53,
+      "outWide": 61,
+      "longBall": 39,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 17592186144611,
+    "name": "Fabio Cannavaro",
+    "accentedName": "Fabio Cannavaro",
+    "japName": "ファビオ カンナヴァーロ",
+    "chineseName": "法比奥·坎纳瓦罗",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 72,
+      "quickCounter": 55,
+      "longBallCounter": 61,
+      "outWide": 52,
+      "longBall": 41,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184428,
+    "name": "David Pagou",
+    "accentedName": "David Pagou",
+    "japName": "ダヴィド パグ",
+    "chineseName": "大卫·帕古",
+    "country": 0,
+    "age": 57,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 42,
+      "longBallCounter": 57,
+      "outWide": 60,
+      "longBall": 48,
+      "overload": 56
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184426,
+    "name": "Miguel Gamondi",
+    "accentedName": "Miguel Gamondi",
+    "japName": "ミゲル ガモンディ",
+    "chineseName": "米格尔·加蒙迪",
+    "country": 0,
+    "age": 60,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 33,
+      "quickCounter": 23,
+      "longBallCounter": 50,
+      "outWide": 60,
+      "longBall": 29,
+      "overload": 39
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184425,
+    "name": "Mario Marinica",
+    "accentedName": "Mario Marinică",
+    "japName": "マリオ マリニカ",
+    "chineseName": "马里奥·马里尼卡",
+    "country": 0,
+    "age": 62,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 19,
+      "quickCounter": 26,
+      "longBallCounter": 38,
+      "outWide": 60,
+      "longBall": 50,
+      "overload": 31
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184424,
+    "name": "Moses Sichone",
+    "accentedName": "Moses Sichone",
+    "japName": "モーゼズ シチョン",
+    "chineseName": "摩西·西乔恩",
+    "country": 0,
+    "age": 49,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 22,
+      "quickCounter": 34,
+      "longBallCounter": 60,
+      "outWide": 28,
+      "longBall": 50,
+      "overload": 28
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184353,
+    "name": "Chiquinho Conde",
+    "accentedName": "Chiquinho Conde",
+    "japName": "シキーニョ コンジ",
+    "chineseName": "希基尼奥·孔德",
+    "country": 0,
+    "age": 61,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 46,
+      "quickCounter": 28,
+      "longBallCounter": 60,
+      "outWide": 37,
+      "longBall": 48,
+      "overload": 34
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184351,
+    "name": "Pedro Goncalves",
+    "accentedName": "Pedro Gonçalves",
+    "japName": "ペドロ ゴンサウヴィス",
+    "chineseName": "",
+    "country": 228,
+    "age": 49,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 36,
+      "quickCounter": 46,
+      "longBallCounter": 60,
+      "outWide": 57,
+      "longBall": 31,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184349,
+    "name": "Stefano Cusin",
+    "accentedName": "Stefano Cusin",
+    "japName": "ステーファノ クジン",
+    "chineseName": "斯特凡诺·库辛",
+    "country": 0,
+    "age": 58,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 39,
+      "quickCounter": 37,
+      "longBallCounter": 60,
+      "outWide": 60,
+      "longBall": 46,
+      "overload": 29
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184346,
+    "name": "Hemed Suleiman",
+    "accentedName": "Hemed Suleiman",
+    "japName": "ハメド スレイマン",
+    "chineseName": "",
+    "country": 90,
+    "age": 55,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 51,
+      "quickCounter": 36,
+      "longBallCounter": 22,
+      "outWide": 63,
+      "longBall": 27,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184344,
+    "name": "Juan Micha",
+    "accentedName": "Juan Michá",
+    "japName": "ファン マチャ",
+    "chineseName": "胡安·米查",
+    "country": 0,
+    "age": 51,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 38,
+      "quickCounter": 33,
+      "longBallCounter": 52,
+      "outWide": 47,
+      "longBall": 63,
+      "overload": 32
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184270,
+    "name": "Sami Trabelsi",
+    "accentedName": "Sami Trabelsi",
+    "japName": "サミ トラベルシ",
+    "chineseName": "萨米·特拉布勒西",
+    "country": 0,
+    "age": 58,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 51,
+      "longBallCounter": 61,
+      "outWide": 41,
+      "longBall": 55,
+      "overload": 46
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184134,
+    "name": "M. Ramoreboli",
+    "accentedName": "M. Ramoreboli",
+    "japName": "モリーナ ラモリボリ",
+    "chineseName": "莫利纳·拉莫雷博利",
+    "country": 0,
+    "age": 45,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 28,
+      "quickCounter": 24,
+      "longBallCounter": 60,
+      "outWide": 33,
+      "longBall": 36,
+      "overload": 28
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184133,
+    "name": "Michael Nees",
+    "accentedName": "Michael Nees",
+    "japName": "ミヒャエル ネース",
+    "chineseName": "",
+    "country": 210,
+    "age": 58,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 29,
+      "quickCounter": 41,
+      "longBallCounter": 49,
+      "outWide": 60,
+      "longBall": 39,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184132,
+    "name": "T. Mouyouma",
+    "accentedName": "T. Mouyouma",
+    "japName": "ティエリー ムユマ",
+    "chineseName": "蒂埃里·穆尤马",
+    "country": 0,
+    "age": 51,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 62,
+      "quickCounter": 45,
+      "longBallCounter": 40,
+      "outWide": 56,
+      "longBall": 27,
+      "overload": 48
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88184043,
+    "name": "Tom Saintfiet",
+    "accentedName": "Tom Saintfiet",
+    "japName": "トム サンフィエ",
+    "chineseName": "汤姆·圣菲特",
+    "country": 0,
+    "age": 53,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 48,
+      "quickCounter": 62,
+      "longBallCounter": 43,
+      "outWide": 60,
+      "longBall": 46,
+      "overload": 39
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88183994,
+    "name": "Brama Traore",
+    "accentedName": "Brama Traoré",
+    "japName": "ブラマ トラオレ",
+    "chineseName": "布拉马·特拉奥雷",
+    "country": 0,
+    "age": 64,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 42,
+      "quickCounter": 45,
+      "longBallCounter": 50,
+      "outWide": 63,
+      "longBall": 60,
+      "overload": 26
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88183992,
+    "name": "Emerse Fae",
+    "accentedName": "Emerse Faé",
+    "japName": "イーメルス ファエ",
+    "chineseName": "埃默斯·法埃",
+    "country": 0,
+    "age": 42,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 62,
+      "longBallCounter": 32,
+      "outWide": 60,
+      "longBall": 28,
+      "overload": 54
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88183587,
+    "name": "Eric Chelle",
+    "accentedName": "Éric Chelle",
+    "japName": "エリク シェル",
+    "chineseName": "埃里克·谢勒",
+    "country": 0,
+    "age": 49,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 67,
+      "quickCounter": 63,
+      "longBallCounter": 44,
+      "outWide": 52,
+      "longBall": 42,
+      "overload": 61
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88183409,
+    "name": "Pape Thiaw",
+    "accentedName": "Pape Thiaw",
+    "japName": "パプ ティアウ",
+    "chineseName": "帕普·恰夫",
+    "country": 0,
+    "age": 45,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 47,
+      "quickCounter": 63,
+      "longBallCounter": 41,
+      "outWide": 68,
+      "longBall": 38,
+      "overload": 26
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88182677,
+    "name": "S. Desabre",
+    "accentedName": "S. Desabre",
+    "japName": "セバスティアン デザブル",
+    "chineseName": "塞巴斯蒂安·德萨布尔",
+    "country": 0,
+    "age": 50,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 42,
+      "quickCounter": 60,
+      "longBallCounter": 60,
+      "outWide": 44,
+      "longBall": 54,
+      "overload": 48
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88182526,
+    "name": "Hoalid Regragui",
+    "accentedName": "Hoalid Regragui",
+    "japName": "ワリド レグラギ",
+    "chineseName": "瓦利德·雷格拉古伊",
+    "country": 0,
+    "age": 51,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 52,
+      "quickCounter": 47,
+      "longBallCounter": 63,
+      "outWide": 67,
+      "longBall": 36,
+      "overload": 50
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88182038,
+    "name": "Marc Brys",
+    "accentedName": "Marc Brys",
+    "japName": "マルク ブリス",
+    "chineseName": "马克·布里斯",
+    "country": 197,
+    "age": 63,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 52,
+      "longBallCounter": 54,
+      "outWide": 62,
+      "longBall": 35,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88181239,
+    "name": "Hugo Broos",
+    "accentedName": "Hugo Broos",
+    "japName": "ウーゴ ブロース",
+    "chineseName": "乌戈·布罗斯",
+    "country": 0,
+    "age": 74,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 40,
+      "longBallCounter": 63,
+      "outWide": 48,
+      "longBall": 46,
+      "overload": 38
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88180783,
+    "name": "Gernot Rohr",
+    "accentedName": "Gernot Rohr",
+    "japName": "ジェルノト ロール",
+    "chineseName": "格诺特·罗尔",
+    "country": 0,
+    "age": 73,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 44,
+      "quickCounter": 53,
+      "longBallCounter": 62,
+      "outWide": 63,
+      "longBall": 48,
+      "overload": 36
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88180618,
+    "name": "Avram Grant",
+    "accentedName": "Avram Grant",
+    "japName": "アヴラム グラント",
+    "chineseName": "阿夫拉姆·格兰特",
+    "country": 189,
+    "age": 70,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 51,
+      "longBallCounter": 50,
+      "outWide": 53,
+      "longBall": 38,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88080730,
+    "name": "Akwasi Appiah",
+    "accentedName": "Akwasi Appiah",
+    "japName": "アクワシ アッピアー",
+    "chineseName": "夸西·阿皮亚",
+    "country": 0,
+    "age": 66,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 30,
+      "quickCounter": 36,
+      "longBallCounter": 62,
+      "outWide": 43,
+      "longBall": 56,
+      "overload": 33
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88080714,
+    "name": "P. Beaumelle",
+    "accentedName": "P. Beaumelle",
+    "japName": "パトリス ビュームル",
+    "chineseName": "帕特里斯·博梅勒",
+    "country": 0,
+    "age": 48,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 51,
+      "quickCounter": 51,
+      "longBallCounter": 60,
+      "outWide": 63,
+      "longBall": 52,
+      "overload": 57
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88080525,
+    "name": "V. Petkovic",
+    "accentedName": "V. Petković",
+    "japName": "ヴラディミル ペトコヴィッチ",
+    "chineseName": "弗拉迪米尔·佩特科维奇",
+    "country": 0,
+    "age": 63,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 70,
+      "quickCounter": 66,
+      "longBallCounter": 62,
+      "outWide": 70,
+      "longBall": 56,
+      "overload": 52
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88080479,
+    "name": "Paul Put",
+    "accentedName": "Paul Put",
+    "japName": "ポール ピュ",
+    "chineseName": "保罗·普特",
+    "country": 0,
+    "age": 70,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 19,
+      "quickCounter": 29,
+      "longBallCounter": 57,
+      "outWide": 33,
+      "longBall": 62,
+      "overload": 20
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 88080431,
+    "name": "Hossam Hassan",
+    "accentedName": "Hossam Hassan",
+    "japName": "ホッサム ハッサン",
+    "chineseName": "胡萨姆·哈桑",
+    "country": 0,
+    "age": 60,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 54,
+      "quickCounter": 48,
+      "longBallCounter": 60,
+      "outWide": 48,
+      "longBall": 42,
+      "overload": 56
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54629633,
+    "name": "Maksim Lisitsyn",
+    "accentedName": "Maksim Lisitsyn",
+    "japName": "マクシム リシツィン",
+    "chineseName": "马克西姆·利西津",
+    "country": 0,
+    "age": 48,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 12,
+      "quickCounter": 22,
+      "longBallCounter": 50,
+      "outWide": 28,
+      "longBall": 60,
+      "overload": 32
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54629632,
+    "name": "Jamal Sellami",
+    "accentedName": "Jamal Sellami",
+    "japName": "ジャマル セラミ",
+    "chineseName": "贾马尔·塞拉米",
+    "country": 0,
+    "age": 56,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 47,
+      "quickCounter": 42,
+      "longBallCounter": 66,
+      "outWide": 51,
+      "longBall": 53,
+      "overload": 55
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54629442,
+    "name": "Sin Yong-Nam",
+    "accentedName": "Sin Yong-Nam",
+    "japName": "シン ヨンナム",
+    "chineseName": "申永南",
+    "country": 0,
+    "age": 48,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 33,
+      "quickCounter": 38,
+      "longBallCounter": 50,
+      "outWide": 60,
+      "longBall": 43,
+      "overload": 32
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54629337,
+    "name": "Makram Daboub",
+    "accentedName": "Makram Daboub",
+    "japName": "マクラム ダブブ",
+    "chineseName": "马克拉姆·达布布",
+    "country": 0,
+    "age": 54,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 49,
+      "quickCounter": 60,
+      "longBallCounter": 50,
+      "outWide": 41,
+      "longBall": 39,
+      "overload": 36
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54629147,
+    "name": "Jesus Casas",
+    "accentedName": "Jesús Casas",
+    "japName": "ヘスス カーサス",
+    "chineseName": "耶稣·卡萨斯",
+    "country": 0,
+    "age": 53,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 51,
+      "quickCounter": 63,
+      "longBallCounter": 60,
+      "outWide": 43,
+      "longBall": 32,
+      "overload": 38
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54627497,
+    "name": "Dragan Talajic",
+    "accentedName": "Dragan Talajić",
+    "japName": "ドラガン タライッチ",
+    "chineseName": "德拉甘·塔拉伊奇",
+    "country": 0,
+    "age": 61,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 62,
+      "quickCounter": 55,
+      "longBallCounter": 52,
+      "outWide": 44,
+      "longBall": 39,
+      "overload": 38
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54627448,
+    "name": "Shin Tae-Yong",
+    "accentedName": "Shin Tae-Yong",
+    "japName": "シン テ ヨン",
+    "chineseName": "申台龙",
+    "country": 0,
+    "age": 56,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 32,
+      "quickCounter": 31,
+      "longBallCounter": 65,
+      "outWide": 50,
+      "longBall": 47,
+      "overload": 46
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54627137,
+    "name": "Tintin Marquez",
+    "accentedName": "Tintín Márquez",
+    "japName": "ティンティン マルケス",
+    "chineseName": "廷廷·马克斯",
+    "country": 0,
+    "age": 64,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 66,
+      "quickCounter": 39,
+      "longBallCounter": 15,
+      "outWide": 54,
+      "longBall": 23,
+      "overload": 40
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54626994,
+    "name": "J. Silhavy",
+    "accentedName": "J. Šilhavý",
+    "japName": "ヤロスラフ シルハヴィ",
+    "chineseName": "雅罗斯拉夫·希尔哈维",
+    "country": 0,
+    "age": 65,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 52,
+      "quickCounter": 44,
+      "longBallCounter": 63,
+      "outWide": 63,
+      "longBall": 68,
+      "overload": 41
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54626758,
+    "name": "Graham Arnold",
+    "accentedName": "Graham Arnold",
+    "japName": "グラハム アーノルド",
+    "chineseName": "格雷厄姆·阿诺德",
+    "country": 0,
+    "age": 63,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 37,
+      "quickCounter": 52,
+      "longBallCounter": 58,
+      "outWide": 60,
+      "longBall": 46,
+      "overload": 35
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54626151,
+    "name": "B. Ivankovic",
+    "accentedName": "B. Ivanković",
+    "japName": "ブランコ イヴァンコヴィッチ",
+    "chineseName": "布兰科·伊万科维奇",
+    "country": 0,
+    "age": 72,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 37,
+      "quickCounter": 28,
+      "longBallCounter": 52,
+      "outWide": 65,
+      "longBall": 42,
+      "overload": 35
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526447,
+    "name": "Moriyasu Hajime",
+    "accentedName": "Moriyasu Hajime",
+    "japName": "森保 一",
+    "chineseName": "森保一",
+    "country": 0,
+    "age": 58,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 46,
+      "quickCounter": 72,
+      "longBallCounter": 63,
+      "outWide": 54,
+      "longBall": 41,
+      "overload": 57
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526296,
+    "name": "Hong Myung-Bo",
+    "accentedName": "Hong Myung-Bo",
+    "japName": "ホン ミョンボ",
+    "chineseName": "洪明甫",
+    "country": 0,
+    "age": 57,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 42,
+      "quickCounter": 60,
+      "longBallCounter": 53,
+      "outWide": 61,
+      "longBall": 46,
+      "overload": 43
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526292,
+    "name": "Srecko Katanec",
+    "accentedName": "Srečko Katanec",
+    "japName": "スレチコ カタネツ",
+    "chineseName": "斯雷茨科·卡塔内茨",
+    "country": 0,
+    "age": 63,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 41,
+      "quickCounter": 47,
+      "longBallCounter": 65,
+      "outWide": 64,
+      "longBall": 54,
+      "overload": 34
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526086,
+    "name": "Paulo Bento",
+    "accentedName": "Paulo Bento",
+    "japName": "パウロ ベント",
+    "chineseName": "保罗·本托",
+    "country": 0,
+    "age": 57,
+    "affinity": 4,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 50,
+      "longBallCounter": 65,
+      "outWide": 61,
+      "longBall": 36,
+      "overload": 48
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526075,
+    "name": "Roberto Mancini",
+    "accentedName": "Roberto Mancini",
+    "japName": "ロベルト マンチーニ",
+    "chineseName": "罗伯托·曼奇尼",
+    "country": 0,
+    "age": 62,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 75,
+      "quickCounter": 70,
+      "longBallCounter": 39,
+      "outWide": 61,
+      "longBall": 30,
+      "overload": 50
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54526033,
+    "name": "J.Antonio Pizzi",
+    "accentedName": "J.Antonio Pizzi",
+    "japName": "ファン アントニオ ピッツィ",
+    "chineseName": "胡安·皮齐",
+    "country": 0,
+    "age": 58,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 49,
+      "quickCounter": 55,
+      "longBallCounter": 65,
+      "outWide": 65,
+      "longBall": 46,
+      "overload": 50
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 54525990,
+    "name": "Amir Ghalenoei",
+    "accentedName": "Amir Ghalenoei",
+    "japName": "アミル ガレノエイ",
+    "chineseName": "阿米尔·加里诺伊",
+    "country": 0,
+    "age": 63,
+    "affinity": 0,
+    "skills": {
+      "possessionGame": 37,
+      "quickCounter": 56,
+      "longBallCounter": 63,
+      "outWide": 50,
+      "longBall": 60,
+      "overload": 42
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25169927,
+    "name": "Silvestar Krpan",
+    "accentedName": "Silvestar Krpan",
+    "japName": "シルヴェスタル クルパン",
+    "chineseName": "西尔韦斯塔尔·克尔潘",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 6,
+      "quickCounter": 27,
+      "longBallCounter": 61,
+      "outWide": 40,
+      "longBall": 19,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25169860,
+    "name": "Danylo Gogol",
+    "accentedName": "Danylo Gogol",
+    "japName": "ダニロ ホホル",
+    "chineseName": "达内洛·戈戈尔",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 44,
+      "quickCounter": 20,
+      "longBallCounter": 9,
+      "outWide": 60,
+      "longBall": 28,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25169846,
+    "name": "Franjo Rajic",
+    "accentedName": "Franjo Rajić",
+    "japName": "フランヨ ライッチ",
+    "chineseName": "弗拉尼奥·拉伊奇",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 14,
+      "quickCounter": 12,
+      "longBallCounter": 41,
+      "outWide": 62,
+      "longBall": 11,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25169834,
+    "name": "Kyrylo Zhuk",
+    "accentedName": "Kyrylo Zhuk",
+    "japName": "キリロ ジュク",
+    "chineseName": "基雷洛·茹克",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 26,
+      "quickCounter": 7,
+      "longBallCounter": 40,
+      "outWide": 12,
+      "longBall": 61,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168498,
+    "name": "Ionna Radic",
+    "accentedName": "Ionna Radić",
+    "japName": "イオンナ ラディチ",
+    "chineseName": "约恩纳·拉迪奇",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 63,
+      "quickCounter": 16,
+      "longBallCounter": 23,
+      "outWide": 34,
+      "longBall": 17,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168448,
+    "name": "Taher Hakam",
+    "accentedName": "Taher Hakam",
+    "japName": "タヘル ハカム",
+    "chineseName": "塔希尔·哈卡姆",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 34,
+      "quickCounter": 38,
+      "longBallCounter": 60,
+      "outWide": 40,
+      "longBall": 23,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168404,
+    "name": "Nyura Ivanic",
+    "accentedName": "Nyura Ivanić",
+    "japName": "ニュラ イヴァニッチ",
+    "chineseName": "尼乌拉·伊万尼茨",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 61,
+      "quickCounter": 6,
+      "longBallCounter": 6,
+      "outWide": 43,
+      "longBall": 32,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168396,
+    "name": "Leopold Nutley",
+    "accentedName": "Leopold Nutley",
+    "japName": "レオポルド ナトリー",
+    "chineseName": "利奥波德·纳特利",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 5,
+      "quickCounter": 7,
+      "longBallCounter": 64,
+      "outWide": 6,
+      "longBall": 26,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168390,
+    "name": "Massud Uthman",
+    "accentedName": "Massud Uthman",
+    "japName": "マスウド ウトマン",
+    "chineseName": "马苏德·奥斯曼",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 32,
+      "quickCounter": 33,
+      "longBallCounter": 16,
+      "outWide": 60,
+      "longBall": 20,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168383,
+    "name": "Nader Bin Talat",
+    "accentedName": "Nader Bin Talat",
+    "japName": "ナデル ビン タラト",
+    "chineseName": "纳德尔·本·塔拉特",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 21,
+      "quickCounter": 42,
+      "longBallCounter": 16,
+      "outWide": 21,
+      "longBall": 61,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168367,
+    "name": "Vail M.Lintonen",
+    "accentedName": "Vail M.Lintonen",
+    "japName": "ヴァイル マッティ リントネン",
+    "chineseName": "韦尔-马蒂·林托宁",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 27,
+      "quickCounter": 34,
+      "longBallCounter": 60,
+      "outWide": 14,
+      "longBall": 6,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168341,
+    "name": "Mustafa Sahir",
+    "accentedName": "Mustafa Sahir",
+    "japName": "ムスタファ サヒル",
+    "chineseName": "穆斯塔法·萨希尔",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 32,
+      "quickCounter": 34,
+      "longBallCounter": 61,
+      "outWide": 18,
+      "longBall": 27,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168338,
+    "name": "Adel Raji",
+    "accentedName": "Adel Raji",
+    "japName": "アデル ラジ",
+    "chineseName": "阿德尔·拉吉",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 11,
+      "quickCounter": 22,
+      "longBallCounter": 62,
+      "outWide": 10,
+      "longBall": 15,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168326,
+    "name": "Jochum v.d. Pol",
+    "accentedName": "Jochum v.d. Pol",
+    "japName": "ヨフン ファン デ ポル",
+    "chineseName": "约胡姆·范德波尔",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 29,
+      "quickCounter": 32,
+      "longBallCounter": 60,
+      "outWide": 19,
+      "longBall": 6,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168320,
+    "name": "Solmu Jurkka",
+    "accentedName": "Solmu Jurkka",
+    "japName": "ソルム ユルッカ",
+    "chineseName": "索尔穆·尤尔卡",
+    "country": 0,
+    "age": 46,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 10,
+      "quickCounter": 65,
+      "longBallCounter": 25,
+      "outWide": 11,
+      "longBall": 14,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168308,
+    "name": "Gojko Krstic",
+    "accentedName": "Gojko Krstić",
+    "japName": "ガイコ クルスティッチ",
+    "chineseName": "戈伊科·克尔斯蒂奇",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 64,
+      "quickCounter": 30,
+      "longBallCounter": 21,
+      "outWide": 24,
+      "longBall": 32,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168302,
+    "name": "Aldous Mayerl",
+    "accentedName": "Aldous Mayerl",
+    "japName": "アルダス メイヤール",
+    "chineseName": "奥尔德斯·梅耶尔",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 41,
+      "quickCounter": 15,
+      "longBallCounter": 24,
+      "outWide": 60,
+      "longBall": 38,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168293,
+    "name": "Najim Zafar",
+    "accentedName": "Najim Zafar",
+    "japName": "ナジム ザファル",
+    "chineseName": "纳吉姆·扎法尔",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 34,
+      "quickCounter": 29,
+      "longBallCounter": 33,
+      "outWide": 39,
+      "longBall": 60,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168292,
+    "name": "Hamid Bin Talat",
+    "accentedName": "Hamid Bin Talat",
+    "japName": "ハミド ビン タラト",
+    "chineseName": "哈米德·本·塔拉特",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 65,
+      "quickCounter": 15,
+      "longBallCounter": 12,
+      "outWide": 29,
+      "longBall": 8,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168291,
+    "name": "Z. Simunovic",
+    "accentedName": "Z. Simunović",
+    "japName": "ズラトコ シムノヴィッチ",
+    "chineseName": "兹拉特科·西穆诺维奇",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 66,
+      "quickCounter": 20,
+      "longBallCounter": 22,
+      "outWide": 12,
+      "longBall": 24,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168205,
+    "name": "Ali Talib",
+    "accentedName": "Ali Talib",
+    "japName": "アリ タリブ",
+    "chineseName": "阿里·塔利布",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 20,
+      "quickCounter": 32,
+      "longBallCounter": 62,
+      "outWide": 37,
+      "longBall": 11,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 25168195,
+    "name": "Devoss de Vos",
+    "accentedName": "Devoss de Vos",
+    "japName": "デフォス デ フォス",
+    "chineseName": "德弗斯·德福斯",
+    "country": 0,
+    "age": 46,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 16,
+      "quickCounter": 13,
+      "longBallCounter": 33,
+      "outWide": 13,
+      "longBall": 65,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881314,
+    "name": "Mergen Orazov",
+    "accentedName": "Mergen Orazov",
+    "japName": "メルゲン オラゾフ",
+    "chineseName": "梅尔根·奥拉佐夫",
+    "country": 0,
+    "age": 38,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 42,
+      "quickCounter": 55,
+      "longBallCounter": 62,
+      "outWide": 39,
+      "longBall": 37,
+      "overload": 28
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881313,
+    "name": "Hussam Fawzi",
+    "accentedName": "Hussam Fawzi",
+    "japName": "フッサム ファウジ",
+    "chineseName": "胡萨姆·法齐",
+    "country": 0,
+    "age": 52,
+    "affinity": 2,
+    "skills": {
+      "possessionGame": 34,
+      "quickCounter": 39,
+      "longBallCounter": 61,
+      "outWide": 50,
+      "longBall": 45,
+      "overload": 36
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881302,
+    "name": "Bartosch Gaul",
+    "accentedName": "Bartosch Gaul",
+    "japName": "バルトシュ ガウル",
+    "chineseName": "巴托施·高尔",
+    "country": 0,
+    "age": 39,
+    "affinity": 1,
+    "skills": {
+      "possessionGame": 52,
+      "quickCounter": 65,
+      "longBallCounter": 38,
+      "outWide": 50,
+      "longBall": 24,
+      "overload": 38
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881299,
+    "name": "Jens Wissing",
+    "accentedName": "Jens Wissing",
+    "japName": "イェンス ヴィッシング",
+    "chineseName": "延斯·维辛",
+    "country": 0,
+    "age": 38,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 64,
+      "quickCounter": 57,
+      "longBallCounter": 38,
+      "outWide": 42,
+      "longBall": 22,
+      "overload": 47
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881214,
+    "name": "C. Gamel",
+    "accentedName": "C. Gamel",
+    "japName": "クリストフ ギャメル",
+    "chineseName": "克里斯托弗·加梅尔",
+    "country": 0,
+    "age": 54,
+    "affinity": 7,
+    "skills": {
+      "possessionGame": 38,
+      "quickCounter": 65,
+      "longBallCounter": 43,
+      "outWide": 52,
+      "longBall": 34,
+      "overload": 39
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  },
+  {
+    "id": 16881212,
+    "name": "Emad El-Nahhas",
+    "accentedName": "Emad El-Nahhas",
+    "japName": "エマド エル ナハース",
+    "chineseName": "伊马德·埃尔-纳哈斯",
+    "country": 0,
+    "age": 50,
+    "affinity": 6,
+    "skills": {
+      "possessionGame": 60,
+      "quickCounter": 47,
+      "longBallCounter": 32,
+      "outWide": 37,
+      "longBall": 22,
+      "overload": 0
+    },
+    "boosts": [
+      -1,
+      -1
+    ],
+    "hasBoost": false,
+    "linkupId": 0,
+    "linkup": null,
+    "linkupId2": 0,
+    "linkup2": null
+  }
+]

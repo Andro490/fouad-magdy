@@ -91,11 +91,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#080b1a] text-white" dir="rtl">
+    <div className="min-h-screen text-white" style={{ background: 'linear-gradient(160deg, #060c1f 0%, #091428 40%, #0a1a3a 70%, #060c1f 100%)' }} dir="rtl">
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20"
-        style={{ background: 'linear-gradient(135deg, #060c1f 0%, #091428 30%, #0a1a3a 55%, #060c1f 100%)' }}>
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
 
         {/* Subtle grid */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"

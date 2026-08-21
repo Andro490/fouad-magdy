@@ -2,31 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* eFootball 2027 Global Background */
+/* Global Layout */
 body {
-  background-color: #080b1a;
-  background-image:
-    url('./assets/efootball-bg.jpeg');
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  background-color: #f9fafb; /* gray-50 */
   min-height: 100vh;
-}
-
-/* Dark overlay so content is readable */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(8, 11, 26, 0.88) 0%,
-    rgba(8, 11, 26, 0.75) 50%,
-    rgba(8, 11, 26, 0.88) 100%
-  );
-  pointer-events: none;
-  z-index: 0;
 }
 
 #root {

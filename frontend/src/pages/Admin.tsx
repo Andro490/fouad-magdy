@@ -96,10 +96,9 @@ const Admin = () => {
     setIsUploading(true);
     const files = Array.from(e.target.files);
     
-    const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY || '64893796dcb70764722c0d575faeb0a9';
-    
     try {
       const uploadedUrls: string[] = [];
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       
       for (const file of files) {
         const base64 = await new Promise<string>((resolve, reject) => {
@@ -109,65 +108,19 @@ const Admin = () => {
           reader.onerror = error => reject(error);
         });
 
-        let isSuccess = false;
-        let uploadedUrl = '';
-        let errorMessage = '';
-
-        try {
-          const formData = new FormData();
-          formData.append('image', base64);
-          
-          const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-            method: 'POST',
-            body: formData
-          });
-          
-          const data = await res.json();
-          if (data.success) {
-            isSuccess = true;
-            uploadedUrl = data.data.url;
-          } else {
-            errorMessage = data.error?.message || 'Unknown ImgBB error';
-            console.error('ImgBB Upload failed:', data);
-          }
-        } catch (e: any) {
-          console.error('ImgBB network error:', e);
-          errorMessage = e.message;
-        }
-
-        // Fallback to freeimage.host if ImgBB fails (e.g., down for maintenance)
-        if (!isSuccess) {
-          try {
-            console.log('Falling back to freeimage.host...');
-            const fallbackFormData = new FormData();
-            fallbackFormData.append('source', base64);
-            fallbackFormData.append('key', '6d207e02198a847aa98d0a2a901485a5'); // Public freeimage key
-            
-            const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
-              method: 'POST',
-              body: fallbackFormData
-            });
-            
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.status_code === 200) {
-              isSuccess = true;
-              uploadedUrl = fallbackData.image.url;
-            } else {
-              console.error('Fallback upload failed:', fallbackData);
-            }
-          } catch (fallbackError) {
-            console.error('Fallback network error:', fallbackError);
-          }
-        }
+        const res = await fetch(`${API_URL}/api/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64 })
+        });
         
-        if (isSuccess) {
-          uploadedUrls.push(uploadedUrl);
+        const data = await res.json();
+        if (data.success) {
+          uploadedUrls.push(data.url);
         } else {
-          if (errorMessage.toLowerCase().includes('api key')) {
-            alert('مفتاح ImgBB غير صالح. يرجى الحصول على مفتاح جديد وإضافته.');
-            setIsUploading(false);
-            e.target.value = '';
-            return;
+          console.error('Upload failed:', data);
+          if (data.error?.toLowerCase().includes('api key')) {
+            alert('يوجد خطأ في مفتاح API في السيرفر.');
           }
         }
       }
@@ -184,7 +137,7 @@ const Admin = () => {
       }
     } catch (error) {
       console.error('Error uploading images:', error);
-      alert('حدث خطأ أثناء الاتصال بخادم رفع الصور.');
+      alert('حدث خطأ أثناء الاتصال بالسيرفر لرفع الصور.');
     } finally {
       setIsUploading(false);
       e.target.value = '';

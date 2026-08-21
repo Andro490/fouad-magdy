@@ -242,6 +242,68 @@ app.get('/api/chat/users', (req, res) => {
   }
 });
 
+// --- IMAGE UPLOAD PROXY ---
+app.post('/api/upload', async (req, res) => {
+  try {
+    const { image } = req.body;
+    if (!image) {
+      return res.status(400).json({ success: false, error: 'No image provided' });
+    }
+
+    const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '64893796dcb70764722c0d575faeb0a9';
+    let isSuccess = false;
+    let uploadedUrl = '';
+    let errorMessage = '';
+
+    try {
+      const formData = new FormData();
+      formData.append('image', image);
+      const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData
+      });
+      const imgbbData = await imgbbRes.json();
+      if (imgbbData.success) {
+        uploadedUrl = imgbbData.data.url;
+        isSuccess = true;
+      } else {
+        errorMessage = imgbbData.error?.message || 'ImgBB error';
+      }
+    } catch (e: any) {
+      errorMessage = e.message;
+    }
+
+    if (!isSuccess) {
+      try {
+        const fallbackFormData = new FormData();
+        fallbackFormData.append('source', image);
+        fallbackFormData.append('key', '6d207e02198a847aa98d0a2a901485a5');
+        
+        const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
+          method: 'POST',
+          body: fallbackFormData
+        });
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.status_code === 200) {
+          uploadedUrl = fallbackData.image.url;
+          isSuccess = true;
+        }
+      } catch (e: any) {
+        console.error('Fallback error:', e);
+      }
+    }
+
+    if (isSuccess) {
+      res.json({ success: true, url: uploadedUrl });
+    } else {
+      res.status(500).json({ success: false, error: errorMessage || 'Failed to upload image' });
+    }
+  } catch (err: any) {
+    console.error('Server upload error:', err);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

@@ -26,7 +26,7 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 76;
+  const [totalPages, setTotalPages] = useState(10);
 
   useEffect(() => {
     const fetchManagers = async () => {
@@ -48,7 +48,12 @@ const Products = () => {
         if (!res.ok) throw new Error('Failed to fetch from local API');
         
         const pageData = await res.json();
-        const pageArray = extractArray(pageData);
+        
+        if (pageData.totalPages) {
+          setTotalPages(pageData.totalPages);
+        }
+        
+        const pageArray = extractArray(pageData.coaches || pageData);
         
         setManagers(pageArray);
       } catch (err) {

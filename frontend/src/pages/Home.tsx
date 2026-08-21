@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import fouadImg from '../assets/FOUAD.png';
+import patternImg from '../assets/pattern.png';
 import type { StoreProduct } from './Store';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -95,6 +96,15 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
+
+        {/* Pattern Background with fade animation */}
+        <div className="absolute inset-0 z-0 pointer-events-none mix-blend-screen"
+             style={{
+               backgroundImage: `url(${patternImg})`,
+               backgroundSize: 'cover',
+               backgroundPosition: 'center',
+               animation: 'patternFade 5s ease-in-out infinite alternate'
+             }} />
 
         {/* Subtle grid */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
@@ -340,6 +350,12 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <style>{`
+        @keyframes patternFade {
+          0% { opacity: 0.05; transform: scale(1.02); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
+      `}</style>
     </div>
   );
 }

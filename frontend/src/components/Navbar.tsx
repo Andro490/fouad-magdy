@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { logout } from '../store/authSlice';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -14,7 +15,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full min-h-[5rem] py-3 bg-[#030510]/80 backdrop-blur-md border-b border-gray-900 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm transition-all">
+    <motion.nav 
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="w-full min-h-[5rem] py-3 bg-[#030510]/80 backdrop-blur-md border-b border-gray-900 fixed top-0 z-50 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 gap-4 md:gap-0 shadow-sm"
+    >
       <Link to="/" className="text-2xl md:text-3xl font-black text-white mx-auto md:mx-0">
         FOUAD<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">F9</span>
       </Link>
@@ -41,7 +47,7 @@ const Navbar = () => {
           </Link>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

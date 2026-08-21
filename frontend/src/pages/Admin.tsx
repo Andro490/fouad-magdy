@@ -23,7 +23,7 @@ const Admin = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [image, setImage] = useState('');
+  const [imagesInput, setImagesInput] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
 
   useEffect(() => {
@@ -91,12 +91,15 @@ const Admin = () => {
 
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedImages = imagesInput.split('\n').map(s => s.trim()).filter(Boolean);
+    
     const newProduct: StoreProduct = {
       id: Date.now().toString(),
       name,
       description,
       price: Number(price),
-      image,
+      image: parsedImages[0] || '',
+      images: parsedImages.length > 0 ? parsedImages : undefined,
       adminPhone: adminPhone.trim() || undefined
     };
     
@@ -107,7 +110,7 @@ const Admin = () => {
     setName('');
     setDescription('');
     setPrice('');
-    setImage('');
+    setImagesInput('');
     setAdminPhone('');
     alert('تم إضافة المنتج بنجاح');
   };
@@ -229,9 +232,9 @@ const Admin = () => {
                   className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">رابط الصورة (URL)</label>
-                <input type="url" value={image} onChange={e => setImage(e.target.value)} required
-                  className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none text-left" dir="ltr" />
+                <label className="block text-sm font-medium text-gray-300 mb-2">روابط الصور (رابط في كل سطر)</label>
+                <textarea value={imagesInput} onChange={e => setImagesInput(e.target.value)} required placeholder="https://..."
+                  className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none text-left h-24" dir="ltr" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">رقم هاتف تليجرام (اختياري)</label>

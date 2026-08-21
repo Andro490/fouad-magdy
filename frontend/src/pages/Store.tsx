@@ -12,6 +12,7 @@ export interface StoreProduct {
   image: string;
   isSoldOut?: boolean;
   adminPhone?: string;
+  images?: string[];
 }
 
 const Store = () => {
@@ -71,12 +72,29 @@ const Store = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" style={{ direction: 'rtl' }}>
             {products.map((product) => (
               <div key={product.id} className="glass-panel rounded-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col">
-                <div className="h-48 bg-gradient-to-br from-dark-lighter to-dark relative flex items-center justify-center p-4 border-b border-gray-800">
-                  {product.image ? (
-                    <img src={product.image} alt={product.name} className="h-full object-cover rounded-lg" />
-                  ) : (
-                    <div className="text-gray-500">لا توجد صورة</div>
-                  )}
+                <div className="h-48 bg-gradient-to-br from-dark-lighter to-dark relative border-b border-gray-800">
+                  <div className="flex w-full h-full overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    {product.images && product.images.length > 0 ? (
+                      product.images.map((img, idx) => (
+                        <div key={idx} className="min-w-full h-full flex items-center justify-center p-4 snap-center shrink-0 relative">
+                          <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full object-cover rounded-lg" />
+                          {product.images && product.images.length > 1 && (
+                            <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                              {idx + 1} / {product.images.length}
+                            </span>
+                          )}
+                        </div>
+                      ))
+                    ) : product.image ? (
+                      <div className="min-w-full h-full flex items-center justify-center p-4 snap-center shrink-0">
+                        <img src={product.image} alt={product.name} className="h-full object-cover rounded-lg" />
+                      </div>
+                    ) : (
+                      <div className="min-w-full h-full flex items-center justify-center p-4 snap-center shrink-0 text-gray-500">
+                        لا توجد صورة
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="p-6 flex-1 flex flex-col relative">

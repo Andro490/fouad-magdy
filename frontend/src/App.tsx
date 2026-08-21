@@ -10,6 +10,7 @@ import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import Checkout from './pages/Checkout';
 import Leaderboard from './pages/Leaderboard';
+import SupportChat from './components/SupportChat';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        <SupportChat />
       </div>
     </Router>
   )

@@ -10,6 +10,7 @@ export interface StoreProduct {
   description: string;
   price: number;
   image: string;
+  isSoldOut?: boolean;
 }
 
 const Store = () => {
@@ -67,22 +68,35 @@ const Store = () => {
                   )}
                 </div>
                 
-                <div className="p-6 flex-1 flex flex-col">
-                  <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
+                <div className="p-6 flex-1 flex flex-col relative">
+                  <h3 className={`text-xl font-bold mb-2 ${product.isSoldOut ? 'text-gray-500 line-through' : 'text-white'}`}>{product.name}</h3>
                   <p className="text-gray-400 text-sm mb-4 flex-1 line-clamp-3 break-words">{product.description}</p>
                   
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-gray-300">السعر:</span>
-                    <span className="text-accent font-bold text-xl">{product.price} EGP</span>
+                    {product.isSoldOut ? (
+                      <span className="text-gray-500 font-bold text-xl"><del>{product.price} EGP</del></span>
+                    ) : (
+                      <span className="text-accent font-bold text-xl">{product.price} EGP</span>
+                    )}
                   </div>
                   
-                  <button 
-                    onClick={() => handleBuy(product)}
-                    className="w-full mt-auto py-3 bg-primary text-dark font-bold rounded-lg hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
-                  >
-                    <ShoppingCart size={18} />
-                    شراء الآن
-                  </button>
+                  {product.isSoldOut ? (
+                    <button 
+                      disabled
+                      className="w-full mt-auto py-3 bg-red-500/20 text-red-500 font-bold rounded-lg border border-red-500/30 flex items-center justify-center gap-2 cursor-not-allowed opacity-80"
+                    >
+                      تم البيع
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => handleBuy(product)}
+                      className="w-full mt-auto py-3 bg-primary text-dark font-bold rounded-lg hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
+                    >
+                      <ShoppingCart size={18} />
+                      شراء الآن
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

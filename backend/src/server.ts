@@ -177,6 +177,71 @@ app.post('/api/managers/add', (req, res) => {
   }
 });
 
+// --- CHAT SYSTEM ---
+const chatDataPath = path.join(process.cwd(), 'src', 'data', 'chats.json');
+
+app.get('/api/chat/messages', (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!fs.existsSync(chatDataPath)) {
+      return res.json([]);
+    }
+    const chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
+    if (userId) {
+      const userChats = chats.filter((c: any) => c.userId === userId);
+      return res.json(userChats);
+    }
+    res.json(chats);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/chat/send', (req, res) => {
+  try {
+    const message = req.body;
+    let chats = [];
+    if (fs.existsSync(chatDataPath)) {
+      chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
+    }
+    
+    const newMessage = {
+      ...message,
+      id: Date.now().toString(),
+      timestamp: Date.now()
+    };
+    
+    chats.push(newMessage);
+    fs.writeFileSync(chatDataPath, JSON.stringify(chats, null, 2));
+    
+    res.json({ success: true, message: 'تم إرسال الرسالة بنجاح' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/chat/users', (req, res) => {
+  try {
+    if (!fs.existsSync(chatDataPath)) return res.json([]);
+    const chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
+    const usersMap = new Map();
+    chats.forEach((c: any) => {
+      if (!usersMap.has(c.userId)) {
+        usersMap.set(c.userId, { userId: c.userId, userName: c.userName, lastMessage: c.text, timestamp: c.timestamp });
+      } else {
+        const u = usersMap.get(c.userId);
+        if (c.timestamp > u.timestamp) {
+          u.lastMessage = c.text;
+          u.timestamp = c.timestamp;
+        }
+      }
+    });
+    res.json(Array.from(usersMap.values()).sort((a: any, b: any) => b.timestamp - a.timestamp));
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

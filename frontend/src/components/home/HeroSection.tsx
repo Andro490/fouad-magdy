@@ -45,13 +45,13 @@ const SocialIcons: Record<string, JSX.Element> = {
 };
 
 const socialStyles: Record<string, { bg: string; text: string; ring: string }> = {
-  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-white', ring: 'ring-pink-400' },
-  TikTok:    { bg: 'bg-black', text: 'text-white', ring: 'ring-white' },
-  YouTube:   { bg: 'bg-red-600', text: 'text-white', ring: 'ring-red-400' },
-  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-white', ring: 'ring-blue-400' },
-  Kick:      { bg: 'bg-[#53fc18]', text: 'text-black', ring: 'ring-green-400' },
-  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-white', ring: 'ring-green-300' },
-  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-white', ring: 'ring-blue-300' },
+  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-pink-500', ring: 'ring-pink-400' },
+  TikTok:    { bg: 'bg-black', text: 'text-gray-300', ring: 'ring-gray-400' },
+  YouTube:   { bg: 'bg-red-600', text: 'text-red-500', ring: 'ring-red-400' },
+  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-blue-500', ring: 'ring-blue-400' },
+  Kick:      { bg: 'bg-[#53fc18]', text: 'text-[#53fc18]', ring: 'ring-green-400' },
+  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-green-500', ring: 'ring-green-300' },
+  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-[#2AABEE]', ring: 'ring-blue-300' },
 };
 
 // ===================== MOBILE PROFILE CARD =====================
@@ -227,26 +227,28 @@ function MobileProfileCard() {
                     className="relative rounded-2xl overflow-hidden cursor-pointer"
                     style={{ aspectRatio: '4/3' }}
                   >
-                    <div className={`absolute inset-0 ${style?.bg ?? 'bg-gray-800'}`} />
+                    {/* Black background with subtle colored border */}
+                    <div className="absolute inset-0 bg-[#0a0a0a]" style={{ border: `1px solid ${style?.ring ? style.ring.replace('ring-', '') : 'rgba(255,255,255,0.1)'}` }} />
                     
-                    {/* Big background icon */}
-                    <div className={`absolute -bottom-4 -right-4 w-24 h-24 opacity-20 ${social.label === 'Kick' ? 'text-black' : 'text-white'}`}>
-                      {icon}
-                    </div>
-
-                    {/* Dark gradient overlay for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                    {/* Platform icon — top left */}
-                    <div className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-md ${social.label === 'Kick' ? 'text-black' : 'text-white'} shadow-md border border-white/30`}>
-                      {icon}
-                    </div>
-
-                    {/* Platform name — bottom left */}
-                    <div className="absolute bottom-2.5 left-3 right-3">
-                      <span className="text-white font-black text-sm drop-shadow-lg">
+                    {/* Big centered icon/text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className={`w-12 h-12 mb-2 ${style?.text ?? 'text-white'} opacity-80 drop-shadow-[0_0_10px_currentColor]`}>
+                        {icon}
+                      </div>
+                      <span 
+                        className={`font-black tracking-widest uppercase ${style?.text ?? 'text-white'}`}
+                        style={{
+                          fontSize: '1rem',
+                          textShadow: '0 0 15px currentColor',
+                        }}
+                      >
                         {social.label}
                       </span>
+                    </div>
+
+                    {/* Subtle top-left icon just for consistency */}
+                    <div className={`absolute top-3 left-3 w-6 h-6 flex items-center justify-center ${style?.text ?? 'text-white'} opacity-50`}>
+                      {icon}
                     </div>
                   </motion.a>
                 );

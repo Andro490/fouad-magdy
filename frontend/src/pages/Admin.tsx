@@ -36,9 +36,14 @@ const Admin = () => {
     // Load from API
     fetch(`${API_URL}/api/products`)
       .then(r => r.json())
-      .then(data => setProducts(Array.isArray(data) ? data : []))
+      .then(data => {
+        let fetched = Array.isArray(data) ? data : [];
+        if (fetched.length === 0) {
+          fetched = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        }
+        setProducts(fetched);
+      })
       .catch(() => {
-        // fallback to localStorage
         const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
         setProducts(storedProducts);
       });

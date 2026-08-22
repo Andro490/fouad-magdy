@@ -26,11 +26,14 @@ const Store = () => {
     fetch(`${API_URL}/api/products`)
       .then(r => r.json())
       .then(data => {
-        setProducts(Array.isArray(data) ? data : []);
+        let fetched = Array.isArray(data) ? data : [];
+        if (fetched.length === 0) {
+          fetched = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        }
+        setProducts(fetched);
         setLoading(false);
       })
       .catch(() => {
-        // fallback to localStorage
         const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
         setProducts(storedProducts);
         setLoading(false);

@@ -3,13 +3,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
 
 const app = express();
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -24,128 +23,42 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(helmet());
 app.use(morgan('dev'));
 
-// Basic Routes Structure for StreamHub
-
-// --- AUTH & ROLES ---
-app.post('/api/auth/register', (req, res) => {
-  // TODO: Create user, hash password, return JWT
-  res.json({ message: 'User registered successfully' });
-});
-
-app.post('/api/auth/login', (req, res) => {
-  // TODO: Validate credentials, return JWT & user details
-  res.json({ token: 'mock-jwt-token', user: { name: 'Streamer 1', role: 'STREAMER' } });
-});
-
-app.get('/api/auth/me', (req, res) => {
-  // TODO: Return current user based on JWT
-  res.json({ user: { name: 'Streamer 1', role: 'STREAMER', coinsBalance: 5000 } });
-});
-
-
-// --- COINS & WALLET ---
-app.get('/api/wallet/balance', (req, res) => {
-  res.json({ coinsBalance: 5000, cashBalance: 0 });
-});
-
-app.post('/api/wallet/convert', (req, res) => {
-  // TODO: Create a CASH_OUT_REQUEST transaction
-  res.json({ success: true, message: 'Cash out request submitted successfully.' });
-});
-
-
-// --- STREAMER DASHBOARD ---
-app.get('/api/streamer/stats', (req, res) => {
-  res.json({
-    views: 12500,
-    likes: 4300,
-    streamHours: 12.5
-  });
-});
-
-app.post('/api/streamer/upload-link', (req, res) => {
-  const { link } = req.body;
-  // TODO: Analyze the link (e.g. TikTok)
-  res.json({ success: true, message: 'Link analyzed successfully', data: { extraViews: 500 } });
-});
-
-
-// --- LEADERBOARDS & CONTESTS ---
-app.get('/api/leaderboards/top-streamers', (req, res) => {
-  res.json([
-    { id: '1', name: 'أحمد جيمنج', coins: 50000, rank: 1 },
-    { id: '2', name: 'عمر برو', coins: 42000, rank: 2 }
-  ]);
-});
-
-app.post('/api/contests/distribute-rewards', (req, res) => {
-  // TODO: Admin or cron job to distribute coins to top users
-  res.json({ success: true, message: 'Rewards distributed.' });
-});
-
-
-// --- ADMIN DASHBOARD ---
-app.get('/api/admin/transactions', (req, res) => {
-  res.json([
-    { id: 't1', userId: 'u1', amount: 1000, type: 'CASH_OUT_REQUEST', status: 'PENDING' }
-  ]);
-});
-
-app.put('/api/admin/transactions/:id/status', (req, res) => {
-  const { status } = req.body; // APPROVED or REJECTED
-  // TODO: Update transaction and user cashBalance
-  res.json({ success: true, message: `Transaction marked as ${status}` });
-});
-
-
 // Health Check
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to StreamHub API 🚀' });
+  res.json({ message: 'Welcome to StreamHub API with PostgreSQL 🚀' });
 });
 
-
-// Managers API - reads from local coaches.json file (no CORS, no 403 issues!)
-app.get('/api/managers', (req, res) => {
+// ─────────────────────────────────────────
+// MANAGERS API
+// ─────────────────────────────────────────
+app.get('/api/managers', async (req, res) => {
   try {
-    // استخدم process.cwd() بدلاً من __dirname لكي يقرأ الملف الصحيح بعد عمل build (dist) على Railway
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'coaches.json');
-    if (!fs.existsSync(dataPath)) {
-      return res.json({ coaches: [] });
-    }
-    
-    const rawData = fs.readFileSync(dataPath, 'utf-8');
-    const allCoaches = JSON.parse(rawData);
-    
     const page = parseInt(req.query.page as string) || 1;
-    const limit = 15; // same limit as EFHub
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    const limit = 15;
     
-    const paginatedCoaches = allCoaches.slice(startIndex, endIndex);
+    const totalCoaches = await prisma.manager.count();
+    const coaches = await prisma.manager.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    });
     
     res.json({
       page,
-      totalPages: Math.ceil(allCoaches.length / limit),
-      totalCoaches: allCoaches.length,
-      coaches: paginatedCoaches
+      totalPages: Math.ceil(totalCoaches / limit),
+      totalCoaches,
+      coaches: coaches.map((c: any) => c.data)
     });
   } catch (err) {
-    console.error('Error reading coaches.json:', err);
+    console.error('Error fetching managers:', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Add New Coaches API
-app.post('/api/managers/add', (req, res) => {
+app.post('/api/managers/add', async (req, res) => {
   try {
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'coaches.json');
-    let existingCoaches = [];
-    if (fs.existsSync(dataPath)) {
-      existingCoaches = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-    }
-
     let inputData = req.body;
-    let newCoaches = [];
+    let newCoaches: any[] = [];
     if (inputData.coaches && Array.isArray(inputData.coaches)) {
       newCoaches = inputData.coaches;
     } else if (Array.isArray(inputData)) {
@@ -155,83 +68,103 @@ app.post('/api/managers/add', (req, res) => {
     }
 
     if (newCoaches.length === 0) {
-      return res.status(400).json({ error: 'لم يتم العثور على مدربين في البيانات المرسلة' });
+      return res.status(400).json({ error: 'لم يتم العثور على مدربين' });
     }
 
-    const map = new Map();
-    newCoaches.forEach((c: any) => { if(c.id) map.set(c.id, c) });
-    existingCoaches.forEach((c: any) => {
-      if (c.id && !map.has(c.id)) {
-        map.set(c.id, c);
+    let addedCount = 0;
+    for (const coach of newCoaches) {
+      if (coach.id) {
+        await prisma.manager.upsert({
+          where: { id: coach.id.toString() },
+          update: { data: coach },
+          create: { id: coach.id.toString(), data: coach }
+        });
+        addedCount++;
       }
-    });
+    }
 
-    const merged = Array.from(map.values());
-    fs.writeFileSync(dataPath, JSON.stringify(merged, null, 2));
-
-    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح!`, totalCoaches: merged.length });
+    res.json({ success: true, message: `تمت إضافة ${addedCount} مدرب بنجاح!` });
   } catch (err: any) {
     console.error('Error adding coaches:', err);
-    res.status(500).json({ error: 'حدث خطأ أثناء معالجة البيانات: ' + err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
 // ─────────────────────────────────────────
-// PRODUCTS API — persists to products.json
+// PRODUCTS API
 // ─────────────────────────────────────────
-const productsDataPath = path.join(process.cwd(), 'src', 'data', 'products.json');
-
-// GET all products
-app.get('/api/products', (_req, res) => {
+app.get('/api/products', async (_req, res) => {
   try {
-    if (!fs.existsSync(productsDataPath)) return res.json([]);
-    const products = JSON.parse(fs.readFileSync(productsDataPath, 'utf-8'));
+    const products = await prisma.product.findMany();
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// POST save products (replace full list — used by admin)
-app.post('/api/products', (req, res) => {
+app.post('/api/products', async (req, res) => {
   try {
     const products = req.body;
-    if (!Array.isArray(products)) {
-      return res.status(400).json({ error: 'Expected an array of products' });
-    }
-    const dataDir = path.join(process.cwd(), 'src', 'data');
-    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(productsDataPath, JSON.stringify(products, null, 2));
-    res.json({ success: true, count: products.length });
+    if (!Array.isArray(products)) return res.status(400).json({ error: 'Expected an array' });
+    
+    // For simplicity, the admin panel sends the entire list of products.
+    // We will clear and recreate to match the JSON file overwrite behavior.
+    await prisma.product.deleteMany();
+    
+    const created = await prisma.product.createMany({
+      data: products.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        price: Number(p.price),
+        image: p.image,
+        images: p.images || [],
+        adminPhone: p.adminPhone,
+        isSoldOut: Boolean(p.isSoldOut)
+      }))
+    });
+    
+    res.json({ success: true, count: created.count });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // ─────────────────────────────────────────
-// USERS API — persists to users.json
+// USERS API
 // ─────────────────────────────────────────
-const usersDataPath = path.join(process.cwd(), 'src', 'data', 'users.json');
-
-app.get('/api/users', (_req, res) => {
+app.get('/api/users', async (_req, res) => {
   try {
-    if (!fs.existsSync(usersDataPath)) return res.json([]);
-    const users = JSON.parse(fs.readFileSync(usersDataPath, 'utf-8'));
+    const users = await prisma.user.findMany();
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.post('/api/users', (req, res) => {
+app.post('/api/users', async (req, res) => {
   try {
     const users = req.body;
-    if (!Array.isArray(users)) {
-      return res.status(400).json({ error: 'Expected an array of users' });
+    if (!Array.isArray(users)) return res.status(400).json({ error: 'Expected an array' });
+    
+    for (const u of users) {
+      await prisma.user.upsert({
+        where: { email: u.email }, // Using email as unique identifier
+        update: {
+          name: u.name,
+          role: u.role,
+          coins: Number(u.coins || 0)
+        },
+        create: {
+          id: u.id || undefined, // Prisma will generate if undefined
+          name: u.name,
+          email: u.email,
+          password: u.password,
+          role: u.role,
+          coins: Number(u.coins || 0)
+        }
+      });
     }
-    const dataDir = path.join(process.cwd(), 'src', 'data');
-    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(usersDataPath, JSON.stringify(users, null, 2));
     res.json({ success: true, count: users.length });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -239,108 +172,105 @@ app.post('/api/users', (req, res) => {
 });
 
 // ─────────────────────────────────────────
-// VIDEOS API — persists to videos.json
+// VIDEOS API
 // ─────────────────────────────────────────
-const videosDataPath = path.join(process.cwd(), 'src', 'data', 'videos.json');
-
-app.get('/api/videos', (_req, res) => {
+app.get('/api/videos', async (_req, res) => {
   try {
-    if (!fs.existsSync(videosDataPath)) return res.json([]);
-    const videos = JSON.parse(fs.readFileSync(videosDataPath, 'utf-8'));
+    const videos = await prisma.videoReport.findMany();
     res.json(videos);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.post('/api/videos', (req, res) => {
+app.post('/api/videos', async (req, res) => {
   try {
     const videos = req.body;
-    if (!Array.isArray(videos)) {
-      return res.status(400).json({ error: 'Expected an array of videos' });
+    if (!Array.isArray(videos)) return res.status(400).json({ error: 'Expected an array' });
+    
+    for (const v of videos) {
+      await prisma.videoReport.upsert({
+        where: { id: v.id },
+        update: { status: v.status },
+        create: {
+          id: v.id,
+          streamerId: v.streamerId,
+          streamerName: v.streamerName,
+          videoLink: v.videoLink,
+          views: Number(v.views),
+          likes: Number(v.likes),
+          earnedCoins: Number(v.earnedCoins),
+          status: v.status,
+          createdAt: v.createdAt ? new Date(v.createdAt) : undefined
+        }
+      });
     }
-    const dataDir = path.join(process.cwd(), 'src', 'data');
-    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(videosDataPath, JSON.stringify(videos, null, 2));
     res.json({ success: true, count: videos.length });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-
-// --- CHAT SYSTEM ---
-const chatDataPath = path.join(process.cwd(), 'src', 'data', 'chats.json');
-
-app.get('/api/chat/messages', (req, res) => {
+// ─────────────────────────────────────────
+// CHAT SYSTEM
+// ─────────────────────────────────────────
+app.get('/api/chat/messages', async (req, res) => {
   try {
     const { userId } = req.query;
-    if (!fs.existsSync(chatDataPath)) {
-      return res.json([]);
-    }
-    const chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
     if (userId) {
-      const userChats = chats.filter((c: any) => c.userId === userId);
-      return res.json(userChats);
+      const chats = await prisma.chatMessage.findMany({ where: { userId: String(userId) } });
+      return res.json(chats);
     }
+    const chats = await prisma.chatMessage.findMany();
     res.json(chats);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.post('/api/chat/send', (req, res) => {
+app.post('/api/chat/send', async (req, res) => {
   try {
     const message = req.body;
-    let chats = [];
-    if (fs.existsSync(chatDataPath)) {
-      chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
-    }
-    
-    const newMessage = {
-      ...message,
-      id: Date.now().toString(),
-      timestamp: Date.now()
-    };
-    
-    chats.push(newMessage);
-    fs.writeFileSync(chatDataPath, JSON.stringify(chats, null, 2));
-    
+    await prisma.chatMessage.create({
+      data: {
+        userId: message.userId,
+        userName: message.userName,
+        text: message.text,
+        sender: message.sender,
+        timestamp: Date.now()
+      }
+    });
     res.json({ success: true, message: 'تم إرسال الرسالة بنجاح' });
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.get('/api/chat/users', (req, res) => {
+app.get('/api/chat/users', async (req, res) => {
   try {
-    if (!fs.existsSync(chatDataPath)) return res.json([]);
-    const chats = JSON.parse(fs.readFileSync(chatDataPath, 'utf-8'));
+    const chats = await prisma.chatMessage.findMany({
+      orderBy: { timestamp: 'desc' }
+    });
+    
     const usersMap = new Map();
     chats.forEach((c: any) => {
       if (!usersMap.has(c.userId)) {
         usersMap.set(c.userId, { userId: c.userId, userName: c.userName, lastMessage: c.text, timestamp: c.timestamp });
-      } else {
-        const u = usersMap.get(c.userId);
-        if (c.timestamp > u.timestamp) {
-          u.lastMessage = c.text;
-          u.timestamp = c.timestamp;
-        }
       }
     });
-    res.json(Array.from(usersMap.values()).sort((a: any, b: any) => b.timestamp - a.timestamp));
+    res.json(Array.from(usersMap.values()));
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// --- IMAGE UPLOAD PROXY ---
+// ─────────────────────────────────────────
+// IMAGE UPLOAD PROXY
+// ─────────────────────────────────────────
 app.post('/api/upload', async (req, res) => {
   try {
     const { image } = req.body;
-    if (!image) {
-      return res.status(400).json({ success: false, error: 'No image provided' });
-    }
+    if (!image) return res.status(400).json({ success: false, error: 'No image provided' });
 
     const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '64893796dcb70764722c0d575faeb0a9';
     let isSuccess = false;
@@ -352,7 +282,7 @@ app.post('/api/upload', async (req, res) => {
       formData.append('image', image);
       const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
         method: 'POST',
-        body: formData
+        body: formData as any
       });
       const imgbbData = await imgbbRes.json();
       if (imgbbData.success) {
@@ -373,7 +303,7 @@ app.post('/api/upload', async (req, res) => {
         
         const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
           method: 'POST',
-          body: fallbackFormData
+          body: fallbackFormData as any
         });
         const fallbackData = await fallbackRes.json();
         if (fallbackData.status_code === 200) {
@@ -391,7 +321,6 @@ app.post('/api/upload', async (req, res) => {
       res.status(500).json({ success: false, error: errorMessage || 'Failed to upload image' });
     }
   } catch (err: any) {
-    console.error('Server upload error:', err);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });

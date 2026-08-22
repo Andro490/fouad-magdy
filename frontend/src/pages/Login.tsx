@@ -10,18 +10,24 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Mock authentication
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
     
     // Check if it's admin (mocked admin logic)
     if (phone === 'admin' && password === 'admin') {
       dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', phone: 'admin', role: 'ADMIN' }, token: 'mock-admin-token' }));
       navigate('/admin');
       return;
+    }
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    let users = [];
+    try {
+      const res = await fetch(`${API_URL}/api/users`);
+      if (res.ok) users = await res.json();
+    } catch (err) {
+      users = JSON.parse(localStorage.getItem('users') || '[]');
     }
 
     const foundUser = users.find((u: Record<string, any>) => u.phone === phone && u.password === password);

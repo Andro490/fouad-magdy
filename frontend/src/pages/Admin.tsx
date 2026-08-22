@@ -42,9 +42,14 @@ const Admin = () => {
         const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
         setProducts(storedProducts);
       });
-    const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
-    setVideoSubmissions(storedVideos);
-  }, [isAuthenticated, user, navigate]);
+    fetch(`${API_URL}/api/videos`)
+      .then(r => r.json())
+      .then(data => setVideoSubmissions(Array.isArray(data) ? data : []))
+      .catch(() => {
+        const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+        setVideoSubmissions(storedVideos);
+      });
+  }, [isAuthenticated, user, navigate, API_URL]);
 
   useEffect(() => {
     if (activeTab === 'support') {
@@ -210,22 +215,57 @@ const Admin = () => {
     }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
   };
 
-  const handleApproveVideo = (id: string) => {
+  const handleApproveVideo = async (id: string) => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    let earnedCoins = 0;
+    let streamerId = '';
+
     const updatedSubmissions = videoSubmissions.map(sub => {
       if (sub.id === id && sub.status === 'PENDING') {
-        // Also update the streamer's coins in users localStorage
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userIndex = users.findIndex((u: any) => u.id === sub.streamerId);
-        if (userIndex !== -1) {
-          users[userIndex].coins = (users[userIndex].coins || 0) + sub.earnedCoins;
-          localStorage.setItem('users', JSON.stringify(users));
-        }
+        earnedCoins = sub.earnedCoins;
+        streamerId = sub.streamerId;
         return { ...sub, status: 'APPROVED' };
       }
       return sub;
     });
+
     setVideoSubmissions(updatedSubmissions);
-    localStorage.setItem('videoSubmissions', JSON.stringify(updatedSubmissions));
+    
+    try {
+      await fetch(`${API_URL}/api/videos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedSubmissions)
+      });
+    } catch (err) {
+      localStorage.setItem('videoSubmissions', JSON.stringify(updatedSubmissions));
+    }
+
+    if (earnedCoins > 0 && streamerId) {
+      try {
+        const res = await fetch(`${API_URL}/api/users`);
+        if (res.ok) {
+          const users = await res.json();
+          const userIndex = users.findIndex((u: any) => u.id === streamerId);
+          if (userIndex !== -1) {
+            users[userIndex].coins = (users[userIndex].coins || 0) + earnedCoins;
+            await fetch(`${API_URL}/api/users`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(users)
+            });
+          }
+        }
+      } catch (err) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex((u: any) => u.id === streamerId);
+        if (userIndex !== -1) {
+          users[userIndex].coins = (users[userIndex].coins || 0) + earnedCoins;
+          localStorage.setItem('users', JSON.stringify(users));
+        }
+      }
+    }
+    
     alert('تم الموافقة على التقرير وإضافة الكوينز للستريمر!');
   };
 

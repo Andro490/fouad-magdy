@@ -208,6 +208,67 @@ app.post('/api/products', (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────
+// USERS API — persists to users.json
+// ─────────────────────────────────────────
+const usersDataPath = path.join(process.cwd(), 'src', 'data', 'users.json');
+
+app.get('/api/users', (_req, res) => {
+  try {
+    if (!fs.existsSync(usersDataPath)) return res.json([]);
+    const users = JSON.parse(fs.readFileSync(usersDataPath, 'utf-8'));
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/users', (req, res) => {
+  try {
+    const users = req.body;
+    if (!Array.isArray(users)) {
+      return res.status(400).json({ error: 'Expected an array of users' });
+    }
+    const dataDir = path.join(process.cwd(), 'src', 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(usersDataPath, JSON.stringify(users, null, 2));
+    res.json({ success: true, count: users.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// VIDEOS API — persists to videos.json
+// ─────────────────────────────────────────
+const videosDataPath = path.join(process.cwd(), 'src', 'data', 'videos.json');
+
+app.get('/api/videos', (_req, res) => {
+  try {
+    if (!fs.existsSync(videosDataPath)) return res.json([]);
+    const videos = JSON.parse(fs.readFileSync(videosDataPath, 'utf-8'));
+    res.json(videos);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/videos', (req, res) => {
+  try {
+    const videos = req.body;
+    if (!Array.isArray(videos)) {
+      return res.status(400).json({ error: 'Expected an array of videos' });
+    }
+    const dataDir = path.join(process.cwd(), 'src', 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(videosDataPath, JSON.stringify(videos, null, 2));
+    res.json({ success: true, count: videos.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // --- CHAT SYSTEM ---
 const chatDataPath = path.join(process.cwd(), 'src', 'data', 'chats.json');
 

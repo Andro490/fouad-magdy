@@ -22,16 +22,24 @@ export default function Leaderboard() {
   const [streamers, setStreamers] = useState<Streamer[]>([]);
 
   useEffect(() => {
-    // 1. جلب صناع المحتوى الحقيقيين من LocalStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const realStreamers = users
-      .filter((u: any) => u.role === 'STREAMER')
-      .map((u: any) => ({
-        id: u.id,
-        name: u.name,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=141414&color=FFD700`,
-        coins: u.coins || 0,
-      }));
+    const fetchUsers = async () => {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      let users = [];
+      try {
+        const res = await fetch(`${API_URL}/api/users`);
+        if (res.ok) users = await res.json();
+      } catch (err) {
+        users = JSON.parse(localStorage.getItem('users') || '[]');
+      }
+
+      const realStreamers = users
+        .filter((u: any) => u.role === 'STREAMER')
+        .map((u: any) => ({
+          id: u.id,
+          name: u.name,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=141414&color=FFD700`,
+          coins: u.coins || 0,
+        }));
 
     // 2. دمجهم مع الداتا الوهمية إذا كان العدد قليل (اختياري، لكن هنا سنعرض الحقيقيين ثم نكمل بالوهميين لو أردنا)
     // أو نعرض الحقيقيين فقط إذا كانوا موجودين
@@ -52,7 +60,9 @@ export default function Leaderboard() {
     // 4. إضافة الرتبة (Rank)
     const finalStreamers = combined.map((s: any, i: number) => ({ ...s, rank: i + 1 }));
     setStreamers(finalStreamers);
-
+    };
+    
+    fetchUsers();
   }, []);
 
   const getRankColor = (rank: number) => {

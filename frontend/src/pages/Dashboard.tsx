@@ -12,23 +12,51 @@ const Dashboard = () => {
   const [currentCoins, setCurrentCoins] = useState(user?.coins || 0);
 
   React.useEffect(() => {
-    if (user?.id) {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const foundUser = users.find((u: any) => u.id === user.id);
-      if (foundUser) {
-        setCurrentCoins(foundUser.coins || 0);
+    const fetchUser = async () => {
+      if (user?.id) {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        let users = [];
+        try {
+          const res = await fetch(`${API_URL}/api/users`);
+          if (res.ok) users = await res.json();
+        } catch (err) {
+          users = JSON.parse(localStorage.getItem('users') || '[]');
+        }
+        
+        const foundUser = users.find((u: any) => u.id === user.id);
+        if (foundUser) {
+          setCurrentCoins(foundUser.coins || 0);
+        }
       }
-    }
+    };
+    fetchUser();
   }, [user]);
 
   const dispatch = useDispatch();
 
-  const handleUpgradeToStreamer = () => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const handleUpgradeToStreamer = async () => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    let users = [];
+    try {
+      const res = await fetch(`${API_URL}/api/users`);
+      if (res.ok) users = await res.json();
+    } catch (err) {
+      users = JSON.parse(localStorage.getItem('users') || '[]');
+    }
+
     const userIndex = users.findIndex((u: any) => u.id === user.id);
     if (userIndex !== -1) {
       users[userIndex].role = 'STREAMER';
-      localStorage.setItem('users', JSON.stringify(users));
+      try {
+        await fetch(`${API_URL}/api/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(users)
+        });
+      } catch (err) {
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      
       dispatch(loginSuccess({ user: users[userIndex], token: 'mock-jwt-token' }));
       alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
     }
@@ -59,10 +87,31 @@ const Dashboard = () => {
         createdAt: new Date().toISOString()
       };
 
-      // Save to localStorage for Admin to see
-      const submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
-      submissions.push(submission);
-      localStorage.setItem('videoSubmissions', JSON.stringify(submissions));
+      // Save via API for Admin to see
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const saveSubmission = async () => {
+        let submissions = [];
+        try {
+          const res = await fetch(`${API_URL}/api/videos`);
+          if (res.ok) submissions = await res.json();
+        } catch (err) {
+          submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+        }
+        
+        submissions.push(submission);
+        
+        try {
+          await fetch(`${API_URL}/api/videos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(submissions)
+          });
+        } catch (err) {
+          localStorage.setItem('videoSubmissions', JSON.stringify(submissions));
+        }
+      };
+      
+      saveSubmission();
 
       setResult(submission);
       setIsAnalyzing(false);

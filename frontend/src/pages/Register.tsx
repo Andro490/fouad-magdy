@@ -11,14 +11,28 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save to local storage for mocked auth
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
     const newUser = { id: Date.now().toString(), name, phone, password, role, coins: 0 };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    
+    try {
+      const res = await fetch(`${API_URL}/api/users`);
+      const users = res.ok ? await res.json() : [];
+      users.push(newUser);
+      
+      await fetch(`${API_URL}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(users)
+      });
+    } catch (err) {
+      // Save to local storage for mocked auth fallback
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
 
     // Auto login
     dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role, coins: newUser.coins }, token: 'mock-jwt-token' }));

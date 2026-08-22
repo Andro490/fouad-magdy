@@ -41,24 +41,11 @@ export default function Leaderboard() {
           coins: u.coins || 0,
         }));
 
-    // 2. دمجهم مع الداتا الوهمية إذا كان العدد قليل (اختياري، لكن هنا سنعرض الحقيقيين ثم نكمل بالوهميين لو أردنا)
-    // أو نعرض الحقيقيين فقط إذا كانوا موجودين
-    let combined = realStreamers;
-    if (combined.length === 0) {
-      combined = mockStreamers.map(({ rank, ...rest }) => rest);
-    } else {
-      // فقط لتكملة شكل القائمة إذا كان هناك ستريمر واحد حقيقي مثلاً
-      const needed = 5 - combined.length;
-      if (needed > 0) {
-        combined = [...combined, ...mockStreamers.slice(0, needed).map(({ rank, ...rest }) => rest)];
-      }
-    }
-
     // 3. ترتيبهم حسب الكوينز
-    combined.sort((a: any, b: any) => b.coins - a.coins);
+    realStreamers.sort((a: any, b: any) => b.coins - a.coins);
     
     // 4. إضافة الرتبة (Rank)
-    const finalStreamers = combined.map((s: any, i: number) => ({ ...s, rank: i + 1 }));
+    const finalStreamers = realStreamers.map((s: any, i: number) => ({ ...s, rank: i + 1 }));
     setStreamers(finalStreamers);
     };
     
@@ -85,36 +72,43 @@ export default function Leaderboard() {
         </div>
 
         <div className="glass-panel rounded-2xl p-6 space-y-4">
-          <AnimatePresence>
-            {streamers.map((streamer) => (
-              <motion.div
-                key={streamer.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className={`flex items-center gap-6 p-4 rounded-xl border bg-dark-lighter/50 backdrop-blur-md ${getRankColor(streamer.rank)}`}
-              >
-                <div className="text-3xl font-black w-10 text-center">
-                  #{streamer.rank}
-                </div>
-                <img 
-                  src={streamer.avatar} 
-                  alt={streamer.name} 
-                  className="w-16 h-16 rounded-full border-2 border-current p-0.5 object-cover"
-                />
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white">{streamer.name}</h3>
-                  <p className="text-accent text-sm">ستريمر معتمد</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold font-mono">{streamer.coins.toLocaleString()}</div>
-                  <div className="text-xs text-primary font-bold">COINS</div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {streamers.length === 0 ? (
+            <div className="text-center py-10 text-gray-400">
+              <p className="text-xl">لا يوجد صناع محتوى حالياً.</p>
+              <p className="text-sm mt-2">كن أول من ينضم لقائمة الصدارة!</p>
+            </div>
+          ) : (
+            <AnimatePresence>
+              {streamers.map((streamer) => (
+                <motion.div
+                  key={streamer.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className={`flex items-center gap-6 p-4 rounded-xl border bg-dark-lighter/50 backdrop-blur-md ${getRankColor(streamer.rank)}`}
+                >
+                  <div className="text-3xl font-black w-10 text-center">
+                    #{streamer.rank}
+                  </div>
+                  <img 
+                    src={streamer.avatar} 
+                    alt={streamer.name} 
+                    className="w-16 h-16 rounded-full border-2 border-current p-0.5 object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-white">{streamer.name}</h3>
+                    <p className="text-accent text-sm">ستريمر معتمد</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold font-mono">{streamer.coins.toLocaleString()}</div>
+                    <div className="text-xs text-primary font-bold">COINS</div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
       </div>
     </main>

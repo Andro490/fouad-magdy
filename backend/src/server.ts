@@ -39,11 +39,13 @@ app.get('/api/managers', async (req, res) => {
     const limit = 15;
     
     const totalCoaches = await prisma.manager.count();
-    const coaches = await prisma.manager.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { id: 'desc' }
-    });
+    
+    // Cast string ID to numeric to ensure 14-digit IDs are sorted properly above 8-digit IDs
+    const coaches: any[] = await prisma.$queryRaw`
+      SELECT * FROM "Manager"
+      ORDER BY CAST(id AS BIGINT) DESC
+      LIMIT ${limit} OFFSET ${(page - 1) * limit}
+    `;
     
     res.json({
       page,
@@ -54,6 +56,16 @@ app.get('/api/managers', async (req, res) => {
   } catch (err) {
     console.error('Error fetching managers:', err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/managers/reset', async (req, res) => {
+  try {
+    await prisma.manager.deleteMany({});
+    await seedCoachesIfEmpty();
+    res.json({ message: 'Managers reset and re-seeded successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 

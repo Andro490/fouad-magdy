@@ -5,7 +5,7 @@ import { generateToken } from '../utils/jwt';
 
 export const register = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -16,6 +16,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 
     const user = await prisma.user.create({
       data: {
+        name: name || email.split('@')[0],
         email,
         password: hashedPassword,
       },
@@ -25,7 +26,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 
     res.status(201).json({
       message: 'تم إنشاء الحساب بنجاح',
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (error) {
@@ -42,6 +43,11 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: 'بيانات الدخول غير صحيحة' });
     }
 
+    // password can be null if user was created via the old system
+    if (!user.password) {
+      return res.status(400).json({ message: 'بيانات الدخول غير صحيحة' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'بيانات الدخول غير صحيحة' });
@@ -51,7 +57,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
 
     res.json({
       message: 'تم تسجيل الدخول بنجاح',
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (error) {

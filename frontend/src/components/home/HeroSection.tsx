@@ -227,17 +227,18 @@ function MobileProfileCard() {
                     className="relative rounded-2xl overflow-hidden cursor-pointer"
                     style={{ aspectRatio: '4/3' }}
                   >
-                    {/* FOUAD.png as background */}
-                    <img
-                      src={fouadImg}
-                      alt={social.label}
-                      className="absolute inset-0 w-full h-full object-cover object-top"
-                    />
-                    {/* Dark overlay */}
-                    <div className="absolute inset-0 bg-black/45" />
+                    <div className={`absolute inset-0 ${style?.bg ?? 'bg-gray-800'}`} />
+                    
+                    {/* Big background icon */}
+                    <div className={`absolute -bottom-4 -right-4 w-24 h-24 opacity-20 ${social.label === 'Kick' ? 'text-black' : 'text-white'}`}>
+                      {icon}
+                    </div>
+
+                    {/* Dark gradient overlay for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
                     {/* Platform icon — top left */}
-                    <div className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center ${style?.bg ?? 'bg-gray-700'} ${style?.text ?? 'text-white'} shadow-md`}>
+                    <div className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-md ${social.label === 'Kick' ? 'text-black' : 'text-white'} shadow-md border border-white/30`}>
                       {icon}
                     </div>
 

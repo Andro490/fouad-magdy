@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
@@ -324,7 +326,61 @@ app.post('/api/upload', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────
+// AUTO-SEED COACHES FROM JSON FILES
+// ─────────────────────────────────────────
+async function seedCoachesIfEmpty() {
+  try {
+    const count = await prisma.manager.count();
+    if (count > 0) {
+      console.log(`✅ Coaches already in DB: ${count}`);
+      return;
+    }
+
+    console.log('🌱 Seeding coaches from JSON files...');
+    const files = ['coaches.json', 'new_coaches.json'];
+    const map = new Map<string, any>();
+
+    for (const file of files) {
+      const filePath = path.join(process.cwd(), 'src', 'data', file);
+      if (!fs.existsSync(filePath)) continue;
+      
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      let data: any[] = [];
+      try { data = JSON.parse(raw); } catch { continue; }
+      if (!Array.isArray(data)) continue;
+
+      data.forEach((coach: any) => {
+        if (coach.id) map.set(String(coach.id), coach);
+      });
+    }
+
+    const coaches = Array.from(map.values());
+    if (coaches.length === 0) return;
+
+    // Insert in batches of 100
+    const batchSize = 100;
+    for (let i = 0; i < coaches.length; i += batchSize) {
+      const batch = coaches.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map((coach: any) =>
+          prisma.manager.upsert({
+            where: { id: String(coach.id) },
+            update: { data: coach },
+            create: { id: String(coach.id), data: coach }
+          })
+        )
+      );
+    }
+
+    console.log(`✅ Seeded ${coaches.length} coaches into PostgreSQL!`);
+  } catch (err) {
+    console.error('❌ Error seeding coaches:', err);
+  }
+}
+
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);
+  await seedCoachesIfEmpty();
 });

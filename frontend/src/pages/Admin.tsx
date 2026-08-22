@@ -49,7 +49,13 @@ const Admin = () => {
       });
     fetch(`${API_URL}/api/videos`)
       .then(r => r.json())
-      .then(data => setVideoSubmissions(Array.isArray(data) ? data : []))
+      .then(data => {
+        let fetched = Array.isArray(data) ? data : [];
+        if (fetched.length === 0) {
+          fetched = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+        }
+        setVideoSubmissions(fetched);
+      })
       .catch(() => {
         const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
         setVideoSubmissions(storedVideos);

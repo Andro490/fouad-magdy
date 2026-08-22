@@ -107,7 +107,14 @@ const Dashboard = () => {
         let submissions = [];
         try {
           const res = await fetch(`${API_URL}/api/videos`);
-          if (res.ok) submissions = await res.json();
+          if (res.ok) {
+            submissions = await res.json();
+            if (submissions.length === 0) {
+              submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+            }
+          } else {
+            submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+          }
         } catch (err) {
           submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
         }

@@ -119,7 +119,7 @@ app.post('/api/products', async (req, res) => {
         price: Number(p.price),
         image: p.image,
         images: p.images || [],
-        adminPhone: p.adminPhone,
+        adminPhone: p.adminPhone ?? undefined,
         isSoldOut: Boolean(p.isSoldOut)
       }))
     });
@@ -156,12 +156,11 @@ app.post('/api/users', async (req, res) => {
           coins: Number(u.coins || 0)
         },
         create: {
-          id: u.id || undefined, // Prisma will generate if undefined
           name: u.name,
           email: u.email,
-          password: u.password,
-          role: u.role,
-          coins: Number(u.coins || 0)
+          password: u.password ?? undefined,
+          role: u.role ?? 'USER',
+          coins: Number(u.coins ?? 0)
         }
       });
     }

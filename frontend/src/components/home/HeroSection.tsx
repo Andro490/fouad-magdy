@@ -29,7 +29,7 @@ const SocialIcons: Record<string, JSX.Element> = {
   ),
   Kick: (
     <svg viewBox="0 0 50 50" fill="currentColor" className="w-5 h-5">
-      <path d="M5 5 L5 45 L15 45 L15 30 L20 25 L30 45 L42 45 L27 22 L41 5 L29 5 L15 22 L15 5 Z"/>
+      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="32" fontWeight="900" fontFamily="Arial Black, sans-serif">K</text>
     </svg>
   ),
   WhatsApp: (
@@ -45,13 +45,13 @@ const SocialIcons: Record<string, JSX.Element> = {
 };
 
 const socialStyles: Record<string, { bg: string; text: string; ring: string }> = {
-  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-pink-500', ring: 'ring-pink-400' },
-  TikTok:    { bg: 'bg-black', text: 'text-gray-300', ring: 'ring-gray-400' },
-  YouTube:   { bg: 'bg-red-600', text: 'text-red-500', ring: 'ring-red-400' },
-  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-blue-500', ring: 'ring-blue-400' },
-  Kick:      { bg: 'bg-[#53fc18]', text: 'text-[#53fc18]', ring: 'ring-green-400' },
-  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-green-500', ring: 'ring-green-300' },
-  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-[#2AABEE]', ring: 'ring-blue-300' },
+  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-white', ring: 'ring-pink-400' },
+  TikTok:    { bg: 'bg-[#111111] border-2 border-white/20', text: 'text-white', ring: 'ring-white/40' },
+  YouTube:   { bg: 'bg-[#FF0000]', text: 'text-white', ring: 'ring-red-400' },
+  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-white', ring: 'ring-blue-400' },
+  Kick:      { bg: 'bg-[#53fc18]', text: 'text-black', ring: 'ring-green-400' },
+  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-white', ring: 'ring-green-300' },
+  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-white', ring: 'ring-blue-300' },
 };
 
 // ===================== MOBILE PROFILE CARD =====================

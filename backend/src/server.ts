@@ -42,7 +42,7 @@ app.get('/api/managers', async (req, res) => {
     const coaches = await prisma.manager.findMany({
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { updatedAt: 'desc' }
     });
     
     res.json({

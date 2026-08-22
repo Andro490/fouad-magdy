@@ -196,24 +196,6 @@ const Products = () => {
         {!loading && !error && (
           <div className="flex flex-col items-center justify-center mt-16 mb-8" dir="ltr">
             
-            {/* Google Style Pagination Numbers */}
-            <div className="flex items-end gap-1 mb-2">
-              <span className="text-[#4285F4] text-4xl font-bold">S</span>
-              <span className="text-[#EA4335] text-4xl font-bold">t</span>
-              <span className="text-[#FBBC05] text-4xl font-bold">r</span>
-              <span className="text-[#4285F4] text-4xl font-bold">e</span>
-              <span className="text-[#34A853] text-4xl font-bold">a</span>
-              <span className="text-[#EA4335] text-4xl font-bold">m</span>
-              
-              {/* Generate 'u's based on visible pages to mimic Google's 'o's */}
-              {Array.from({ length: Math.min(10, totalPages) }).map((_, i) => (
-                <span key={i} className={`${i % 2 === 0 ? 'text-[#FBBC05]' : 'text-[#34A853]'} text-4xl font-bold`}>
-                  u
-                </span>
-              ))}
-              
-              <span className="text-[#4285F4] text-4xl font-bold">b</span>
-            </div>
 
             <div className="flex items-center gap-3 mt-2 text-sm font-arial" dir="rtl">
               <button 

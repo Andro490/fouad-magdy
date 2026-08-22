@@ -159,9 +159,7 @@ app.post('/api/managers/add', (req, res) => {
     }
 
     const map = new Map();
-    // نضع الجدد أولاً ليكونوا في أعلى الصفحة 1
     newCoaches.forEach((c: any) => { if(c.id) map.set(c.id, c) });
-    // نضع القدامى
     existingCoaches.forEach((c: any) => {
       if (c.id && !map.has(c.id)) {
         map.set(c.id, c);
@@ -175,6 +173,38 @@ app.post('/api/managers/add', (req, res) => {
   } catch (err: any) {
     console.error('Error adding coaches:', err);
     res.status(500).json({ error: 'حدث خطأ أثناء معالجة البيانات: ' + err.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// PRODUCTS API — persists to products.json
+// ─────────────────────────────────────────
+const productsDataPath = path.join(process.cwd(), 'src', 'data', 'products.json');
+
+// GET all products
+app.get('/api/products', (_req, res) => {
+  try {
+    if (!fs.existsSync(productsDataPath)) return res.json([]);
+    const products = JSON.parse(fs.readFileSync(productsDataPath, 'utf-8'));
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST save products (replace full list — used by admin)
+app.post('/api/products', (req, res) => {
+  try {
+    const products = req.body;
+    if (!Array.isArray(products)) {
+      return res.status(400).json({ error: 'Expected an array of products' });
+    }
+    const dataDir = path.join(process.cwd(), 'src', 'data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(productsDataPath, JSON.stringify(products, null, 2));
+    res.json({ success: true, count: products.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 

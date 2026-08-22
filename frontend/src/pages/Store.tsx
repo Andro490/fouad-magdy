@@ -22,10 +22,19 @@ const Store = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch products from local storage for now
-    const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
-    setProducts(storedProducts);
-    setLoading(false);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${API_URL}/api/products`)
+      .then(r => r.json())
+      .then(data => {
+        setProducts(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => {
+        // fallback to localStorage
+        const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        setProducts(storedProducts);
+        setLoading(false);
+      });
   }, []);
 
   const handleBuy = (product: StoreProduct) => {

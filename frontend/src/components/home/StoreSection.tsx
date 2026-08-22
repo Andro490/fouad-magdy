@@ -8,8 +8,17 @@ export default function StoreSection() {
   const [products, setProducts] = useState<StoreProduct[]>([]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('storeProducts') || '[]');
-    setProducts(stored.filter((p: StoreProduct) => !p.isSoldOut).slice(0, 4));
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${API_URL}/api/products`)
+      .then(r => r.json())
+      .then(data => {
+        const list = Array.isArray(data) ? data : [];
+        setProducts(list.filter((p: StoreProduct) => !p.isSoldOut).slice(0, 4));
+      })
+      .catch(() => {
+        const stored = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        setProducts(stored.filter((p: StoreProduct) => !p.isSoldOut).slice(0, 4));
+      });
   }, []);
 
   if (products.length === 0) return null;

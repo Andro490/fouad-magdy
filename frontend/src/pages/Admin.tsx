@@ -27,12 +27,21 @@ const Admin = () => {
   const [adminPhone, setAdminPhone] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'ADMIN') {
       navigate('/');
     }
-    const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
-    setProducts(storedProducts);
+    // Load from API
+    fetch(`${API_URL}/api/products`)
+      .then(r => r.json())
+      .then(data => setProducts(Array.isArray(data) ? data : []))
+      .catch(() => {
+        // fallback to localStorage
+        const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        setProducts(storedProducts);
+      });
     const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
     setVideoSubmissions(storedVideos);
   }, [isAuthenticated, user, navigate]);
@@ -163,7 +172,12 @@ const Admin = () => {
     
     const updatedProducts = [...products, newProduct];
     setProducts(updatedProducts);
-    localStorage.setItem('storeProducts', JSON.stringify(updatedProducts));
+    // Save to API
+    fetch(`${API_URL}/api/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProducts)
+    }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
     
     setName('');
     setDescription('');
@@ -177,7 +191,11 @@ const Admin = () => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
     const updatedProducts = products.filter(p => p.id !== id);
     setProducts(updatedProducts);
-    localStorage.setItem('storeProducts', JSON.stringify(updatedProducts));
+    fetch(`${API_URL}/api/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProducts)
+    }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
   };
 
   const handleToggleSoldOut = (id: string) => {
@@ -185,7 +203,11 @@ const Admin = () => {
       p.id === id ? { ...p, isSoldOut: !p.isSoldOut } : p
     );
     setProducts(updatedProducts);
-    localStorage.setItem('storeProducts', JSON.stringify(updatedProducts));
+    fetch(`${API_URL}/api/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProducts)
+    }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
   };
 
   const handleApproveVideo = (id: string) => {

@@ -256,7 +256,10 @@ const Admin = () => {
       try {
         const res = await fetch(`${API_URL}/api/users`);
         if (res.ok) {
-          const users = await res.json();
+          let users = await res.json();
+          if (users.length === 0) {
+            users = JSON.parse(localStorage.getItem('users') || '[]');
+          }
           const userIndex = users.findIndex((u: any) => u.id === streamerId);
           if (userIndex !== -1) {
             users[userIndex].coins = (users[userIndex].coins || 0) + earnedCoins;
@@ -264,8 +267,10 @@ const Admin = () => {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(users)
-            });
+            }).catch(() => localStorage.setItem('users', JSON.stringify(users)));
           }
+        } else {
+          throw new Error('Fallback to local');
         }
       } catch (err) {
         const users = JSON.parse(localStorage.getItem('users') || '[]');

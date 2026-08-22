@@ -27,7 +27,14 @@ export default function Leaderboard() {
       let users = [];
       try {
         const res = await fetch(`${API_URL}/api/users`);
-        if (res.ok) users = await res.json();
+        if (res.ok) {
+          users = await res.json();
+          if (users.length === 0) {
+            users = JSON.parse(localStorage.getItem('users') || '[]');
+          }
+        } else {
+          users = JSON.parse(localStorage.getItem('users') || '[]');
+        }
       } catch (err) {
         users = JSON.parse(localStorage.getItem('users') || '[]');
       }

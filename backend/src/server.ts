@@ -338,42 +338,56 @@ async function seedCoachesIfEmpty() {
     }
 
     console.log('🌱 Seeding coaches from JSON files...');
-    const files = ['coaches.json', 'new_coaches.json'];
-    const map = new Map<string, any>();
 
-    for (const file of files) {
-      const filePath = path.join(process.cwd(), 'src', 'data', file);
-      if (!fs.existsSync(filePath)) continue;
-      
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      let data: any[] = [];
-      try { data = JSON.parse(raw); } catch { continue; }
-      if (!Array.isArray(data)) continue;
-
-      data.forEach((coach: any) => {
-        if (coach.id) map.set(String(coach.id), coach);
-      });
+    // Insert coaches.json FIRST (older = further back in pages)
+    const coachesPath = path.join(process.cwd(), 'src', 'data', 'coaches.json');
+    if (fs.existsSync(coachesPath)) {
+      let coaches: any[] = [];
+      try { coaches = JSON.parse(fs.readFileSync(coachesPath, 'utf-8')); } catch {}
+      if (Array.isArray(coaches) && coaches.length > 0) {
+        const batchSize = 50;
+        for (let i = 0; i < coaches.length; i += batchSize) {
+          const batch = coaches.slice(i, i + batchSize);
+          await Promise.all(
+            batch.filter((c: any) => c.id).map((coach: any) =>
+              prisma.manager.upsert({
+                where: { id: String(coach.id) },
+                update: { data: coach },
+                create: { id: String(coach.id), data: coach }
+              })
+            )
+          );
+        }
+        console.log(`✅ Seeded ${coaches.length} coaches from coaches.json`);
+      }
     }
 
-    const coaches = Array.from(map.values());
-    if (coaches.length === 0) return;
+    // Small delay so new_coaches get newer createdAt timestamps
+    await new Promise(r => setTimeout(r, 500));
 
-    // Insert in batches of 100
-    const batchSize = 100;
-    for (let i = 0; i < coaches.length; i += batchSize) {
-      const batch = coaches.slice(i, i + batchSize);
-      await Promise.all(
-        batch.map((coach: any) =>
-          prisma.manager.upsert({
-            where: { id: String(coach.id) },
-            update: { data: coach },
-            create: { id: String(coach.id), data: coach }
-          })
-        )
-      );
+    // Insert new_coaches.json SECOND (newer = appears on first pages)
+    const newCoachesPath = path.join(process.cwd(), 'src', 'data', 'new_coaches.json');
+    if (fs.existsSync(newCoachesPath)) {
+      let newCoaches: any[] = [];
+      try { newCoaches = JSON.parse(fs.readFileSync(newCoachesPath, 'utf-8')); } catch {}
+      if (Array.isArray(newCoaches) && newCoaches.length > 0) {
+        const batchSize = 50;
+        for (let i = 0; i < newCoaches.length; i += batchSize) {
+          const batch = newCoaches.slice(i, i + batchSize);
+          await Promise.all(
+            batch.filter((c: any) => c.id).map((coach: any) =>
+              prisma.manager.upsert({
+                where: { id: String(coach.id) },
+                update: { data: coach },
+                create: { id: String(coach.id), data: coach }
+              })
+            )
+          );
+        }
+        console.log(`✅ Seeded ${newCoaches.length} coaches from new_coaches.json (they appear first)`);
+      }
     }
 
-    console.log(`✅ Seeded ${coaches.length} coaches into PostgreSQL!`);
   } catch (err) {
     console.error('❌ Error seeding coaches:', err);
   }

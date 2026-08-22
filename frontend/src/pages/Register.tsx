@@ -19,7 +19,16 @@ const Register = () => {
     
     try {
       const res = await fetch(`${API_URL}/api/users`);
-      const users = res.ok ? await res.json() : [];
+      let users = [];
+      if (res.ok) {
+        users = await res.json();
+        if (users.length === 0) {
+          users = JSON.parse(localStorage.getItem('users') || '[]');
+        }
+      } else {
+        users = JSON.parse(localStorage.getItem('users') || '[]');
+      }
+      
       users.push(newUser);
       
       await fetch(`${API_URL}/api/users`, {

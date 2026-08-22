@@ -45,13 +45,13 @@ const SocialIcons: Record<string, JSX.Element> = {
 };
 
 const socialStyles: Record<string, { bg: string; text: string; ring: string }> = {
-  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-white', ring: 'ring-pink-400' },
-  TikTok:    { bg: 'bg-[#111111] border-2 border-white/20', text: 'text-white', ring: 'ring-white/40' },
-  YouTube:   { bg: 'bg-[#FF0000]', text: 'text-white', ring: 'ring-red-400' },
-  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-white', ring: 'ring-blue-400' },
-  Kick:      { bg: 'bg-[#53fc18]', text: 'text-black', ring: 'ring-green-400' },
-  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-white', ring: 'ring-green-300' },
-  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-white', ring: 'ring-blue-300' },
+  Instagram: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400', text: 'text-white', ring: '#ec4899' },
+  TikTok:    { bg: 'bg-[#111111] border-2 border-white/20', text: 'text-white', ring: '#ffffff' },
+  YouTube:   { bg: 'bg-[#FF0000]', text: 'text-white', ring: '#ef4444' },
+  Facebook:  { bg: 'bg-[#1877F2]', text: 'text-white', ring: '#3b82f6' },
+  Kick:      { bg: 'bg-[#53fc18]', text: 'text-white', ring: '#53fc18' },
+  WhatsApp:  { bg: 'bg-[#25D366]', text: 'text-white', ring: '#25D366' },
+  Telegram:  { bg: 'bg-[#2AABEE]', text: 'text-white', ring: '#2AABEE' },
 };
 
 // ===================== MOBILE PROFILE CARD =====================
@@ -228,7 +228,7 @@ function MobileProfileCard() {
                     style={{ aspectRatio: '4/3' }}
                   >
                     {/* Black background with subtle colored border */}
-                    <div className="absolute inset-0 bg-[#0a0a0a]" style={{ border: `1px solid ${style?.ring ? style.ring.replace('ring-', '') : 'rgba(255,255,255,0.1)'}` }} />
+                    <div className="absolute inset-0 bg-[#0a0a0a]" style={{ border: `1px solid ${style?.ring || 'rgba(255,255,255,0.1)'}` }} />
                     
                     {/* Big centered icon/text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">

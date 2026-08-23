@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
+import { authenticateToken, AuthRequest } from './middleware/auth';
 
 dotenv.config();
 
@@ -229,19 +230,47 @@ app.get('/api/checkout/verify', async (req, res) => {
   }
 });
 
-// Check if a user has already purchased access to a coach
-app.get('/api/checkout/check-purchase', async (req, res) => {
+// ─────────────────────────────────────────────────────────────
+// SECURE: Check purchase with JWT (can't be faked from browser)
+// ─────────────────────────────────────────────────────────────
+// Endpoint: GET /api/checkout/check-purchase
+// Headers:  Authorization: Bearer <token>
+// Query:    managerId=<id>
+// Returns:  { purchased: true/false }
+app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const { managerId, userEmail } = req.query as Record<string, string>;
-    if (!managerId || !userEmail) return res.json({ purchased: false });
-    
+    const { managerId } = req.query as Record<string, string>;
+    if (!managerId) return res.status(400).json({ error: 'Missing managerId' });
+
+    // Get user email from the verified JWT payload (cannot be tampered)
+    const userEmail = req.user?.email;
+    const userId = req.user?.id;
+
+    if (!userEmail && !userId) {
+      return res.status(401).json({ purchased: false, error: 'Cannot identify user from token' });
+    }
+
+    // Fetch user email from DB if only userId is in token
+    let email = userEmail;
+    if (!email && userId) {
+      const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+      email = dbUser?.email;
+    }
+
+    if (!email) return res.status(401).json({ purchased: false, error: 'User not found' });
+
+    // Query the DB directly — localStorage cannot influence this
     const record = await (prisma as any).coachPurchase.findFirst({
-      where: { managerId, userEmail }
+      where: { managerId, userEmail: email }
     });
-    
-    res.json({ purchased: !!record });
+
+    if (!record) {
+      return res.status(403).json({ purchased: false, error: 'No purchase record found' });
+    }
+
+    return res.json({ purchased: true });
   } catch (err: any) {
-    res.json({ purchased: false });
+    return res.status(500).json({ purchased: false, error: err.message });
   }
 });
 

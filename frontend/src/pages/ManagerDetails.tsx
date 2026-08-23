@@ -79,17 +79,27 @@ const ManagerDetails = () => {
         if (mVideo) setCoachVideo(mVideo);
       });
 
-    // Check if user already purchased this coach
+    // Check if user already purchased this coach (secured with JWT)
     if (id) {
       const email = user?.email || '';
       const localKey = `purchased_${email}_${id}`;
       if (localStorage.getItem(localKey) === '1') {
         setHasPurchased(true);
-      } else if (email) {
-        fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&userEmail=${encodeURIComponent(email)}`)
-          .then(r => r.json())
-          .then(data => { if (data.purchased) setHasPurchased(true); })
-          .catch(() => {});
+      } else {
+        const token = localStorage.getItem('token');
+        if (token) {
+          fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+            .then(r => r.json())
+            .then(data => {
+              if (data.purchased) {
+                setHasPurchased(true);
+                localStorage.setItem(localKey, '1');
+              }
+            })
+            .catch(() => {});
+        }
       }
     }
   }, [id, API_URL, user?.email]);

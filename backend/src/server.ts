@@ -33,49 +33,53 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────
-// SEED FROM coaches.json
+// MANAGERS API - Serves directly from coaches.json
+// Order in file = order on site. New coaches prepended = appear first.
 // ─────────────────────────────────────────
+const COACHES_FILE = path.join(__dirname, '../src/data/coaches.json');
 
-// ─────────────────────────────────────────
-// MANAGERS API
-// ─────────────────────────────────────────
-app.get('/api/managers', async (req, res) => {
+const readCoachesFile = (): any[] => {
+  try {
+    const raw = fs.readFileSync(COACHES_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+};
+
+const writeCoachesFile = (coaches: any[]) => {
+  fs.writeFileSync(COACHES_FILE, JSON.stringify(coaches, null, 4), 'utf-8');
+};
+
+app.get('/api/managers', (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = 15;
-    
-    const totalCoaches = await prisma.manager.count();
-    
-    // Manually added coaches bubble to top (recent updatedAt), rest sorted by ID DESC
-    const coaches: any[] = await prisma.$queryRaw`
-      SELECT * FROM "Manager"
-      ORDER BY "updatedAt" DESC, CAST(id AS BIGINT) DESC
-      LIMIT ${limit} OFFSET ${(page - 1) * limit}
-    `;
-    
+    const allCoaches = readCoachesFile();
+    const totalCoaches = allCoaches.length;
+    const start = (page - 1) * limit;
+    const coaches = allCoaches.slice(start, start + limit);
+
     res.json({
       page,
       totalPages: Math.ceil(totalCoaches / limit),
       totalCoaches,
-      coaches: coaches.map((c: any) => c.data)
+      coaches
     });
-  } catch (err) {
-    console.error('Error fetching managers:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-app.get('/api/managers/reset', async (req, res) => {
-  try {
-    await prisma.manager.deleteMany({});
-    await seedCoachesIfEmpty();
-    res.json({ message: 'Managers reset and re-seeded successfully' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/managers/add', async (req, res) => {
+app.get('/api/managers/reset', async (req, res) => {
+  try {
+    res.json({ message: 'Reset not needed - coaches served from file' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/managers/add', (req, res) => {
   try {
     let inputData = req.body;
     let newCoaches: any[] = [];
@@ -91,30 +95,32 @@ app.post('/api/managers/add', async (req, res) => {
       return res.status(400).json({ error: 'لم يتم العثور على مدربين' });
     }
 
-    let addedCount = 0;
-    for (const coach of newCoaches) {
-      if (coach.id) {
-        await prisma.manager.upsert({
-          where: { id: coach.id.toString() },
-          update: { data: coach },
-          create: { id: coach.id.toString(), data: coach }
-        });
-        addedCount++;
-      }
-    }
+    const existing = readCoachesFile();
 
-    res.json({ success: true, message: `تمت إضافة ${addedCount} مدرب بنجاح!` });
+    // Remove duplicates (same id), then prepend new coaches to the top
+    const withoutDupes = existing.filter(
+      (e: any) => !newCoaches.some((n: any) => String(n.id) === String(e.id))
+    );
+    const updated = [...newCoaches, ...withoutDupes];
+    writeCoachesFile(updated);
+
+    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح في أول القائمة!` });
   } catch (err: any) {
     console.error('Error adding coaches:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete('/api/managers/:id', async (req, res) => {
+app.delete('/api/managers/:id', (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.manager.delete({ where: { id: id } });
-    res.json({ success: true, message: 'Manager deleted successfully' });
+    const existing = readCoachesFile();
+    const filtered = existing.filter((c: any) => String(c.id) !== String(id));
+    if (filtered.length === existing.length) {
+      return res.status(404).json({ error: 'المدرب غير موجود' });
+    }
+    writeCoachesFile(filtered);
+    res.json({ success: true, message: 'تم حذف المدرب بنجاح' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

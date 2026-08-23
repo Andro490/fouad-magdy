@@ -42,7 +42,7 @@ const Checkout = () => {
           body: JSON.stringify({
             planName: product.name,
             amount: 2000, // $20.00
-            successUrl: window.location.origin + '/store',
+            successUrl: window.location.origin + '/payment-success',
             cancelUrl: window.location.href,
           })
         });

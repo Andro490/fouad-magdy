@@ -10,6 +10,7 @@ import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import Checkout from './pages/Checkout';
 import Leaderboard from './pages/Leaderboard';
+import PaymentSuccess from './pages/PaymentSuccess';
 import SupportChat from './components/SupportChat';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

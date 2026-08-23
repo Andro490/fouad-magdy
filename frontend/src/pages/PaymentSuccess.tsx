@@ -157,7 +157,7 @@ const PaymentSuccess = () => {
             تفاصيل التكتيك
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {images.map((img, idx) => (
+            {images.map((img: { src: string; caption: string }, idx: number) => (
               <div
                 key={idx}
                 className="group relative overflow-hidden rounded-2xl border border-gray-800 bg-[#1a1e2e] hover:border-[#e06c88]/50 transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(224,108,136,0.15)]"

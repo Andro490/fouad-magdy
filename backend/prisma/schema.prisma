@@ -58,3 +58,15 @@ model Manager {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model CoachVideo {
+  id          String   @id @default(uuid())
+  managerId   String   @unique
+  freeUrl     String?
+  libraryId   String?
+  tokenKey    String?
+  videoId     String?
+  images      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

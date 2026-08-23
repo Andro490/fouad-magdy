@@ -256,14 +256,10 @@ const COACH_VIDEOS_FILE = path.join(__dirname, '..', 'coach-videos.json');
 
 app.get('/api/coach-videos', async (req, res) => {
   try {
-    if (!fs.existsSync(COACH_VIDEOS_FILE)) {
-      return res.json([]);
-    }
-    const data = fs.readFileSync(COACH_VIDEOS_FILE, 'utf-8');
-    const parsedData = JSON.parse(data || '[]');
+    const coachVideos = await prisma.coachVideo.findMany();
     
     // Generate secure token URL for Bunny Stream if credentials exist
-    const enhancedData = parsedData.map((cv: any) => {
+    const enhancedData = coachVideos.map((cv: any) => {
       if (cv.libraryId && cv.videoId && cv.tokenKey) {
         const expires = Math.floor(Date.now() / 1000) + 3600; // 1 hour expiration
         const hashableBase = cv.tokenKey + cv.videoId + expires;
@@ -286,20 +282,26 @@ app.post('/api/coach-videos', async (req, res) => {
       return res.status(400).json({ error: 'Missing managerId' });
     }
     
-    let currentData: any[] = [];
-    if (fs.existsSync(COACH_VIDEOS_FILE)) {
-      const fileData = fs.readFileSync(COACH_VIDEOS_FILE, 'utf-8');
-      currentData = JSON.parse(fileData || '[]');
-    }
+    const upsertedVideo = await prisma.coachVideo.upsert({
+      where: { managerId: entry.managerId },
+      update: {
+        freeUrl: entry.freeUrl,
+        libraryId: entry.libraryId,
+        tokenKey: entry.tokenKey,
+        videoId: entry.videoId,
+        images: entry.images || [],
+      },
+      create: {
+        managerId: entry.managerId,
+        freeUrl: entry.freeUrl,
+        libraryId: entry.libraryId,
+        tokenKey: entry.tokenKey,
+        videoId: entry.videoId,
+        images: entry.images || [],
+      }
+    });
     
-    // Remove existing entry for this manager if it exists
-    currentData = currentData.filter(d => d.managerId !== entry.managerId);
-    
-    // Add new entry
-    currentData.unshift(entry);
-    
-    fs.writeFileSync(COACH_VIDEOS_FILE, JSON.stringify(currentData, null, 2));
-    res.json({ success: true, count: currentData.length });
+    res.json({ success: true, data: upsertedVideo });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

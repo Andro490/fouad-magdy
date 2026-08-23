@@ -529,16 +529,53 @@ const Admin = () => {
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
             placeholder="انسخ كود JSON هنا..."
-            className="w-full h-96 bg-dark/50 border border-gray-700 rounded-lg p-4 text-white focus:border-primary focus:outline-none mb-4"
+            className="w-full h-64 bg-dark/50 border border-gray-700 rounded-lg p-4 text-white focus:border-primary focus:outline-none mb-4"
             dir="ltr"
           />
           <button 
             onClick={handleAddCoaches}
             disabled={isSubmittingJson}
-            className="w-full py-3 bg-accent text-dark font-bold rounded-lg hover:bg-primary transition-colors shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50"
+            className="w-full py-3 bg-accent text-dark font-bold rounded-lg hover:bg-primary transition-colors shadow-[0_0_15px_rgba(0,240,255,0.3)] disabled:opacity-50 mb-8"
           >
             {isSubmittingJson ? 'جاري الإضافة...' : 'إضافة المدربين الآن'}
           </button>
+          
+          <hr className="border-gray-700 mb-8" />
+          
+          <h2 className="text-2xl font-bold mb-6 text-red-500 text-center">حذف مدرب</h2>
+          <p className="text-gray-400 mb-4 text-center">أدخل الـ ID الخاص بالمدرب لحذفه نهائياً من قاعدة البيانات والموقع.</p>
+          <div className="flex gap-4">
+            <input 
+              type="text" 
+              id="deleteCoachIdInput"
+              placeholder="مثال: 17608292273375"
+              className="flex-1 bg-dark/50 border border-gray-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none"
+              dir="ltr"
+            />
+            <button 
+              onClick={async () => {
+                const idInput = (document.getElementById('deleteCoachIdInput') as HTMLInputElement).value;
+                if (!idInput) return alert('يرجى إدخال ID المدرب');
+                if (window.confirm('هل أنت متأكد من حذف هذا المدرب نهائياً؟')) {
+                  try {
+                    const res = await fetch(`${API_URL}/api/managers/${idInput}`, { method: 'DELETE' });
+                    const result = await res.json();
+                    if (res.ok) {
+                      alert('تم حذف المدرب بنجاح!');
+                      (document.getElementById('deleteCoachIdInput') as HTMLInputElement).value = '';
+                    } else {
+                      alert(`فشل الحذف: ${result.error}`);
+                    }
+                  } catch (e) {
+                    alert('حدث خطأ في الاتصال بالسيرفر');
+                  }
+                }
+              }}
+              className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+            >
+              حذف المدرب
+            </button>
+          </div>
         </div>
         ) : activeTab === 'coachVideos' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

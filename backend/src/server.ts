@@ -110,6 +110,16 @@ app.post('/api/managers/add', async (req, res) => {
   }
 });
 
+app.delete('/api/managers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.manager.delete({ where: { id: id } });
+    res.json({ success: true, message: 'Manager deleted successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────
 // PRODUCTS API
 // ─────────────────────────────────────────

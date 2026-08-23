@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { MessageCircle, X, Send } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ChatMessage {
   id: string;
@@ -13,11 +14,13 @@ interface ChatMessage {
 }
 
 const SupportChat = () => {
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [firstCoach, setFirstCoach] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -33,10 +36,21 @@ const SupportChat = () => {
   const activeUserId = user?.id || guestId;
   const activeUserName = user?.name || (user?.id ? 'مستخدم' : 'زائر');
 
+  // Fetch the first/top coach to display on the bubble
+  useEffect(() => {
+    fetch(`${API_URL}/api/managers?page=1`)
+      .then(r => r.json())
+      .then(data => {
+        const coaches = Array.isArray(data.coaches) ? data.coaches : Array.isArray(data) ? data : [];
+        if (coaches.length > 0) setFirstCoach(coaches[0]);
+      })
+      .catch(() => {});
+  }, [API_URL]);
+
   useEffect(() => {
     if (isOpen) {
       fetchMessages();
-      const interval = setInterval(fetchMessages, 3000); // Polling for new messages
+      const interval = setInterval(fetchMessages, 3000);
       return () => clearInterval(interval);
     }
   }, [isOpen, activeUserId]);
@@ -69,8 +83,6 @@ const SupportChat = () => {
     };
 
     setMessage('');
-    
-    // Optimistic UI update
     setMessages(prev => [...prev, { ...newMessage, id: Date.now().toString(), timestamp: Date.now(), sender: 'USER' }]);
 
     try {
@@ -85,9 +97,53 @@ const SupportChat = () => {
     }
   };
 
-  // الزر سيظهر للجميع، حتى للأدمن لكي يتمكن من رؤيته وتجربته
+  // Build coach avatar URL (same logic as ManagerDetails)
+  const coachAvatarUrl = firstCoach?.id
+    ? `https://efootball.konami.net/img/manager/${firstCoach.id}.png`
+    : null;
+
+  const coachInitials = firstCoach?.name
+    ? firstCoach.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'MA';
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+      
+      {/* ── Coach Bubble: goes to coaches page ── */}
+      {!isOpen && (
+        <div className="relative group" title="اكتشف المدربين">
+          <button
+            onClick={() => navigate('/products')}
+            className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(0,240,255,0.5)] hover:scale-110 transition-all duration-300 hover:shadow-[0_0_24px_rgba(0,240,255,0.8)]"
+          >
+            {coachAvatarUrl ? (
+              <img
+                src={coachAvatarUrl}
+                alt={firstCoach?.name}
+                className="w-full h-full object-cover bg-[#1a1e2e]"
+                onError={(e) => {
+                  const t = e.currentTarget;
+                  t.style.display = 'none';
+                  const parent = t.parentElement!;
+                  parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-bold text-lg">${coachInitials}</div>`;
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-bold text-lg">
+                {coachInitials}
+              </div>
+            )}
+          </button>
+          {/* Pulsing ring */}
+          <span className="absolute inset-0 rounded-full border-2 border-primary animate-ping opacity-40 pointer-events-none" />
+          {/* Tooltip */}
+          <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-dark/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-primary/30">
+            المدربين
+          </span>
+        </div>
+      )}
+
+      {/* ── Support Chat ── */}
       {isOpen ? (
         <div className="w-80 h-96 bg-dark/95 border border-primary/30 rounded-2xl shadow-[0_0_20px_rgba(0,240,255,0.2)] flex flex-col backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-5">
           <div className="bg-primary/20 p-4 border-b border-primary/20 flex justify-between items-center">

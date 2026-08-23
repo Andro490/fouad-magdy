@@ -97,9 +97,9 @@ const SupportChat = () => {
     }
   };
 
-  // Build coach avatar URL (same logic as ManagerDetails)
+  // Build coach avatar URL using efimg.com coach card images
   const coachAvatarUrl = firstCoach?.id
-    ? `https://efootball.konami.net/img/manager/${firstCoach.id}.png`
+    ? `https://efimg.com/efootballhub22/images/coach_cards/${firstCoach.id}.png`
     : null;
 
   const coachInitials = firstCoach?.name

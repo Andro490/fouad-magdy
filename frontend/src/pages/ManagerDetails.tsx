@@ -82,8 +82,11 @@ const ManagerDetails = () => {
     // Check if user already purchased this coach (secured with JWT)
     if (id) {
       const email = user?.email || '';
-      const localKey = `purchased_${email}_${id}`;
-      if (localStorage.getItem(localKey) === '1') {
+      // Simple key - works even if email is empty
+      const simpleKey = `coach_paid_${id}`;
+      const emailKey = `purchased_${email}_${id}`;
+      
+      if (localStorage.getItem(simpleKey) === '1' || localStorage.getItem(emailKey) === '1') {
         setHasPurchased(true);
       } else {
         const token = localStorage.getItem('token');
@@ -95,7 +98,7 @@ const ManagerDetails = () => {
             .then(data => {
               if (data.purchased) {
                 setHasPurchased(true);
-                localStorage.setItem(localKey, '1');
+                localStorage.setItem(simpleKey, '1');
               }
             })
             .catch(() => {});

@@ -51,8 +51,9 @@ const PaymentSuccess = () => {
           // Save purchase to localStorage as backup
           if (managerId) {
             const email = userEmail || data.customerEmail || '';
-            const key = `purchased_${email}_${managerId}`;
-            localStorage.setItem(key, '1');
+            // Save with both keys for compatibility
+            localStorage.setItem(`coach_paid_${managerId}`, '1');
+            if (email) localStorage.setItem(`purchased_${email}_${managerId}`, '1');
             // Fetch coach video
             fetch(`${API_URL}/api/coach-videos`)
               .then(r => r.json())

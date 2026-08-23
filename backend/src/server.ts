@@ -145,6 +145,43 @@ app.post('/api/products', async (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// CHECKOUT API
+// ─────────────────────────────────────────
+app.post('/api/checkout/stripe', async (req, res) => {
+  try {
+    const { successUrl, cancelUrl, planName = 'الخطة المدفوعة', amount = 2000 } = req.body;
+    const STRIPE_SECRET_KEY = 'sk_test_51Tde06Ghb1UVYu3xS51dPby0T6CB2WYLctiuxBFI7kBttHS2o4Vwhl8pIKcAzt2PXSDYwMOU8eVnPdGI8ucdAAYq00ptHkWMjv';
+    
+    const params = new URLSearchParams();
+    params.append('success_url', successUrl || 'http://localhost:5173/');
+    params.append('cancel_url', cancelUrl || 'http://localhost:5173/');
+    params.append('mode', 'payment');
+    params.append('line_items[0][price_data][currency]', 'usd');
+    params.append('line_items[0][price_data][product_data][name]', planName);
+    params.append('line_items[0][price_data][unit_amount]', amount.toString()); // in cents
+    params.append('line_items[0][quantity]', '1');
+
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString()
+    });
+
+    const session = await response.json();
+    if (session.error) {
+      return res.status(400).json({ error: session.error.message });
+    }
+    
+    res.json({ url: session.url });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────
 app.get('/api/users', async (_req, res) => {

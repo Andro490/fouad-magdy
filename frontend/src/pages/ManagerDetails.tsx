@@ -430,7 +430,7 @@ const ManagerDetails = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate('/products')}
+          onClick={() => navigate('/checkout', { state: { product: { name: `الخطة المدفوعة لـ ${manager.name}`, price: '$20' } } })}
           className="z-10 px-10 py-4 bg-gradient-to-l from-[#e06c88] to-[#ff477e] hover:from-[#ff7b9a] hover:to-[#ff477e] text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(224,108,136,0.4)] hover:shadow-[0_0_35px_rgba(224,108,136,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
         >
           <span>دفع الآن</span>

@@ -274,6 +274,152 @@ app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthReque
   }
 });
 
+// ─────────────────────────────────────────────────────────────
+// MANUAL PAYMENT (TELEGRAM INTEGRATION)
+// ─────────────────────────────────────────────────────────────
+app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const { name, phone, gameId, productName, price, receiptBase64, managerId } = req.body;
+    const userEmail = req.user?.email || 'guest@unknown.com';
+
+    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+    const API_URL = process.env.VITE_API_URL || 'http://localhost:5000'; // Make sure this is public URL in production
+
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      return res.status(500).json({ error: 'Telegram configuration is missing in backend.' });
+    }
+
+    const caption = `💰 *طلب شراء جديد (دفع يدوي)*\n\n` +
+      `👤 *الاسم:* ${name}\n` +
+      `📧 *الإيميل:* ${userEmail}\n` +
+      `📱 *الهاتف:* ${phone}\n` +
+      `🎮 *لعبة ID:* ${gameId}\n` +
+      `🛍️ *المنتج:* ${productName}\n` +
+      `💵 *السعر:* ${price}\n\n` +
+      `يرجى مراجعة الإيصال المرفق والموافقة أو الرفض.`;
+
+    const replyMarkup = JSON.stringify({
+      inline_keyboard: [
+        [
+          { text: "✅ تم الدفع (موافقة)", url: `${API_URL}/api/checkout/manual-approve?managerId=${managerId}&email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}` },
+          { text: "❌ لم يتم الدفع (رفض)", url: `${API_URL}/api/checkout/manual-reject?managerId=${managerId}&email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}` }
+        ]
+      ]
+    });
+
+    let fetchBody: any = null;
+    let fetchHeaders: any = {};
+
+    if (receiptBase64 && typeof FormData !== 'undefined' && typeof Blob !== 'undefined') {
+      try {
+        const [mimePart, dataPart] = receiptBase64.split(',');
+        const mime = mimePart.match(/:(.*?);/)?.[1] || 'image/jpeg';
+        const buffer = Buffer.from(dataPart, 'base64');
+        const blob = new Blob([buffer], { type: mime });
+        
+        const formData = new FormData();
+        formData.append('chat_id', TELEGRAM_CHAT_ID);
+        formData.append('photo', blob, 'receipt.jpg');
+        formData.append('caption', caption);
+        formData.append('parse_mode', 'Markdown');
+        formData.append('reply_markup', replyMarkup);
+        
+        fetchBody = formData;
+      } catch (e) {
+        console.log('Error creating FormData for Telegram:', e);
+      }
+    }
+
+    // Fallback if FormData fails or no receipt
+    if (!fetchBody) {
+      fetchHeaders = { 'Content-Type': 'application/json' };
+      fetchBody = JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: caption + (receiptBase64 ? '\n\n*(ملاحظة: فشل إرفاق الصورة، يرجى مراجعة Google Sheets)*' : ''),
+        parse_mode: 'Markdown',
+        reply_markup: JSON.parse(replyMarkup)
+      });
+    }
+
+    const endpoint = fetchHeaders['Content-Type'] === 'application/json' ? 'sendMessage' : 'sendPhoto';
+    const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${endpoint}`;
+
+    const tgResponse = await fetch(tgUrl, {
+      method: 'POST',
+      headers: fetchHeaders,
+      body: fetchBody
+    });
+
+    const tgResult = await tgResponse.json();
+    if (!tgResult.ok) {
+      console.error('Telegram API Error:', tgResult);
+    }
+
+    res.json({ success: true, message: 'Request sent to Telegram' });
+  } catch (err: any) {
+    console.error('Manual checkout error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin Approve Endpoint
+app.get('/api/checkout/manual-approve', async (req, res) => {
+  try {
+    const { managerId, email, secret } = req.query as Record<string, string>;
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+
+    if (secret !== TELEGRAM_SECRET) {
+      return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
+    }
+
+    if (!managerId || !email) {
+      return res.status(400).send('<h1>خطأ: بيانات ناقصة</h1>');
+    }
+
+    // Give access
+    await (prisma as any).coachPurchase.upsert({
+      where: { userEmail_managerId: { userEmail: email, managerId } },
+      update: { sessionId: 'manual_' + Date.now() },
+      create: { userEmail: email, managerId, sessionId: 'manual_' + Date.now() }
+    });
+
+    res.send(`
+      <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px; direction: rtl;">
+        <h1 style="color: green;">✅ تم التفعيل بنجاح!</h1>
+        <p>تم منح المستخدم (${email}) الصلاحية للدخول على الخطة.</p>
+        <script>setTimeout(() => window.close(), 3000);</script>
+      </div>
+    `);
+  } catch (err: any) {
+    res.status(500).send(`<h1>حدث خطأ: ${err.message}</h1>`);
+  }
+});
+
+// Admin Reject Endpoint
+app.get('/api/checkout/manual-reject', async (req, res) => {
+  try {
+    const { secret, email } = req.query as Record<string, string>;
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+
+    if (secret !== TELEGRAM_SECRET) {
+      return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
+    }
+
+    res.send(`
+      <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px; direction: rtl;">
+        <h1 style="color: red;">❌ تم رفض الطلب</h1>
+        <p>تم رفض طلب المستخدم (${email}) بنجاح.</p>
+        <script>setTimeout(() => window.close(), 3000);</script>
+      </div>
+    `);
+  } catch (err: any) {
+    res.status(500).send(`<h1>حدث خطأ: ${err.message}</h1>`);
+  }
+});
+
+
 // ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────

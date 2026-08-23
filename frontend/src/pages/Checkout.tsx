@@ -86,26 +86,36 @@ const Checkout = () => {
           gameId,
           productName: product.name,
           price: product.price,
-          receiptBase64: base64data
+          receiptBase64: base64data,
+          managerId: location.state?.managerId
         };
 
-        const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxrgUBqaMnfFtdouvLqA5ba7FU6YdTUDy65gR8GjKAr2SjwjYD75mhfgd5EPBc-HYA8wA/exec';
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const token = localStorage.getItem('token');
         
-        if (!GOOGLE_SCRIPT_URL) {
-          alert('يرجى إضافة رابط Google Script في ملف .env');
+        if (!token) {
+          alert('يجب تسجيل الدخول أولاً لإتمام عملية الشراء');
           setLoading(false);
           return;
         }
 
-        await fetch(GOOGLE_SCRIPT_URL, {
+        const response = await fetch(`${API_URL}/api/checkout/manual`, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(payload),
         });
 
-        alert('تم إرسال طلبك بنجاح! سيتم مراجعته والتواصل معك.');
-        navigate('/store');
+        const result = await response.json();
+        
+        if (response.ok) {
+          alert('✅ تم إرسال طلبك بنجاح! سيتم مراجعته وسينفتح لك المحتوى قريباً.');
+          navigate('/store');
+        } else {
+          alert(`❌ حدث خطأ: ${result.error || 'فشل إرسال الطلب'}`);
+        }
         setLoading(false);
       };
     } catch (err) {

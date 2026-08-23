@@ -91,7 +91,7 @@ const ManagerDetails = () => {
       } else {
         const token = localStorage.getItem('token');
         if (token) {
-          fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}`, {
+          fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&phone=${user?.phone || ''}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
             .then(r => r.json())

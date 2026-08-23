@@ -239,12 +239,17 @@ app.get('/api/checkout/verify', async (req, res) => {
 // Returns:  { purchased: true/false }
 app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const { managerId } = req.query as Record<string, string>;
+    const { managerId, phone } = req.query as Record<string, string>;
     if (!managerId) return res.status(400).json({ error: 'Missing managerId' });
 
     // Get user email from the verified JWT payload (cannot be tampered)
-    const userEmail = req.user?.email;
+    let userEmail = req.user?.email;
     const userId = req.user?.id;
+    
+    // Support local mock users by relying on passed phone
+    if (userEmail === 'mock@local.user' && phone) {
+      userEmail = phone;
+    }
 
     if (!userEmail && !userId) {
       return res.status(401).json({ purchased: false, error: 'Cannot identify user from token' });
@@ -252,7 +257,7 @@ app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthReque
 
     // Fetch user email from DB if only userId is in token
     let email = userEmail;
-    if (!email && userId) {
+    if (!email && userId && userId !== 'mock-id') {
       const dbUser = await prisma.user.findUnique({ where: { id: userId } });
       email = dbUser?.email;
     }
@@ -280,7 +285,10 @@ app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthReque
 app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const { name, phone, gameId, productName, price, receiptBase64, managerId } = req.body;
-    const userEmail = req.user?.email || 'guest@unknown.com';
+    
+    // Use phone as the primary identifier for local mock accounts
+    let userEmail = req.user?.email || phone || 'guest@unknown.com';
+    if (userEmail === 'mock@local.user') userEmail = phone;
 
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;

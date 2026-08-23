@@ -80,13 +80,11 @@ const ManagerDetails = () => {
       });
 
     // Check if user already purchased this coach (secured with JWT)
-    if (id) {
-      const email = user?.email || '';
-      // Simple key - works even if email is empty
-      const simpleKey = `coach_paid_${id}`;
-      const emailKey = `purchased_${email}_${id}`;
+    if (id && user) {
+      // User-specific key prevents other accounts on same browser from getting free access
+      const userKey = `user_${user.id}_paid_${id}`;
       
-      if (localStorage.getItem(simpleKey) === '1' || localStorage.getItem(emailKey) === '1') {
+      if (localStorage.getItem(userKey) === '1') {
         setHasPurchased(true);
       } else {
         const token = localStorage.getItem('token');
@@ -98,14 +96,14 @@ const ManagerDetails = () => {
             .then(data => {
               if (data.purchased) {
                 setHasPurchased(true);
-                localStorage.setItem(simpleKey, '1');
+                localStorage.setItem(userKey, '1');
               }
             })
             .catch(() => {});
         }
       }
     }
-  }, [id, API_URL, user?.email]);
+  }, [id, API_URL, user]);
 
   useEffect(() => {
     // إذا كان لدينا بيانات المدرب من الصفحة السابقة، فلا داعي لجلبها مرة أخرى

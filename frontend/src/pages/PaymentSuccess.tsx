@@ -128,10 +128,10 @@ const PaymentSuccess = () => {
             className="relative w-full overflow-hidden rounded-2xl border border-[#2a4a35] shadow-[0_0_40px_rgba(0,200,130,0.1)]"
             style={{ paddingTop: '56.25%' }}
           >
-            {coachVideo?.libraryId && coachVideo?.videoId ? (
+            {coachVideo?.secureEmbedUrl || (coachVideo?.libraryId && coachVideo?.videoId) ? (
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
-                src={`https://iframe.mediadelivery.net/embed/${coachVideo.libraryId}/${coachVideo.videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+                src={coachVideo.secureEmbedUrl || `https://iframe.mediadelivery.net/embed/${coachVideo.libraryId}/${coachVideo.videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
                 loading="lazy"
                 allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
                 allowFullScreen={true}

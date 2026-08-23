@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
@@ -259,7 +260,20 @@ app.get('/api/coach-videos', async (req, res) => {
       return res.json([]);
     }
     const data = fs.readFileSync(COACH_VIDEOS_FILE, 'utf-8');
-    res.json(JSON.parse(data || '[]'));
+    const parsedData = JSON.parse(data || '[]');
+    
+    // Generate secure token URL for Bunny Stream if credentials exist
+    const enhancedData = parsedData.map((cv: any) => {
+      if (cv.libraryId && cv.videoId && cv.tokenKey) {
+        const expires = Math.floor(Date.now() / 1000) + 3600; // 1 hour expiration
+        const hashableBase = cv.tokenKey + cv.videoId + expires;
+        const token = crypto.createHash('sha256').update(hashableBase).digest('hex');
+        cv.secureEmbedUrl = `https://iframe.mediadelivery.net/embed/${cv.libraryId}/${cv.videoId}?token=${token}&expires=${expires}&autoplay=true&loop=false&muted=false&preload=true&responsive=true`;
+      }
+      return cv;
+    });
+    
+    res.json(enhancedData);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

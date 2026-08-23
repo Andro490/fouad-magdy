@@ -150,7 +150,10 @@ app.post('/api/products', async (req, res) => {
 app.post('/api/checkout/stripe', async (req, res) => {
   try {
     const { successUrl, cancelUrl, planName = 'الخطة المدفوعة', amount = 2000 } = req.body;
-    const STRIPE_SECRET_KEY = 'sk_test_51Tde06Ghb1UVYu3xS51dPby0T6CB2WYLctiuxBFI7kBttHS2o4Vwhl8pIKcAzt2PXSDYwMOU8eVnPdGI8ucdAAYq00ptHkWMjv';
+    const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+    if (!STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'Stripe secret key is not configured' });
+    }
     
     const params = new URLSearchParams();
     params.append('success_url', successUrl || 'http://localhost:5173/');

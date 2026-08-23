@@ -319,61 +319,67 @@ const ManagerDetails = () => {
 
             {/* SVG خطوط اتصال */}
             <svg className="absolute inset-0 w-full h-full z-10" style={{ pointerEvents: 'none' }}>
-              {allLinkups[0]?.centerPiecePositions?.map((cp: number) =>
-                allLinkups[0]?.keyManPositions?.map((km: number) => {
-                  const a = pitchCoords[cp];
-                  const b = pitchCoords[km];
-                  if (!a || !b) return null;
-                  return (
-                    <line key={`line-${cp}-${km}`}
-                      x1={`${a.x}%`} y1={`${a.y}%`}
-                      x2={`${b.x}%`} y2={`${b.y}%`}
-                      stroke="#00c9a7" strokeWidth="2" opacity="0.9"
-                    />
-                  );
-                })
+              {allLinkups.map((linkup, idx) =>
+                linkup?.centerPiecePositions?.map((cp: number) =>
+                  linkup?.keyManPositions?.map((km: number) => {
+                    const a = pitchCoords[cp];
+                    const b = pitchCoords[km];
+                    if (!a || !b) return null;
+                    return (
+                      <line key={`line-${idx}-${cp}-${km}`}
+                        x1={`${a.x}%`} y1={`${a.y}%`}
+                        x2={`${b.x}%`} y2={`${b.y}%`}
+                        stroke="#00c9a7" strokeWidth="2" opacity="0.9"
+                      />
+                    );
+                  })
+                )
               )}
             </svg>
 
             {/* نقاط رجال المفتاح */}
-            {allLinkups[0]?.keyManPositions?.map((km: number) => {
-              const c = pitchCoords[km];
-              if (!c) return null;
-              return (
-                <div key={`km-${km}`}
-                  className="absolute z-20 flex items-center justify-center font-bold rounded-full border-2 border-black shadow-lg"
-                  style={{
-                    left: `${c.x}%`, top: `${c.y}%`,
-                    transform: 'translate(-50%,-50%)',
-                    width: '42px', height: '42px',
-                    backgroundColor: '#e06c88',
-                    color: '#000', fontSize: '11px',
-                  }}
-                >
-                  {positionMap[km]}
-                </div>
-              );
-            })}
+            {allLinkups.map((linkup, idx) =>
+              linkup?.keyManPositions?.map((km: number) => {
+                const c = pitchCoords[km];
+                if (!c) return null;
+                return (
+                  <div key={`km-${idx}-${km}`}
+                    className="absolute z-20 flex items-center justify-center font-bold rounded-full border-2 border-black shadow-lg"
+                    style={{
+                      left: `${c.x}%`, top: `${c.y}%`,
+                      transform: 'translate(-50%,-50%)',
+                      width: '42px', height: '42px',
+                      backgroundColor: '#e06c88',
+                      color: '#000', fontSize: '11px',
+                    }}
+                  >
+                    {positionMap[km]}
+                  </div>
+                );
+              })
+            )}
 
             {/* نقاط القطعة المركزية */}
-            {allLinkups[0]?.centerPiecePositions?.map((cp: number) => {
-              const c = pitchCoords[cp];
-              if (!c) return null;
-              return (
-                <div key={`cp-${cp}`}
-                  className="absolute z-20 flex items-center justify-center font-bold rounded-full border-2 border-black shadow-lg"
-                  style={{
-                    left: `${c.x}%`, top: `${c.y}%`,
-                    transform: 'translate(-50%,-50%)',
-                    width: '42px', height: '42px',
-                    backgroundColor: '#00c9a7',
-                    color: '#000', fontSize: '11px',
-                  }}
-                >
-                  {positionMap[cp]}
-                </div>
-              );
-            })}
+            {allLinkups.map((linkup, idx) =>
+              linkup?.centerPiecePositions?.map((cp: number) => {
+                const c = pitchCoords[cp];
+                if (!c) return null;
+                return (
+                  <div key={`cp-${idx}-${cp}`}
+                    className="absolute z-20 flex items-center justify-center font-bold rounded-full border-2 border-black shadow-lg"
+                    style={{
+                      left: `${c.x}%`, top: `${c.y}%`,
+                      transform: 'translate(-50%,-50%)',
+                      width: '42px', height: '42px',
+                      backgroundColor: '#00c9a7',
+                      color: '#000', fontSize: '11px',
+                    }}
+                  >
+                    {positionMap[cp]}
+                  </div>
+                );
+              })
+            )}
 
             {/* Legend */}
             <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-5 z-30">

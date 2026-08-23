@@ -41,8 +41,8 @@ const linkupDb: Record<number, any> = {
 };
 
 // خريطة لتعويض بيانات الخطط للمدربين في حال فشل الـ API في جلبها ورجوعه للملف الأساسي
-const managerLinkupMapping: Record<string, { linkupId: number; linkupId2?: number }> = {
-  '17609097478250': { linkupId: 7, linkupId2: 12 }, // Antonio Conte
+const managerLinkupMapping: Record<string, { linkupId: number; linkupId2?: number; videoUrl?: string }> = {
+  '17609097478250': { linkupId: 7, linkupId2: 12, videoUrl: 'https://www.youtube.com/embed/CWA--IPC_JI' }, // Antonio Conte
   '17606681559180': { linkupId: 10 },               // D. Deschamps
   '17607218430302': { linkupId: 2 },                // Ronald Koeman
   '17607755300893': { linkupId: 8 },                // V. Montella
@@ -136,6 +136,7 @@ const ManagerDetails = () => {
   const fallbackLinkups = managerLinkupMapping[String(imageId)] || {};
   const actualLinkupId = manager.linkupId || fallbackLinkups.linkupId;
   const actualLinkupId2 = manager.linkupId2 || fallbackLinkups.linkupId2;
+  const videoUrl = manager.videoUrl || fallbackLinkups.videoUrl;
 
   // إزالة الخطة الاحتياطية (defaultLinkup) حتى لا يتشارك المدربون نفس الخطة بالخطأ
   const linkup1 = manager.linkup  || (actualLinkupId ? linkupDb[actualLinkupId] : null);
@@ -396,6 +397,25 @@ const ManagerDetails = () => {
         </div>
 
       </div>
+
+      {/* قسم الفيديو */}
+      {videoUrl && (
+        <div className="max-w-6xl mx-auto mt-12 bg-[#1a1e2e] p-6 rounded-2xl border border-gray-800">
+          <h3 className="text-xl font-bold mb-4 text-white text-right">شرح خطة المدرب</h3>
+          <div className="relative w-full overflow-hidden rounded-xl" style={{ paddingTop: '56.25%' }}>
+            <iframe
+              className="absolute top-0 left-0 w-full h-full"
+              src={videoUrl}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

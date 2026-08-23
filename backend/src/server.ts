@@ -299,13 +299,13 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
       return res.status(500).json({ error: 'Telegram configuration is missing in backend.' });
     }
 
-    const caption = `💰 *طلب شراء جديد (دفع يدوي)*\n\n` +
-      `👤 *الاسم:* ${name}\n` +
-      `📧 *الإيميل:* ${userEmail}\n` +
-      `📱 *الهاتف:* ${phone}\n` +
-      `🎮 *لعبة ID:* ${gameId}\n` +
-      `🛍️ *المنتج:* ${productName}\n` +
-      `💵 *السعر:* ${price}\n\n` +
+    const caption = `💰 <b>طلب شراء جديد (دفع يدوي)</b>\n\n` +
+      `👤 <b>الاسم:</b> ${name}\n` +
+      `📧 <b>الإيميل:</b> ${userEmail}\n` +
+      `📱 <b>الهاتف:</b> ${phone}\n` +
+      `🎮 <b>لعبة ID:</b> ${gameId}\n` +
+      `🛍️ <b>المنتج:</b> ${productName}\n` +
+      `💵 <b>السعر:</b> ${price}\n\n` +
       `يرجى مراجعة الإيصال المرفق والموافقة أو الرفض.`;
 
     const replyMarkup = JSON.stringify({
@@ -331,7 +331,7 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
         formData.append('chat_id', TELEGRAM_CHAT_ID);
         formData.append('photo', blob, 'receipt.jpg');
         formData.append('caption', caption);
-        formData.append('parse_mode', 'Markdown');
+        formData.append('parse_mode', 'HTML');
         formData.append('reply_markup', replyMarkup);
         
         fetchBody = formData;
@@ -345,8 +345,8 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
       fetchHeaders = { 'Content-Type': 'application/json' };
       fetchBody = JSON.stringify({
         chat_id: TELEGRAM_CHAT_ID,
-        text: caption + (receiptBase64 ? '\n\n*(ملاحظة: فشل إرفاق الصورة، يرجى مراجعة Google Sheets)*' : ''),
-        parse_mode: 'Markdown',
+        text: caption + (receiptBase64 ? '\n\n<i>(ملاحظة: فشل إرفاق الصورة، يرجى مراجعتها من مصدر آخر)</i>' : ''),
+        parse_mode: 'HTML',
         reply_markup: JSON.parse(replyMarkup)
       });
     }
@@ -360,9 +360,28 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
       body: fetchBody
     });
 
-    const tgResult = await tgResponse.json();
+    let tgResult = await tgResponse.json();
+    
+    // If sending photo failed, fallback to sending text message
+    if (!tgResult.ok && endpoint === 'sendPhoto') {
+      console.warn('sendPhoto failed, falling back to sendMessage', tgResult);
+      const fallbackUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      const fallbackResponse = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: caption + '\n\n<i>(ملاحظة: فشل إرفاق الصورة، يرجى التواصل مع العميل لطلب الإيصال)</i>',
+          parse_mode: 'HTML',
+          reply_markup: JSON.parse(replyMarkup)
+        })
+      });
+      tgResult = await fallbackResponse.json();
+    }
+
     if (!tgResult.ok) {
       console.error('Telegram API Error:', tgResult);
+      throw new Error(`خطأ من تليجرام: ${tgResult.description}`);
     }
 
     res.json({ success: true, message: 'Request sent to Telegram' });

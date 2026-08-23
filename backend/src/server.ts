@@ -156,7 +156,7 @@ app.post('/api/checkout/stripe', async (req, res) => {
     }
     
     const params = new URLSearchParams();
-    params.append('success_url', successUrl || 'http://localhost:5173/');
+    params.append('success_url', (successUrl || 'http://localhost:5173/payment-success') + '?session_id={CHECKOUT_SESSION_ID}');
     params.append('cancel_url', cancelUrl || 'http://localhost:5173/');
     params.append('mode', 'payment');
     params.append('line_items[0][price_data][currency]', 'usd');
@@ -181,6 +181,28 @@ app.post('/api/checkout/stripe', async (req, res) => {
     res.json({ url: session.url });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify a completed Stripe session
+app.get('/api/checkout/verify', async (req, res) => {
+  try {
+    const { session_id } = req.query;
+    if (!session_id) return res.status(400).json({ paid: false, error: 'Missing session_id' });
+
+    const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+    if (!STRIPE_SECRET_KEY) return res.status(500).json({ paid: false, error: 'Stripe not configured' });
+
+    const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${session_id}`, {
+      headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` }
+    });
+    const session = await response.json();
+
+    if (session.error) return res.status(400).json({ paid: false, error: session.error.message });
+
+    res.json({ paid: session.payment_status === 'paid' });
+  } catch (err: any) {
+    res.status(500).json({ paid: false, error: err.message });
   }
 });
 
@@ -219,6 +241,49 @@ app.post('/api/users', async (req, res) => {
       });
     }
     res.json({ success: true, count: users.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────
+// COACH VIDEOS API
+// ─────────────────────────────────────────
+const COACH_VIDEOS_FILE = path.join(__dirname, '..', 'coach-videos.json');
+
+app.get('/api/coach-videos', async (req, res) => {
+  try {
+    if (!fs.existsSync(COACH_VIDEOS_FILE)) {
+      return res.json([]);
+    }
+    const data = fs.readFileSync(COACH_VIDEOS_FILE, 'utf-8');
+    res.json(JSON.parse(data || '[]'));
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/coach-videos', async (req, res) => {
+  try {
+    const entry = req.body;
+    if (!entry.managerId) {
+      return res.status(400).json({ error: 'Missing managerId' });
+    }
+    
+    let currentData: any[] = [];
+    if (fs.existsSync(COACH_VIDEOS_FILE)) {
+      const fileData = fs.readFileSync(COACH_VIDEOS_FILE, 'utf-8');
+      currentData = JSON.parse(fileData || '[]');
+    }
+    
+    // Remove existing entry for this manager if it exists
+    currentData = currentData.filter(d => d.managerId !== entry.managerId);
+    
+    // Add new entry
+    currentData.unshift(entry);
+    
+    fs.writeFileSync(COACH_VIDEOS_FILE, JSON.stringify(currentData, null, 2));
+    res.json({ success: true, count: currentData.length });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

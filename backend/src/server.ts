@@ -293,7 +293,8 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
     const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
-    const API_URL = process.env.VITE_API_URL || 'http://localhost:5000'; // Make sure this is public URL in production
+    // Telegram requires a valid public URL for inline buttons, NOT localhost.
+    const API_URL = process.env.BACKEND_URL || 'https://fouad-magdy-production.up.railway.app';
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       return res.status(500).json({ error: 'Telegram configuration is missing in backend.' });

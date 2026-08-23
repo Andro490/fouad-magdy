@@ -163,15 +163,12 @@ const PaymentSuccess = () => {
                 allowFullScreen={true}
               ></iframe>
             ) : (
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src="https://www.youtube.com/embed/CWA--IPC_JI"
-                title="شرح خطة المدرب"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
+              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#1a1e2e] text-gray-400 border border-gray-800 rounded-2xl">
+                <p className="text-xl font-bold flex flex-col items-center gap-3">
+                  <span className="text-4xl">🎥</span>
+                  جاري تجهيز الفيديو الخاص بهذا المدرب
+                </p>
+              </div>
             )}
           </div>
         </div>

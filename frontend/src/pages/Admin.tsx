@@ -69,6 +69,9 @@ const Admin = () => {
         setVideoSubmissions(fetched);
       })
       .catch(() => {
+        const storedVideos = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+        setVideoSubmissions(storedVideos);
+      });
     fetch(`${API_URL}/api/managers`)
       .then(r => r.json())
       .then(data => {
@@ -688,7 +691,7 @@ const Admin = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(entry)
                   });
-                } catch {}
+                } catch (e) {}
                 setCvIsSaving(false);
                 alert('تم الحفظ بنجاح! ✅');
               }}

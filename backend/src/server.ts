@@ -156,7 +156,9 @@ app.post('/api/checkout/stripe', async (req, res) => {
     }
     
     const params = new URLSearchParams();
-    params.append('success_url', (successUrl || 'http://localhost:5173/payment-success') + '?session_id={CHECKOUT_SESSION_ID}');
+    const finalSuccessUrl = successUrl || 'http://localhost:5173/payment-success';
+    const separator = finalSuccessUrl.includes('?') ? '&' : '?';
+    params.append('success_url', finalSuccessUrl + separator + 'session_id={CHECKOUT_SESSION_ID}');
     params.append('cancel_url', cancelUrl || 'http://localhost:5173/');
     params.append('mode', 'payment');
     params.append('line_items[0][price_data][currency]', 'usd');

@@ -46,10 +46,10 @@ app.get('/api/managers', async (req, res) => {
     
     const totalCoaches = await prisma.manager.count();
     
-    // Cast string ID to numeric to ensure 14-digit IDs are sorted properly above 8-digit IDs
+    // Sort by updatedAt DESC so manually added/updated coaches always appear first on page 1
     const coaches: any[] = await prisma.$queryRaw`
       SELECT * FROM "Manager"
-      ORDER BY CAST(id AS BIGINT) DESC
+      ORDER BY "updatedAt" DESC
       LIMIT ${limit} OFFSET ${(page - 1) * limit}
     `;
     

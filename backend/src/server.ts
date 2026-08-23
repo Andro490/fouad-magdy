@@ -46,10 +46,10 @@ app.get('/api/managers', async (req, res) => {
     
     const totalCoaches = await prisma.manager.count();
     
-    // Sort by updatedAt DESC so manually added/updated coaches always appear first on page 1
+    // Manually added coaches bubble to top (recent updatedAt), rest sorted by ID DESC
     const coaches: any[] = await prisma.$queryRaw`
       SELECT * FROM "Manager"
-      ORDER BY "updatedAt" DESC
+      ORDER BY "updatedAt" DESC, CAST(id AS BIGINT) DESC
       LIMIT ${limit} OFFSET ${(page - 1) * limit}
     `;
     

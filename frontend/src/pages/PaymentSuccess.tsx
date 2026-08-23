@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle, Loader2, XCircle, X } from 'lucide-react';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ const PaymentSuccess = () => {
 
   const [status, setStatus] = useState<'loading' | 'verified' | 'failed'>('loading');
   const [coachVideo, setCoachVideo] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -160,9 +161,10 @@ const PaymentSuccess = () => {
             {images.map((img: { src: string; caption: string }, idx: number) => (
               <div
                 key={idx}
-                className="group relative overflow-hidden rounded-2xl border border-gray-800 bg-[#1a1e2e] hover:border-[#e06c88]/50 transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(224,108,136,0.15)]"
+                onClick={() => setSelectedImage(img.src)}
+                className="group relative overflow-hidden rounded-2xl border border-gray-800 bg-[#1a1e2e] hover:border-[#e06c88]/50 transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(224,108,136,0.15)] cursor-pointer"
               >
-                <div className="overflow-hidden h-52">
+                <div className="overflow-hidden h-52 relative">
                   <img
                     src={img.src}
                     alt={img.caption}
@@ -171,6 +173,11 @@ const PaymentSuccess = () => {
                       (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${idx + 10}/600/400`;
                     }}
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                    <span className="text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                      🔍 اضغط للتكبير
+                    </span>
+                  </div>
                 </div>
                 <div className="p-4">
                   <p className="text-white font-bold text-base">{img.caption}</p>
@@ -179,6 +186,27 @@ const PaymentSuccess = () => {
             ))}
           </div>
         </div>
+
+        {/* Lightbox Modal */}
+        {selectedImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button
+              className="absolute top-4 right-4 z-60 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all duration-200 backdrop-blur-md border border-white/20"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X size={22} />
+            </button>
+            <img
+              src={selectedImage}
+              alt="enlarged"
+              className="max-w-full max-h-[90vh] rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.8)] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
 
         {/* Back Button */}
         <div className="text-center mt-10">

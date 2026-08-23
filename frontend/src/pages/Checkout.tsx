@@ -36,13 +36,18 @@ const Checkout = () => {
     if (paymentMethod === 'visa') {
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const managerId = location.state?.managerId;
+        const successParams = new URLSearchParams();
+        if (managerId) successParams.append('managerId', managerId);
+        const successUrl = `${window.location.origin}/payment-success${managerId ? '?' + successParams.toString() : ''}`;
+        
         const response = await fetch(`${API_URL}/api/checkout/stripe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             planName: product.name,
             amount: 2000, // $20.00
-            successUrl: window.location.origin + '/payment-success',
+            successUrl: successUrl,
             cancelUrl: window.location.href,
           })
         });

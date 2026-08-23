@@ -50,13 +50,31 @@ const managerLinkupMapping: Record<string, { linkupId: number; linkupId2?: numbe
 };
 
 const ManagerDetails = () => {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
 
   // نبدأ بالبيانات اللي اتبعتت من Products (للسرعة)، ثم نحدّثها بالبيانات الكاملة من الـ API
   const [manager, setManager] = useState<any>(location.state?.manager || null);
-  const [loading, setLoading] = useState(!location.state?.manager?.skills);
+  const [loading, setLoading] = useState(!manager);
+  const [coachVideo, setCoachVideo] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/coach-videos`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mVideo = data.find((d: any) => String(d.managerId) === String(id));
+          if (mVideo) setCoachVideo(mVideo);
+        }
+      })
+      .catch(() => {
+        const localData = JSON.parse(localStorage.getItem('coachVideosData') || '[]');
+        const mVideo = localData.find((d: any) => String(d.managerId) === String(id));
+        if (mVideo) setCoachVideo(mVideo);
+      });
+  }, [id, API_URL]);
 
   useEffect(() => {
     // إذا كان لدينا بيانات المدرب من الصفحة السابقة، فلا داعي لجلبها مرة أخرى
@@ -67,8 +85,6 @@ const ManagerDetails = () => {
 
     const fetchFullData = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        
         const localData = await fetch(`${API_URL}/api/managers`).then(res => res.ok ? res.json() : []).catch(() => []);
         const extractArray = (d: any) => {
           if (Array.isArray(d)) return d;
@@ -132,11 +148,10 @@ const ManagerDetails = () => {
     overload:       rawSkills.overload       ?? rawSkills.OverLoad       ?? defaultSkills.overload,
   };
 
-  // استخراج أرقام الخطط من الخريطة المحلية في حال عدم توفرها في بيانات المدرب
   const fallbackLinkups = managerLinkupMapping[String(imageId)] || {};
   const actualLinkupId = manager.linkupId || fallbackLinkups.linkupId;
   const actualLinkupId2 = manager.linkupId2 || fallbackLinkups.linkupId2;
-  const videoUrl = manager.videoUrl || fallbackLinkups.videoUrl;
+  const videoUrl = coachVideo?.freeUrl || manager.videoUrl || fallbackLinkups.videoUrl;
 
   // إزالة الخطة الاحتياطية (defaultLinkup) حتى لا يتشارك المدربون نفس الخطة بالخطأ
   const linkup1 = manager.linkup  || (actualLinkupId ? linkupDb[actualLinkupId] : null);
@@ -430,7 +445,7 @@ const ManagerDetails = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate('/checkout', { state: { product: { name: `الخطة المدفوعة لـ ${manager.name}`, price: '$20' } } })}
+          onClick={() => navigate('/checkout', { state: { product: { name: `الخطة المدفوعة لـ ${manager.name}`, price: '$20' }, managerId: imageId } })}
           className="z-10 px-10 py-4 bg-gradient-to-l from-[#e06c88] to-[#ff477e] hover:from-[#ff7b9a] hover:to-[#ff477e] text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(224,108,136,0.4)] hover:shadow-[0_0_35px_rgba(224,108,136,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
         >
           <span>دفع الآن</span>

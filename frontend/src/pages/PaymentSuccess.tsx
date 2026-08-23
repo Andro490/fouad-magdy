@@ -6,8 +6,10 @@ const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const managerId = searchParams.get('managerId');
 
   const [status, setStatus] = useState<'loading' | 'verified' | 'failed'>('loading');
+  const [coachVideo, setCoachVideo] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -25,6 +27,21 @@ const PaymentSuccess = () => {
         const data = await res.json();
         if (data.paid) {
           setStatus('verified');
+          if (managerId) {
+            // Fetch coach video
+            fetch(`${API_URL}/api/coach-videos`)
+              .then(r => r.json())
+              .then(cvData => {
+                if (Array.isArray(cvData)) {
+                  const mVideo = cvData.find((d: any) => String(d.managerId) === String(managerId));
+                  if (mVideo) setCoachVideo(mVideo);
+                }
+              }).catch(() => {
+                const localData = JSON.parse(localStorage.getItem('coachVideosData') || '[]');
+                const mVideo = localData.find((d: any) => String(d.managerId) === String(managerId));
+                if (mVideo) setCoachVideo(mVideo);
+              });
+          }
         } else {
           setStatus('failed');
         }
@@ -66,7 +83,10 @@ const PaymentSuccess = () => {
   }
 
   // ─── دفع ناجح ✅ ───
-  const images = [
+  const images = coachVideo?.images?.length ? coachVideo.images.map((src: string, idx: number) => ({
+    src,
+    caption: `تفاصيل التكتيك ${idx + 1}`
+  })) : [
     {
       src: 'https://efimg.com/efootballhub22/images/coach_cards/17609097478250.png',
       caption: 'أسلوب الضغط العالي',
@@ -74,15 +94,7 @@ const PaymentSuccess = () => {
     {
       src: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600&q=80',
       caption: 'التنظيم التكتيكي',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&q=80',
-      caption: 'الهجوم المضاد السريع',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&q=80',
-      caption: 'التمركز الدفاعي',
-    },
+    }
   ];
 
   return (
@@ -116,15 +128,25 @@ const PaymentSuccess = () => {
             className="relative w-full overflow-hidden rounded-2xl border border-[#2a4a35] shadow-[0_0_40px_rgba(0,200,130,0.1)]"
             style={{ paddingTop: '56.25%' }}
           >
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src="https://www.youtube.com/embed/CWA--IPC_JI"
-              title="شرح خطة المدرب"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            ></iframe>
+            {coachVideo?.libraryId && coachVideo?.videoId ? (
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`https://iframe.mediadelivery.net/embed/${coachVideo.libraryId}/${coachVideo.videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true`}
+                loading="lazy"
+                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
+                allowFullScreen={true}
+              ></iframe>
+            ) : (
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/CWA--IPC_JI"
+                title="شرح خطة المدرب"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            )}
           </div>
         </div>
 

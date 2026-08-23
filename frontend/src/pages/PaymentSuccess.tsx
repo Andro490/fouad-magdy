@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, XCircle, X } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const managerId = searchParams.get('managerId');
+  const alreadyPurchased = searchParams.get('already_purchased');
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [status, setStatus] = useState<'loading' | 'verified' | 'failed'>('loading');
   const [coachVideo, setCoachVideo] = useState<any>(null);
@@ -14,6 +18,21 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    // If user already paid before (local token or db check)
+    if (alreadyPurchased === '1' && managerId) {
+      setStatus('verified');
+      fetch(`${API_URL}/api/coach-videos`)
+        .then(r => r.json())
+        .then(cvData => {
+          if (Array.isArray(cvData)) {
+            const mVideo = cvData.find((d: any) => String(d.managerId) === String(managerId));
+            if (mVideo) setCoachVideo(mVideo);
+          }
+        }).catch(() => {});
+      return;
+    }
 
     // لو مفيش session_id في الرابط → مدفعش
     if (!sessionId) {
@@ -23,12 +42,17 @@ const PaymentSuccess = () => {
 
     const verifyPayment = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${API_URL}/api/checkout/verify?session_id=${sessionId}`);
+        const userEmail = user?.email || '';
+        const verifyUrl = `${API_URL}/api/checkout/verify?session_id=${sessionId}${managerId ? '&managerId=' + managerId : ''}${userEmail ? '&userEmail=' + encodeURIComponent(userEmail) : ''}`;
+        const res = await fetch(verifyUrl);
         const data = await res.json();
         if (data.paid) {
           setStatus('verified');
+          // Save purchase to localStorage as backup
           if (managerId) {
+            const email = userEmail || data.customerEmail || '';
+            const key = `purchased_${email}_${managerId}`;
+            localStorage.setItem(key, '1');
             // Fetch coach video
             fetch(`${API_URL}/api/coach-videos`)
               .then(r => r.json())

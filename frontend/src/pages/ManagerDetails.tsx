@@ -1,6 +1,8 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 
 const boostMap: Record<number, string> = {
@@ -59,6 +61,8 @@ const ManagerDetails = () => {
   const [manager, setManager] = useState<any>(location.state?.manager || null);
   const [loading, setLoading] = useState(!manager);
   const [coachVideo, setCoachVideo] = useState<any>(null);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     fetch(`${API_URL}/api/coach-videos`)
@@ -74,7 +78,21 @@ const ManagerDetails = () => {
         const mVideo = localData.find((d: any) => String(d.managerId) === String(id));
         if (mVideo) setCoachVideo(mVideo);
       });
-  }, [id, API_URL]);
+
+    // Check if user already purchased this coach
+    if (id) {
+      const email = user?.email || '';
+      const localKey = `purchased_${email}_${id}`;
+      if (localStorage.getItem(localKey) === '1') {
+        setHasPurchased(true);
+      } else if (email) {
+        fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&userEmail=${encodeURIComponent(email)}`)
+          .then(r => r.json())
+          .then(data => { if (data.purchased) setHasPurchased(true); })
+          .catch(() => {});
+      }
+    }
+  }, [id, API_URL, user?.email]);
 
   useEffect(() => {
     // إذا كان لدينا بيانات المدرب من الصفحة السابقة، فلا داعي لجلبها مرة أخرى
@@ -444,13 +462,23 @@ const ManagerDetails = () => {
             احصل على أسرار تكتيكية حصرية وتوجيهات مباشرة تضمن لك السيطرة الكاملة على مجريات اللعب. هذه الخطة مصممة خصيصاً لتطوير أسلوبك وتحويلك إلى خصم لا يُقهر. لا تضيع الفرصة واكتسح خصومك الآن!
           </p>
         </div>
-        <button
-          onClick={() => navigate('/checkout', { state: { product: { name: `الخطة المدفوعة لـ ${manager.name}`, price: '$20' }, managerId: imageId } })}
-          className="z-10 px-10 py-4 bg-gradient-to-l from-[#e06c88] to-[#ff477e] hover:from-[#ff7b9a] hover:to-[#ff477e] text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(224,108,136,0.4)] hover:shadow-[0_0_35px_rgba(224,108,136,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
-        >
-          <span>دفع الآن</span>
-          <ArrowRight size={22} className="rotate-180" />
-        </button>
+        {hasPurchased ? (
+          <button
+            onClick={() => navigate(`/payment-success?managerId=${imageId}&already_purchased=1`)}
+            className="z-10 px-10 py-4 bg-gradient-to-l from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(0,200,100,0.4)] hover:shadow-[0_0_35px_rgba(0,200,100,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
+          >
+            <CheckCircle size={22} />
+            <span>شاهد الخطة</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/checkout', { state: { product: { name: `الخطة المدفوعة لـ ${manager.name}`, price: '$20' }, managerId: imageId } })}
+            className="z-10 px-10 py-4 bg-gradient-to-l from-[#e06c88] to-[#ff477e] hover:from-[#ff7b9a] hover:to-[#ff477e] text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(224,108,136,0.4)] hover:shadow-[0_0_35px_rgba(224,108,136,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
+          >
+            <span>دفع الآن</span>
+            <ArrowRight size={22} className="rotate-180" />
+          </button>
+        )}
       </div>
 
     </div>

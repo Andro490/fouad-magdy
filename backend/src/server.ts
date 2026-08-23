@@ -32,6 +32,10 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// SEED FROM coaches.json
+// ─────────────────────────────────────────
+
+// ─────────────────────────────────────────
 // MANAGERS API
 // ─────────────────────────────────────────
 app.get('/api/managers', async (req, res) => {
@@ -187,10 +191,10 @@ app.post('/api/checkout/stripe', async (req, res) => {
   }
 });
 
-// Verify a completed Stripe session
+// Verify a completed Stripe session and save purchase record
 app.get('/api/checkout/verify', async (req, res) => {
   try {
-    const { session_id } = req.query;
+    const { session_id, managerId, userEmail } = req.query as Record<string, string>;
     if (!session_id) return res.status(400).json({ paid: false, error: 'Missing session_id' });
 
     const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
@@ -203,9 +207,41 @@ app.get('/api/checkout/verify', async (req, res) => {
 
     if (session.error) return res.status(400).json({ paid: false, error: session.error.message });
 
-    res.json({ paid: session.payment_status === 'paid' });
+    const isPaid = session.payment_status === 'paid';
+
+    // Save purchase record to DB so user doesn't need to pay again
+    if (isPaid && managerId) {
+      const email = userEmail || session.customer_details?.email || 'guest@unknown.com';
+      try {
+        await (prisma as any).coachPurchase.upsert({
+          where: { userEmail_managerId: { userEmail: email, managerId } },
+          update: { sessionId: session_id },
+          create: { userEmail: email, managerId, sessionId: session_id }
+        });
+      } catch (e) {
+        console.warn('Could not save purchase record:', e);
+      }
+    }
+
+    res.json({ paid: isPaid, customerEmail: session.customer_details?.email });
   } catch (err: any) {
     res.status(500).json({ paid: false, error: err.message });
+  }
+});
+
+// Check if a user has already purchased access to a coach
+app.get('/api/checkout/check-purchase', async (req, res) => {
+  try {
+    const { managerId, userEmail } = req.query as Record<string, string>;
+    if (!managerId || !userEmail) return res.json({ purchased: false });
+    
+    const record = await (prisma as any).coachPurchase.findFirst({
+      where: { managerId, userEmail }
+    });
+    
+    res.json({ purchased: !!record });
+  } catch (err: any) {
+    res.json({ purchased: false });
   }
 });
 

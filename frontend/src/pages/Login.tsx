@@ -65,7 +65,7 @@ const Login = () => {
         });
         window.google.accounts.id.renderButton(
           document.getElementById("googleSignInDiv"),
-          { theme: "filled_black", size: "large", text: "continue_with", width: 350, shape: "rectangular" }
+          { theme: "outline", size: "large", text: "continue_with", width: 368, shape: "rectangular" }
         );
       } else {
         setTimeout(renderGoogleBtn, 100);

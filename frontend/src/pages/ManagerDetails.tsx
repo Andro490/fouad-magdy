@@ -416,6 +416,28 @@ const ManagerDetails = () => {
         </div>
       )}
 
+      {/* صندوق الخطة المدفوعة */}
+      <div className="max-w-6xl mx-auto mt-8 bg-gradient-to-r from-[#1a1e2e] to-[#2d1b24] p-8 rounded-2xl border border-[#e06c88] shadow-[0_0_30px_rgba(224,108,136,0.15)] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden" style={{ direction: 'rtl' }}>
+        {/* تأثير الإضاءة في الخلفية */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#e06c88] rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+        
+        <div className="text-right z-10">
+          <h3 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
+            ارتقِ بمستواك مع <span className="text-[#e06c88]">الخطة المدفوعة</span> 👑
+          </h3>
+          <p className="text-gray-400 text-sm max-w-xl leading-relaxed">
+            احصل على أسرار تكتيكية حصرية وتوجيهات مباشرة تضمن لك السيطرة الكاملة على مجريات اللعب. هذه الخطة مصممة خصيصاً لتطوير أسلوبك وتحويلك إلى خصم لا يُقهر. لا تضيع الفرصة واكتسح خصومك الآن!
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/products')}
+          className="z-10 px-10 py-4 bg-gradient-to-l from-[#e06c88] to-[#ff477e] hover:from-[#ff7b9a] hover:to-[#ff477e] text-white font-black text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(224,108,136,0.4)] hover:shadow-[0_0_35px_rgba(224,108,136,0.7)] flex items-center gap-3 whitespace-nowrap transform hover:-translate-y-1"
+        >
+          <span>دفع الآن</span>
+          <ArrowRight size={22} className="rotate-180" />
+        </button>
+      </div>
+
     </div>
   );
 };

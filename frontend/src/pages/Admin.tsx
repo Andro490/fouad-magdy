@@ -114,7 +114,10 @@ const Admin = () => {
   const fetchChatUsers = async () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${API_URL}/api/chat/users`);
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/chat/users`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) setChatUsers(await res.json());
     } catch (e) {}
   };
@@ -122,7 +125,10 @@ const Admin = () => {
   const fetchAdminMessages = async (userId: string) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${API_URL}/api/chat/messages?userId=${userId}`);
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/chat/admin/messages?userId=${userId}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) setAdminMessages(await res.json());
     } catch (e) {}
   };
@@ -133,9 +139,13 @@ const Admin = () => {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await fetch(`${API_URL}/api/chat/send`, {
+      const token = localStorage.getItem('authToken');
+      await fetch(`${API_URL}/api/chat/admin/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           userId: selectedUserId,
           userName: 'Admin',

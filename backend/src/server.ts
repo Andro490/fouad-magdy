@@ -677,55 +677,88 @@ app.post('/api/videos', async (req, res) => {
 });
 
 // ─────────────────────────────────────────
-// CHAT SYSTEM
-// ─────────────────────────────────────────
-app.get('/api/chat/messages', authenticateToken, async (req: AuthRequest, res) => {
+// GET messages for a specific user (no auth needed - userId is the guest/user ID from localStorage)
+app.get('/api/chat/messages', async (req: AuthRequest, res) => {
   try {
     const { userId } = req.query;
-
-    if (req.user?.role !== 'ADMIN' && userId && userId !== req.user?.id) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
-    if (userId) {
-      const chats = await prisma.chatMessage.findMany({ where: { userId: String(userId) } });
-      return res.json(chats);
-    }
-    const chats = await prisma.chatMessage.findMany();
-    res.json(chats);
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+    const chats = await prisma.chatMessage.findMany({
+      where: { userId: String(userId) },
+      orderBy: { timestamp: 'asc' }
+    });
+    return res.json(chats);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.post('/api/chat/send', authenticateToken, async (req: AuthRequest, res) => {
+// GET all messages for admin (requires JWT + ADMIN)
+app.get('/api/chat/admin/messages', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const { userId } = req.query;
+    const chats = await prisma.chatMessage.findMany({
+      where: userId ? { userId: String(userId) } : undefined,
+      orderBy: { timestamp: 'asc' }
+    });
+    return res.json(chats);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST send message (no auth needed - guest users can send)
+app.post('/api/chat/send', async (req: AuthRequest, res) => {
   try {
     const message = req.body;
+    if (!message.userId || !message.text) {
+      return res.status(400).json({ error: 'Missing userId or text' });
+    }
     await prisma.chatMessage.create({
       data: {
-        userId: String(message.userId || req.user?.id || 'unknown'),
-        userName: message.userName || req.user?.email || 'user',
-        text: String(message.text || '').slice(0, 2000),
-        sender: String(message.sender || 'USER'),
+        userId: String(message.userId),
+        userName: String(message.userName || 'زائر'),
+        text: String(message.text).slice(0, 2000),
+        sender: message.sender === 'ADMIN' ? 'ADMIN' : 'USER',
         timestamp: Date.now()
       }
     });
-    res.json({ success: true, message: 'تم إرسال الرسالة بنجاح' });
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
+// POST admin reply (requires JWT + ADMIN)
+app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const message = req.body;
+    if (!message.userId || !message.text) {
+      return res.status(400).json({ error: 'Missing userId or text' });
+    }
+    await prisma.chatMessage.create({
+      data: {
+        userId: String(message.userId),
+        userName: 'Admin',
+        text: String(message.text).slice(0, 2000),
+        sender: 'ADMIN',
+        timestamp: Date.now()
+      }
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET chat users list for admin dashboard (requires JWT + ADMIN)
 app.get('/api/chat/users', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (req.user?.role !== 'ADMIN') {
-      return res.status(403).json({ error: 'Admins only' });
-    }
-
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
     const chats = await prisma.chatMessage.findMany({
       orderBy: { timestamp: 'desc' }
     });
-    
     const usersMap = new Map();
     chats.forEach((c: any) => {
       if (!usersMap.has(c.userId)) {
@@ -737,6 +770,7 @@ app.get('/api/chat/users', authenticateToken, async (req: AuthRequest, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // ─────────────────────────────────────────
 // IMAGE UPLOAD PROXY

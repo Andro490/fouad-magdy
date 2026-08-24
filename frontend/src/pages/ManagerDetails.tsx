@@ -87,20 +87,17 @@ const ManagerDetails = () => {
       if (localStorage.getItem(userKey) === '1') {
         setHasPurchased(true);
       } else {
-        const token = localStorage.getItem('token');
-        if (token) {
-          fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&phone=${user?.phone || ''}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&phone=${user?.phone || ''}`, {
+          credentials: 'include',
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.purchased) {
+              setHasPurchased(true);
+              localStorage.setItem(userKey, '1');
+            }
           })
-            .then(r => r.json())
-            .then(data => {
-              if (data.purchased) {
-                setHasPurchased(true);
-                localStorage.setItem(userKey, '1');
-              }
-            })
-            .catch(() => {});
-        }
+          .catch(() => {});
       }
     }
   }, [id, API_URL, user]);

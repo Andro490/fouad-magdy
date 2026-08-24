@@ -49,7 +49,7 @@ const Login = () => {
         localStorage.setItem('users', JSON.stringify(users));
       }
       
-      dispatch(loginSuccess({ user, token: 'mock-jwt-token' }));
+      dispatch(loginSuccess({ user }));
       navigate('/');
     } else {
       setError('فشل تسجيل الدخول عبر جوجل');
@@ -80,7 +80,7 @@ const Login = () => {
     
     // Check if it's admin (mocked admin logic)
     if (phone === 'admin' && password === 'admin') {
-      dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', phone: 'admin', role: 'ADMIN' }, token: 'mock-admin-token' }));
+      dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', phone: 'admin', role: 'ADMIN' } }));
       navigate('/admin');
       return;
     }
@@ -88,7 +88,7 @@ const Login = () => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     let users = [];
     try {
-      const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });
       if (res.ok) {
         users = await res.json();
         if (users.length === 0) {
@@ -104,7 +104,7 @@ const Login = () => {
     const foundUser = users.find((u: Record<string, any>) => u.phone === phone && u.password === password);
     
     if (foundUser) {
-      dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, email: foundUser.email, role: foundUser.role, coins: foundUser.coins || 0 }, token: 'mock-jwt-token' }));
+      dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, email: foundUser.email, role: foundUser.role, coins: foundUser.coins || 0 } }));
       navigate('/');
     } else {
       setError('رقم الهاتف أو كلمة المرور غير صحيحة');

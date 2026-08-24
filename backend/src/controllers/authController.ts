@@ -3,6 +3,16 @@ import bcrypt from 'bcrypt';
 import prisma from '../prisma/client';
 import { generateToken } from '../utils/jwt';
 
+const setAuthCookie = (res: Response, token: string) => {
+  res.cookie('auth_token', token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+};
+
 export const register = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password, name } = req.body;
@@ -23,6 +33,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
     });
 
     const token = generateToken(user.id, user.role);
+    setAuthCookie(res, token);
 
     res.status(201).json({
       message: 'تم إنشاء الحساب بنجاح',
@@ -54,6 +65,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     }
 
     const token = generateToken(user.id, user.role);
+    setAuthCookie(res, token);
 
     res.json({
       message: 'تم تسجيل الدخول بنجاح',

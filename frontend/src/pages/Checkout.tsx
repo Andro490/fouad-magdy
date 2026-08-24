@@ -91,20 +91,11 @@ const Checkout = () => {
         };
 
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          alert('يجب تسجيل الدخول أولاً لإتمام عملية الشراء');
-          setLoading(false);
-          return;
-        }
 
         const response = await fetch(`${API_URL}/api/checkout/manual`, {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         });
 

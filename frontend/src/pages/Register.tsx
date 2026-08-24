@@ -18,7 +18,7 @@ const Register = () => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     
     try {
-      const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });
       let users = [];
       if (res.ok) {
         users = await res.json();
@@ -34,6 +34,7 @@ const Register = () => {
       await fetch(`${API_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(users)
       });
     } catch (err) {
@@ -44,7 +45,7 @@ const Register = () => {
     }
 
     // Auto login
-    dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role, coins: newUser.coins }, token: 'mock-jwt-token' }));
+    dispatch(loginSuccess({ user: { id: newUser.id, name: newUser.name, phone: newUser.phone, role: newUser.role, coins: newUser.coins } }));
     navigate('/');
   };
 

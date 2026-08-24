@@ -71,7 +71,7 @@ const Dashboard = () => {
         localStorage.setItem('users', JSON.stringify(users));
       }
       
-      dispatch(loginSuccess({ user: users[userIndex], token: 'mock-jwt-token' }));
+      dispatch(loginSuccess({ user: users[userIndex] }));
       alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
     }
   };

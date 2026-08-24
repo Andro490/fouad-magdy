@@ -14,18 +14,39 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
+
+app.disable('x-powered-by');
 
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    callback(null, true);
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS policy: origin not allowed'));
   },
   credentials: true,
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(morgan('dev'));
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
+const setAuthCookie = (res: any, token: string) => {
+  res.cookie('auth_token', token, cookieOptions);
+};
+
+const clearAuthCookie = (res: any) => {
+  res.clearCookie('auth_token', { ...cookieOptions, maxAge: 0 });
+};
 
 // Health Check
 app.get('/', (req, res) => {
@@ -308,12 +329,19 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
 
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
-    // Telegram requires a valid public URL for inline buttons, NOT localhost.
-    const API_URL = process.env.BACKEND_URL || 'https://fouad-magdy-production.up.railway.app';
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
+    const API_URL = process.env.BACKEND_URL;
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       return res.status(500).json({ error: 'Telegram configuration is missing in backend.' });
+    }
+
+    if (!TELEGRAM_SECRET) {
+      return res.status(500).json({ error: 'TELEGRAM_SECRET is not configured.' });
+    }
+
+    if (!API_URL) {
+      return res.status(500).json({ error: 'BACKEND_URL is not configured for Telegram callbacks.' });
     }
 
     const caption = `💰 <b>طلب شراء جديد (دفع يدوي)</b>\n\n` +
@@ -412,7 +440,11 @@ app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res
 app.get('/api/checkout/manual-approve', async (req, res) => {
   try {
     const { managerId, email, secret } = req.query as Record<string, string>;
-    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
+
+    if (!TELEGRAM_SECRET) {
+      return res.status(500).send('<h1>خطأ: لم يتم تهيئة SECRET للـ Telegram</h1>');
+    }
 
     if (secret !== TELEGRAM_SECRET) {
       return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
@@ -445,7 +477,11 @@ app.get('/api/checkout/manual-approve', async (req, res) => {
 app.get('/api/checkout/manual-reject', async (req, res) => {
   try {
     const { secret, email } = req.query as Record<string, string>;
-    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+    const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
+
+    if (!TELEGRAM_SECRET) {
+      return res.status(500).send('<h1>خطأ: لم يتم تهيئة SECRET للـ Telegram</h1>');
+    }
 
     if (secret !== TELEGRAM_SECRET) {
       return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
@@ -467,8 +503,46 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
 // ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────
-app.get('/api/users', async (_req, res) => {
+app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res) => {
   try {
+    const user = req.user;
+    if (!user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    if (!dbUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.json({
+      id: dbUser.id,
+      name: dbUser.name,
+      email: dbUser.email,
+      role: dbUser.role,
+      coins: dbUser.coins,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/auth/logout', async (_req, res) => {
+  res.clearCookie('auth_token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+  });
+  return res.json({ success: true, message: 'Logged out successfully' });
+});
+
+app.get('/api/users', authenticateToken, async (_req: AuthRequest, res) => {
+  try {
+    if (_req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admins only' });
+    }
+
     const users = await prisma.user.findMany();
     res.json(users);
   } catch (err) {
@@ -605,9 +679,14 @@ app.post('/api/videos', async (req, res) => {
 // ─────────────────────────────────────────
 // CHAT SYSTEM
 // ─────────────────────────────────────────
-app.get('/api/chat/messages', async (req, res) => {
+app.get('/api/chat/messages', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const { userId } = req.query;
+
+    if (req.user?.role !== 'ADMIN' && userId && userId !== req.user?.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
     if (userId) {
       const chats = await prisma.chatMessage.findMany({ where: { userId: String(userId) } });
       return res.json(chats);
@@ -619,15 +698,15 @@ app.get('/api/chat/messages', async (req, res) => {
   }
 });
 
-app.post('/api/chat/send', async (req, res) => {
+app.post('/api/chat/send', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const message = req.body;
     await prisma.chatMessage.create({
       data: {
-        userId: message.userId,
-        userName: message.userName,
-        text: message.text,
-        sender: message.sender,
+        userId: String(message.userId || req.user?.id || 'unknown'),
+        userName: message.userName || req.user?.email || 'user',
+        text: String(message.text || '').slice(0, 2000),
+        sender: String(message.sender || 'USER'),
         timestamp: Date.now()
       }
     });
@@ -637,8 +716,12 @@ app.post('/api/chat/send', async (req, res) => {
   }
 });
 
-app.get('/api/chat/users', async (req, res) => {
+app.get('/api/chat/users', authenticateToken, async (req: AuthRequest, res) => {
   try {
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admins only' });
+    }
+
     const chats = await prisma.chatMessage.findMany({
       orderBy: { timestamp: 'desc' }
     });
@@ -663,10 +746,15 @@ app.post('/api/upload', async (req, res) => {
     const { image } = req.body;
     if (!image) return res.status(400).json({ success: false, error: 'No image provided' });
 
-    const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '64893796dcb70764722c0d575faeb0a9';
+    const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+    const FREEIMAGE_API_KEY = process.env.FREEIMAGE_API_KEY;
     let isSuccess = false;
     let uploadedUrl = '';
     let errorMessage = '';
+
+    if (!IMGBB_API_KEY) {
+      return res.status(500).json({ success: false, error: 'IMGBB_API_KEY is not configured' });
+    }
 
     try {
       const formData = new FormData();
@@ -686,11 +774,11 @@ app.post('/api/upload', async (req, res) => {
       errorMessage = e.message;
     }
 
-    if (!isSuccess) {
+    if (!isSuccess && FREEIMAGE_API_KEY) {
       try {
         const fallbackFormData = new FormData();
         fallbackFormData.append('source', image);
-        fallbackFormData.append('key', '6d207e02198a847aa98d0a2a901485a5');
+        fallbackFormData.append('key', FREEIMAGE_API_KEY);
         
         const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
           method: 'POST',

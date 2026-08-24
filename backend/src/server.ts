@@ -8,6 +8,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
+import { generateToken } from './utils/jwt';
 
 dotenv.config();
 
@@ -503,6 +504,12 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
 // ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────
+app.post('/api/auth/admin-login', (req, res) => {
+  const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
+  const token = generateToken('admin', 'ADMIN');
+  res.json({ user, token });
+});
+
 app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const user = req.user;

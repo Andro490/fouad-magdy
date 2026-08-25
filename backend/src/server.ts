@@ -171,14 +171,18 @@ app.get('/api/products', async (_req, res) => {
   }
 });
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const products = req.body;
     if (!Array.isArray(products)) return res.status(400).json({ error: 'Expected an array' });
     
-    // For simplicity, the admin panel sends the entire list of products.
-    // We will clear and recreate to match the JSON file overwrite behavior.
-    await prisma.product.deleteMany();
+    if (req.user?.role === 'ADMIN') {
+      await prisma.product.deleteMany();
+    } else if (req.user?.role === 'SELLER') {
+      await prisma.product.deleteMany({ where: { sellerId: req.user.id } });
+    } else {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     
     const created = await prisma.product.createMany({
       data: products.map((p: any) => ({
@@ -189,6 +193,7 @@ app.post('/api/products', async (req, res) => {
         image: p.image,
         images: p.images || [],
         adminPhone: p.adminPhone ?? undefined,
+        sellerId: req.user?.role === 'SELLER' ? req.user.id : (p.sellerId || null),
         isSoldOut: Boolean(p.isSoldOut)
       }))
     });
@@ -514,17 +519,36 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
 // ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────
-app.post('/api/auth/admin-login', (req, res) => {
-  const { phone, password } = req.body;
-  const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Foadmagdy0152020';
+app.post('/api/auth/admin-login', async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+    const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Foadmagdy0152020';
 
-  if (phone === adminPhone && password === adminPassword) {
-    const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
-    const token = generateToken('admin', 'ADMIN');
-    res.json({ user, token });
-  } else {
+    if (phone === adminPhone && password === adminPassword) {
+      const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
+      const token = generateToken('admin', 'ADMIN');
+      return res.json({ user, token });
+    }
+
+    // Check if it's a sub-admin (SELLER)
+    const seller = await prisma.user.findFirst({
+      where: {
+        email: phone, // We use email field to store the phone/ID for sellers
+        password: password,
+        role: 'SELLER'
+      }
+    });
+
+    if (seller) {
+      const user = { id: seller.id, name: seller.name, role: 'SELLER', email: seller.email };
+      const token = generateToken(seller.id, 'SELLER');
+      return res.json({ user, token });
+    }
+
     res.status(401).json({ error: 'Unauthorized' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -581,13 +605,18 @@ app.post('/api/users', async (req, res) => {
     if (!Array.isArray(users)) return res.status(400).json({ error: 'Expected an array' });
     
     for (const u of users) {
+      const updateData: any = {
+        name: u.name,
+        role: u.role,
+        coins: Number(u.coins || 0)
+      };
+      if (u.password) {
+        updateData.password = u.password;
+      }
+      
       await prisma.user.upsert({
         where: { email: u.email }, // Using email as unique identifier
-        update: {
-          name: u.name,
-          role: u.role,
-          coins: Number(u.coins || 0)
-        },
+        update: updateData,
         create: {
           name: u.name,
           email: u.email,

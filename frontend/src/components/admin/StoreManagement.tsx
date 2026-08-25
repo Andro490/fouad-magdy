@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 import type { StoreProduct } from '../../pages/Store';
 
 const StoreManagement = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -17,16 +20,19 @@ const StoreManagement = () => {
       .then(r => r.json())
       .then(data => {
         let fetched = Array.isArray(data) ? data : [];
-        if (fetched.length === 0) {
-          fetched = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        if (user?.role === 'SELLER') {
+          fetched = fetched.filter((p: any) => p.sellerId === user.id);
         }
         setProducts(fetched);
       })
       .catch(() => {
-        const storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        let storedProducts = JSON.parse(localStorage.getItem('storeProducts') || '[]');
+        if (user?.role === 'SELLER') {
+          storedProducts = storedProducts.filter((p: any) => p.sellerId === user.id);
+        }
         setProducts(storedProducts);
       });
-  }, [API_URL]);
+  }, [API_URL, user]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -86,22 +92,27 @@ const StoreManagement = () => {
     e.preventDefault();
     const parsedImages = imagesInput.split('\n').map(s => s.trim()).filter(Boolean);
     
-    const newProduct: StoreProduct = {
+    const newProduct: any = {
       id: Date.now().toString(),
       name,
       description,
       price: Number(price),
       image: parsedImages[0] || '',
       images: parsedImages.length > 0 ? parsedImages : undefined,
-      adminPhone: adminPhone.trim() || undefined
+      adminPhone: adminPhone.trim() || undefined,
+      sellerId: user?.id
     };
     
     const updatedProducts = [...products, newProduct];
     setProducts(updatedProducts);
     
+    const token = localStorage.getItem('authToken');
     fetch(`${API_URL}/api/products`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify(updatedProducts)
     }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
     
@@ -117,9 +128,14 @@ const StoreManagement = () => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
     const updatedProducts = products.filter(p => p.id !== id);
     setProducts(updatedProducts);
+    
+    const token = localStorage.getItem('authToken');
     fetch(`${API_URL}/api/products`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify(updatedProducts)
     }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
   };
@@ -129,9 +145,14 @@ const StoreManagement = () => {
       p.id === id ? { ...p, isSoldOut: !p.isSoldOut } : p
     );
     setProducts(updatedProducts);
+    
+    const token = localStorage.getItem('authToken');
     fetch(`${API_URL}/api/products`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify(updatedProducts)
     }).catch(() => localStorage.setItem('storeProducts', JSON.stringify(updatedProducts)));
   };

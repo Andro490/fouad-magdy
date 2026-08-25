@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
@@ -213,12 +214,12 @@ app.post('/api/products', authenticateToken, async (req: AuthRequest, res) => {
     if (req.user?.role === 'ADMIN') {
       await prisma.product.deleteMany();
     } else if (req.user?.role === 'SELLER') {
-      await prisma.product.deleteMany({ where: { sellerId: req.user.id } });
+      await (prisma.product as any).deleteMany({ where: { sellerId: req.user.id } });
     } else {
       return res.status(403).json({ error: 'Forbidden' });
     }
     
-    const created = await prisma.product.createMany({
+    const created = await (prisma.product as any).createMany({
       data: products.map((p: any) => ({
         id: p.id,
         name: p.name,

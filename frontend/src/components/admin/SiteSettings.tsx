@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const SiteSettings = () => {
   const [showComingSoonBanner, setShowComingSoonBanner] = useState(true);
+  const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -13,6 +14,7 @@ const SiteSettings = () => {
       .then(r => r.json())
       .then(data => {
         setShowComingSoonBanner(!!data.showComingSoonBanner);
+        if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -29,7 +31,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner })
+        body: JSON.stringify({ showComingSoonBanner, paymentPhone })
       });
       if (res.ok) {
         setSaved(true);
@@ -50,15 +52,29 @@ const SiteSettings = () => {
 
   return (
     <div className="max-w-2xl mx-auto" dir="rtl">
-      <h2 className="text-2xl font-bold text-white mb-8">إعدادات الموقع</h2>
+      <h2 className="text-2xl font-bold text-white mb-8">⚙️ إعدادات الموقع</h2>
 
       <div className="glass-panel rounded-2xl p-8 space-y-6">
-        
+
+        {/* Payment Phone Number */}
+        <div className="bg-dark/40 border border-gray-700 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg">رقم التحويل (فودافون كاش / انستا باي)</h3>
+          <p className="text-gray-400 text-sm">هذا الرقم يظهر للعملاء في صفحة الدفع اليدوي. قم بتغييره متى أردت.</p>
+          <input
+            type="text"
+            value={paymentPhone}
+            onChange={e => setPaymentPhone(e.target.value)}
+            className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-3 text-white text-xl font-bold text-center tracking-widest focus:border-primary focus:outline-none"
+            dir="ltr"
+            placeholder="01000000000"
+          />
+        </div>
+
         {/* Coming Soon Banner Toggle */}
         <div className="flex items-center justify-between bg-dark/40 border border-gray-700 rounded-xl p-6">
           <div>
             <h3 className="text-white font-bold text-lg mb-1">بانر "قريباً" في صفحة المدربين</h3>
-            <p className="text-gray-400 text-sm">عند تفعيله، يظهر بانر "قادم قريباً" في أعلى صفحة المدربين لتنبيه الزوار بميزات جديدة.</p>
+            <p className="text-gray-400 text-sm">يظهر بانر "قادم قريباً" في أعلى صفحة المدربين.</p>
           </div>
           <button
             onClick={() => setShowComingSoonBanner(prev => !prev)}
@@ -104,3 +120,4 @@ const SiteSettings = () => {
 };
 
 export default SiteSettings;
+

@@ -26,6 +26,7 @@ model Product {
   image       String
   images      String[]
   adminPhone  String?
+  sellerId    String?
   isSoldOut   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

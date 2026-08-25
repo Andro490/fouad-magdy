@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Copy, CheckCheck } from 'lucide-react';
 
 const Checkout = () => {
   const location = useLocation();
@@ -17,6 +17,25 @@ const Checkout = () => {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'manual' | 'visa'>('manual');
+  const [paymentPhone, setPaymentPhone] = useState('01000026470');
+  const [copied, setCopied] = useState(false);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/settings`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
+      })
+      .catch(() => {});
+  }, [API_URL]);
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(paymentPhone);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!product) {
     return (
@@ -164,16 +183,35 @@ const Checkout = () => {
           </div>
           
           {paymentMethod === 'manual' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">صورة إيصال التحويل (فودافون كاش، انستا باي، الخ)</label>
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-dark/30 hover:bg-dark/50 transition-colors">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-400">اضغط هنا لرفع الصورة</p>
-                  {receipt && <p className="text-accent mt-2 text-sm font-bold">{receipt.name}</p>}
+            <div className="space-y-4">
+              {/* Payment Number Box */}
+              <div className="bg-gradient-to-r from-[#e06c88]/10 to-pink-900/10 border border-[#e06c88]/40 rounded-xl p-5">
+                <p className="text-sm text-gray-400 mb-2 text-center">قم بتحويل المبلغ على الرقم التالي عبر فودافون كاش / انستا باي:</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl font-black text-white tracking-widest" dir="ltr">{paymentPhone}</span>
+                  <button
+                    type="button"
+                    onClick={handleCopyPhone}
+                    className="flex items-center gap-1 px-3 py-2 bg-[#e06c88]/20 border border-[#e06c88]/50 rounded-lg text-[#e06c88] hover:bg-[#e06c88]/30 transition-colors text-sm font-bold"
+                  >
+                    {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                    {copied ? 'تم النسخ' : 'نسخ'}
+                  </button>
                 </div>
-                <input type="file" className="hidden" accept="image/*" onChange={e => setReceipt(e.target.files?.[0] || null)} required={paymentMethod === 'manual'} />
-              </label>
+                <p className="text-xs text-gray-500 text-center mt-3">بعد التحويل، ارفع صورة الإيصال أدناه ليتم تأكيد طلبك</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">صورة إيصال التحويل (فودافون كاش، انستا باي، الخ)</label>
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-dark/30 hover:bg-dark/50 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                    <p className="text-sm text-gray-400">اضغط هنا لرفع الصورة</p>
+                    {receipt && <p className="text-accent mt-2 text-sm font-bold">{receipt.name}</p>}
+                  </div>
+                  <input type="file" className="hidden" accept="image/*" onChange={e => setReceipt(e.target.files?.[0] || null)} required={paymentMethod === 'manual'} />
+                </label>
+              </div>
             </div>
           )}
           

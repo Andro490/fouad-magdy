@@ -158,6 +158,32 @@ const Admin = () => {
     } catch (e) {}
   };
 
+  const handleDeleteChat = async (userId: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذه المحادثة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+    
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/chat/admin/messages/${userId}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      
+      if (res.ok) {
+        if (selectedUserId === userId) {
+          setSelectedUserId(null);
+          setAdminMessages([]);
+        }
+        fetchChatUsers(); // Refresh the list
+      } else {
+        alert('حدث خطأ أثناء الحذف.');
+      }
+    } catch (e) {
+      alert('تعذر الاتصال بالخادم للحذف.');
+    }
+  };
+
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
@@ -855,9 +881,18 @@ const Admin = () => {
           <div className="w-2/3 flex flex-col bg-dark-lighter/30">
             {selectedUserId ? (
               <>
-                <div className="p-4 border-b border-gray-800 bg-dark/60 font-bold text-primary flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  المحادثة مع: {chatUsers.find(u => u.userId === selectedUserId)?.userName}
+                <div className="p-4 border-b border-gray-800 bg-dark/60 font-bold text-primary flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    المحادثة مع: {chatUsers.find(u => u.userId === selectedUserId)?.userName}
+                  </div>
+                  <button 
+                    onClick={() => handleDeleteChat(selectedUserId)}
+                    className="text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded transition-colors text-sm flex items-center gap-1"
+                    title="حذف المحادثة"
+                  >
+                    🗑️ حذف
+                  </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {adminMessages.map(msg => (

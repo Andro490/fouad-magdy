@@ -759,6 +759,23 @@ app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res
   }
 });
 
+// DELETE chat for a specific user (requires JWT + ADMIN)
+app.delete('/api/chat/admin/messages/:userId', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const { userId } = req.params;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+    
+    await prisma.chatMessage.deleteMany({
+      where: { userId: String(userId) }
+    });
+    
+    res.json({ success: true, message: 'Chat deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // GET chat users list for admin dashboard (requires JWT + ADMIN)
 app.get('/api/chat/users', authenticateToken, async (req: AuthRequest, res) => {
   try {

@@ -12,6 +12,17 @@ import { generateToken } from './utils/jwt';
 
 dotenv.config();
 
+// Basic HTML Sanitizer to prevent XSS (Cross-Site Scripting)
+const sanitizeHTML = (str: string | undefined | null) => {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
@@ -505,9 +516,17 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
 // USERS API
 // ─────────────────────────────────────────
 app.post('/api/auth/admin-login', (req, res) => {
-  const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
-  const token = generateToken('admin', 'ADMIN');
-  res.json({ user, token });
+  const { phone, password } = req.body;
+  const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Foadmagdy0152020';
+
+  if (phone === adminPhone && password === adminPassword) {
+    const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
+    const token = generateToken('admin', 'ADMIN');
+    res.json({ user, token });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
 
 app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res) => {
@@ -723,9 +742,9 @@ app.post('/api/chat/send', async (req: AuthRequest, res) => {
     }
     await prisma.chatMessage.create({
       data: {
-        userId: String(message.userId),
-        userName: String(message.userName || 'زائر'),
-        text: String(message.text).slice(0, 2000),
+        userId: sanitizeHTML(String(message.userId)),
+        userName: sanitizeHTML(String(message.userName || 'زائر')).slice(0, 50),
+        text: sanitizeHTML(String(message.text)).slice(0, 2000),
         sender: message.sender === 'ADMIN' ? 'ADMIN' : 'USER',
         timestamp: Date.now()
       }
@@ -746,9 +765,9 @@ app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res
     }
     await prisma.chatMessage.create({
       data: {
-        userId: String(message.userId),
+        userId: sanitizeHTML(String(message.userId)),
         userName: 'Admin',
-        text: String(message.text).slice(0, 2000),
+        text: sanitizeHTML(String(message.text)).slice(0, 2000),
         sender: 'ADMIN',
         timestamp: Date.now()
       }

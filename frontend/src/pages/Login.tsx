@@ -78,27 +78,24 @@ const Login = () => {
     e.preventDefault();
     setError('');
     
-    // Check if it's admin (mocked admin logic, but now gets a real token from backend)
-    if (phone === 'admin' && password === 'admin') {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      try {
-        const res = await fetch(`${API_URL}/api/auth/admin-login`, { method: 'POST' });
-        if (res.ok) {
-          const data = await res.json();
-          dispatch(loginSuccess({ user: data.user, token: data.token }));
-          navigate('/admin');
-          return;
-        }
-      } catch (err) {
-        console.error('Admin login error', err);
+    // Try admin login via backend first for security (so password isn't exposed in frontend code)
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    try {
+      const res = await fetch(`${API_URL}/api/auth/admin-login`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        dispatch(loginSuccess({ user: data.user, token: data.token }));
+        navigate('/admin');
+        return;
       }
-      // Fallback if backend is down
-      dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', phone: 'admin', role: 'ADMIN' }, token: 'mock-admin-token' }));
-      navigate('/admin');
-      return;
+    } catch (err) {
+      console.error('Admin login error', err);
     }
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     let users = [];
     try {
       const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });

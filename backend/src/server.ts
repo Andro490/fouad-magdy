@@ -331,13 +331,12 @@ app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthReque
 // ─────────────────────────────────────────────────────────────
 // MANUAL PAYMENT (TELEGRAM INTEGRATION)
 // ─────────────────────────────────────────────────────────────
-app.post('/api/checkout/manual', authenticateToken, async (req: AuthRequest, res) => {
+app.post('/api/checkout/manual', async (req: express.Request, res) => {
   try {
     const { name, phone, gameId, productName, price, receiptBase64, managerId } = req.body;
     
-    // Use phone as the primary identifier for local mock accounts
-    let userEmail = req.user?.email || phone || 'guest@unknown.com';
-    if (userEmail === 'mock@local.user') userEmail = phone;
+    // Use phone as the primary identifier for guests
+    let userEmail = phone || 'guest@unknown.com';
 
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;

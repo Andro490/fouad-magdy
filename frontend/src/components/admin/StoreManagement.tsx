@@ -100,7 +100,8 @@ const StoreManagement = () => {
       image: parsedImages[0] || '',
       images: parsedImages.length > 0 ? parsedImages : undefined,
       adminPhone: adminPhone.trim() || undefined,
-      sellerId: user?.id
+      sellerId: user?.id,
+      sellerName: user?.name || 'الإدارة'
     };
     
     const updatedProducts = [...products, newProduct];
@@ -213,6 +214,7 @@ const StoreManagement = () => {
                 <tr>
                   <th className="pb-3 px-2">الصورة</th>
                   <th className="pb-3 px-2">الاسم</th>
+                  <th className="pb-3 px-2">البائع</th>
                   <th className="pb-3 px-2">السعر</th>
                   <th className="pb-3 px-2 text-center">إجراء</th>
                 </tr>
@@ -224,6 +226,7 @@ const StoreManagement = () => {
                       <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded border border-gray-600" />
                     </td>
                     <td className="py-3 px-2 font-semibold text-white">{product.name}</td>
+                    <td className="py-3 px-2 text-gray-400 text-sm">{product.sellerName || 'الإدارة'}</td>
                     <td className="py-3 px-2 text-accent font-bold">{product.price} EGP</td>
                     <td className="py-3 px-2 text-center">
                       <button onClick={() => handleToggleSoldOut(product.id)} className={`font-semibold px-3 py-1 rounded transition-colors ml-2 ${product.isSoldOut ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'bg-yellow-500/10 text-yellow-500 hover:text-yellow-400'}`}>

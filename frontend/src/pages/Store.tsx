@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, ShoppingCart } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export interface StoreProduct {
   id: string;
@@ -13,6 +13,8 @@ export interface StoreProduct {
   isSoldOut?: boolean;
   adminPhone?: string;
   images?: string[];
+  sellerId?: string;
+  sellerName?: string;
 }
 
 const Store = () => {
@@ -110,7 +112,19 @@ const Store = () => {
                 </div>
                 
                 <div className="p-6 flex-1 flex flex-col relative">
-                  <h3 className={`text-xl font-bold mb-2 ${product.isSoldOut ? 'text-gray-500 line-through' : 'text-white'}`}>{product.name}</h3>
+                  <h3 className={`text-xl font-bold mb-1 ${product.isSoldOut ? 'text-gray-500 line-through' : 'text-white'}`}>{product.name}</h3>
+                  {product.sellerName && (
+                    <div className="text-xs text-primary mb-2 font-semibold flex items-center gap-1">
+                      <span className="text-gray-400">بائع:</span> 
+                      {product.sellerId ? (
+                        <Link to={`/seller/${product.sellerId}`} className="hover:underline hover:text-white transition-colors">
+                          {product.sellerName}
+                        </Link>
+                      ) : (
+                        <span>{product.sellerName}</span>
+                      )}
+                    </div>
+                  )}
                   <p className="text-gray-400 text-sm mb-4 flex-1 line-clamp-3 break-words">{product.description}</p>
                   
                   <div className="flex justify-between items-center mb-6">

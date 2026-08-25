@@ -200,7 +200,28 @@ app.delete('/api/managers/:id', (req, res) => {
 app.get('/api/products', async (_req, res) => {
   try {
     const products = await prisma.product.findMany();
-    res.json(products);
+    
+    // Fetch users for these products
+    const sellerIds = [...new Set(products.map(p => p.sellerId).filter(Boolean))] as string[];
+    let sellerMap: Record<string, string> = {};
+    
+    if (sellerIds.length > 0) {
+      const sellers = await prisma.user.findMany({
+        where: { id: { in: sellerIds } },
+        select: { id: true, name: true }
+      });
+      sellerMap = sellers.reduce((acc, curr) => {
+        acc[curr.id] = curr.name;
+        return acc;
+      }, {} as Record<string, string>);
+    }
+    
+    const productsWithSeller = products.map(p => ({
+      ...p,
+      sellerName: p.sellerId ? (sellerMap[p.sellerId] || 'بائع غير معروف') : 'الإدارة'
+    }));
+    
+    res.json(productsWithSeller);
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -662,6 +683,60 @@ app.post('/api/users', async (req, res) => {
       });
     }
     res.json({ success: true, count: users.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Public: GET seller profile by ID
+app.get('/api/users/:id/profile', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        phone: true,
+        location: true,
+        screenshots: true
+      }
+    });
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role !== 'SELLER' && user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'User is not a seller' });
+    }
+
+    // Also fetch seller's products
+    const products = await prisma.product.findMany({
+      where: { sellerId: id }
+    });
+
+    res.json({ ...user, products });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Private: PUT update own seller profile
+app.put('/api/users/profile', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user?.id) return res.status(401).json({ error: 'Unauthorized' });
+    
+    const { phone, location, screenshots } = req.body;
+    
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        phone: phone ?? undefined,
+        location: location ?? undefined,
+        screenshots: screenshots ?? undefined
+      }
+    });
+    
+    res.json({ success: true, message: 'تم تحديث البيانات بنجاح' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

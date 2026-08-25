@@ -12,8 +12,11 @@ model User {
   name      String
   email     String   @unique
   password  String?
-  role      String   @default("USER") // USER, STREAMER, ADMIN
-  coins     Int      @default(0)
+  role        String   @default("USER") // USER, STREAMER, ADMIN, SELLER
+  coins       Int      @default(0)
+  phone       String?
+  location    String?
+  screenshots String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

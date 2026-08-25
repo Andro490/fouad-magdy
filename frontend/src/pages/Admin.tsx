@@ -10,11 +10,12 @@ import CoachVideos from '../components/admin/CoachVideos';
 import SupportChatAdmin from '../components/admin/SupportChatAdmin';
 import SubAdminsManagement from '../components/admin/SubAdminsManagement';
 import SiteSettings from '../components/admin/SiteSettings';
+import SellerProfileSettings from '../components/admin/SellerProfileSettings';
 
 const Admin = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings' | 'sellerProfile'>('products');
 
   useEffect(() => {
     // Both ADMIN and SELLER can access this page
@@ -31,6 +32,23 @@ const Admin = () => {
         <h1 className="text-4xl font-bold text-gradient mb-10 text-center">
           {user?.role === 'SELLER' ? 'لوحة تحكم البائع' : 'لوحة تحكم الإدارة'}
         </h1>
+        
+        {user?.role === 'SELLER' && (
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <button 
+              onClick={() => setActiveTab('products')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'products' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+            >
+              إدارة منتجاتي
+            </button>
+            <button 
+              onClick={() => setActiveTab('sellerProfile')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'sellerProfile' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+            >
+              إعدادات حسابي (صور الثقة)
+            </button>
+          </div>
+        )}
         
         {user?.role === 'ADMIN' && (
           <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -76,11 +94,18 @@ const Admin = () => {
             >
               ⚙️ إعدادات الموقع
             </button>
+            <button 
+              onClick={() => setActiveTab('sellerProfile')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'sellerProfile' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+            >
+              إعدادات حسابي (صور الثقة)
+            </button>
           </div>
         )}
         
         <div className="mt-8">
           {activeTab === 'products' && <StoreManagement />}
+          {activeTab === 'sellerProfile' && <SellerProfileSettings />}
           {user?.role === 'ADMIN' && (
             <>
               {activeTab === 'videos' && <VideoReview />}

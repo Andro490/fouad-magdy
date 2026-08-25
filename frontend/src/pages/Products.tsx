@@ -86,8 +86,47 @@ const Products = () => {
     <div className="min-h-screen pt-28 px-4 md:px-10 pb-20 relative">
       <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -translate-x-1/2"></div>
       <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/10 rounded-full blur-[120px] translate-x-1/2"></div>
+
+      {/* ── Full-Page Coming Soon Overlay (outside blurred content) ── */}
+      {showBanner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Glowing orbs */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}} />
+
+          <div className="relative z-10 flex flex-col items-center gap-8 text-center px-6" dir="rtl">
+            {/* Rocket icon */}
+            <div className="relative">
+              <div className="w-28 h-28 rounded-full bg-primary/20 border-2 border-primary/60 flex items-center justify-center shadow-[0_0_60px_rgba(255,215,0,0.3)]">
+                <span className="text-6xl">🚀</span>
+              </div>
+              <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary animate-ping" />
+              <span className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-accent animate-ping" style={{animationDelay: '0.5s'}} />
+            </div>
+
+            <div>
+              <h1 className="text-5xl md:text-7xl font-black text-white mb-4 leading-tight">
+                قريباً
+              </h1>
+              <p className="text-xl md:text-2xl font-bold text-primary tracking-widest mb-3">
+                COMING SOON
+              </p>
+              <p className="text-gray-400 text-base md:text-lg max-w-md">
+                نعمل على تطوير تجربة المدربين لتكون أفضل وأكثر تفاعلاً. ترقّب التحديثات القادمة!
+              </p>
+            </div>
+
+            <div className="w-48 h-1 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full animate-pulse" />
+
+            <a href="/" className="px-8 py-3 bg-primary/20 border border-primary/50 text-primary font-bold rounded-xl hover:bg-primary/30 transition-colors">
+              العودة للرئيسية
+            </a>
+          </div>
+        </div>
+      )}
       
-      <div className="max-w-7xl mx-auto relative z-10">
+      {/* Page content — blurred when coming soon is active */}
+      <div className={`max-w-7xl mx-auto relative z-10 transition-all duration-300 ${showBanner ? 'blur-md pointer-events-none select-none' : ''}`}>
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-4">المدربون (Managers)</h1>
@@ -106,34 +145,6 @@ const Products = () => {
           </div>
         </div>
 
-        {/* ── Coming Soon Banner ── */}
-        {showBanner && (
-          <div className="relative mb-10 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-dark-lighter via-dark to-dark-lighter shadow-[0_0_40px_rgba(255,215,0,0.1)]">
-            {/* Animated glow line */}
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent animate-pulse" />
-            
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-7" dir="rtl">
-              <div className="flex items-center gap-5">
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center animate-pulse">
-                    <span className="text-3xl">🚀</span>
-                  </div>
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary animate-ping" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-1">ميزات جديدة قادمة قريباً!</h2>
-                  <p className="text-gray-400 text-sm">نعمل على تطوير تجربة المدربين لتكون أفضل وأكثر تفاعلاً. ترقّب التحديثات القادمة!</p>
-                </div>
-              </div>
-              <div className="flex-shrink-0">
-                <span className="inline-block px-6 py-3 rounded-xl bg-primary/20 border border-primary/50 text-primary font-black text-lg tracking-widest animate-bounce">
-                  COMING SOON
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">

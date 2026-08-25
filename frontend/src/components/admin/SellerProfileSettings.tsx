@@ -7,6 +7,7 @@ const SellerProfileSettings = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
+  const [bio, setBio] = useState('');
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +23,7 @@ const SellerProfileSettings = () => {
         if (!data.error) {
           setPhone(data.phone || '');
           setLocation(data.location || '');
+          setBio(data.bio || '');
           setScreenshots(data.screenshots || []);
         }
         setIsLoading(false);
@@ -85,7 +87,7 @@ const SellerProfileSettings = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ phone, location, screenshots })
+        body: JSON.stringify({ phone, location, bio, screenshots })
       });
       const data = await res.json();
       if (data.success) {
@@ -128,6 +130,16 @@ const SellerProfileSettings = () => {
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">نبذة عن البائع (وصف أو معلومات إضافية تظهر للعملاء)</label>
+          <textarea 
+            value={bio} 
+            onChange={e => setBio(e.target.value)} 
+            placeholder="اكتب نبذة عنك، عن خدمتك، أو أي معلومات تود أن يراها العميل قبل الصور..."
+            className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none min-h-[100px]"
+          />
         </div>
 
         <div>

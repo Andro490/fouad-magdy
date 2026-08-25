@@ -8,6 +8,7 @@ interface SellerProfileData {
   name: string;
   phone?: string;
   location?: string;
+  bio?: string;
   screenshots?: string[];
   products: StoreProduct[];
 }
@@ -97,6 +98,16 @@ const SellerProfile = () => {
             </a>
           )}
         </div>
+
+        {/* Bio / Description */}
+        {profile.bio && (
+          <div className="glass-panel p-6 rounded-2xl border-r-4 border-primary/50">
+            <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+              <span className="text-primary">📝</span> نبذة عن البائع
+            </h3>
+            <p className="text-gray-300 leading-relaxed whitespace-pre-line">{profile.bio}</p>
+          </div>
+        )}
 
         {/* Screenshots Gallery */}
         {profile.screenshots && profile.screenshots.length > 0 && (

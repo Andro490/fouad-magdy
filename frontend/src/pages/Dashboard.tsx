@@ -153,7 +153,9 @@ const Dashboard = () => {
           <img src={`https://ui-avatars.com/api/?name=${user.name}&background=141414&color=FFD700`} alt={user.name} className="w-20 h-20 rounded-full border-2 border-primary" />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">{user.name}</h2>
-            <p className="text-gray-400">{user.role === 'STREAMER' ? 'صانع محتوى معتمد' : 'مستخدم عادي'}</p>
+            <p className="text-gray-400">
+              {user.role === 'STREAMER' ? 'صانع محتوى معتمد' : user.role === 'SELLER' ? 'بائع (أدمن فرعي)' : user.role === 'ADMIN' ? 'المدير' : 'مستخدم عادي'}
+            </p>
           </div>
           <div className="text-center bg-dark/50 px-6 py-3 rounded-xl border border-accent/20">
             <p className="text-sm text-gray-400 mb-1">الرصيد الحالي</p>

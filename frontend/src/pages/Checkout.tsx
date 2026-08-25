@@ -102,6 +102,10 @@ const Checkout = () => {
         const result = await response.json();
         
         if (response.ok) {
+          // Save phone to allow checking purchase status later for guests
+          if (phone) {
+            localStorage.setItem('guest_phone', phone);
+          }
           alert('✅ تم إرسال طلبك بنجاح! سيتم مراجعته وسينفتح لك المحتوى قريباً.');
           navigate('/store');
         } else {

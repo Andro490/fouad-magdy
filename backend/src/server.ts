@@ -66,6 +66,40 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────
+// SITE SETTINGS API (banner flags, etc.)
+// ─────────────────────────────────────────
+const SETTINGS_FILE = path.join(__dirname, '../src/data/settings.json');
+
+const readSettings = () => {
+  try {
+    const raw = fs.readFileSync(SETTINGS_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return { showComingSoonBanner: true };
+  }
+};
+
+const writeSettings = (data: object) => {
+  const dir = path.dirname(SETTINGS_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2));
+};
+
+// Public: get current settings
+app.get('/api/settings', (req, res) => {
+  res.json(readSettings());
+});
+
+// Admin only: update settings
+app.post('/api/settings', authenticateToken, (req: AuthRequest, res) => {
+  if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+  const current = readSettings();
+  const updated = { ...current, ...req.body };
+  writeSettings(updated);
+  res.json({ success: true, settings: updated });
+});
+
+// ─────────────────────────────────────────
 // MANAGERS API - Serves directly from coaches.json
 // Order in file = order on site. New coaches prepended = appear first.
 // ─────────────────────────────────────────
@@ -288,32 +322,32 @@ app.get('/api/checkout/verify', async (req, res) => {
 // SECURE: Check purchase with JWT (can't be faked from browser)
 // ─────────────────────────────────────────────────────────────
 // Endpoint: GET /api/checkout/check-purchase
-// Headers:  Authorization: Bearer <token>
-// Query:    managerId=<id>
+// Headers:  Authorization: Bearer <token> (Optional for guests)
+// Query:    managerId=<id>, phone=<phone>
 // Returns:  { purchased: true/false }
-app.get('/api/checkout/check-purchase', authenticateToken, async (req: AuthRequest, res) => {
+app.get('/api/checkout/check-purchase', async (req: express.Request, res) => {
   try {
     const { managerId, phone } = req.query as Record<string, string>;
     if (!managerId) return res.status(400).json({ error: 'Missing managerId' });
 
-    // Get user email from the verified JWT payload (cannot be tampered)
-    let userEmail = req.user?.email;
-    const userId = req.user?.id;
-    
-    // Support local mock users by relying on passed phone
-    if (userEmail === 'mock@local.user' && phone) {
-      userEmail = phone;
-    }
+    let email = phone; // Fallback to provided phone for guests
 
-    if (!userEmail && !userId) {
-      return res.status(401).json({ purchased: false, error: 'Cannot identify user from token' });
-    }
-
-    // Fetch user email from DB if only userId is in token
-    let email = userEmail;
-    if (!email && userId && userId !== 'mock-id') {
-      const dbUser = await prisma.user.findUnique({ where: { id: userId } });
-      email = dbUser?.email;
+    // If they have an auth token, try to extract user info securely
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      try {
+        const secret = process.env.JWT_SECRET || '';
+        const decoded = jwt.verify(token, secret) as any;
+        if (decoded.email && decoded.email !== 'mock@local.user') {
+          email = decoded.email;
+        } else if (decoded.id && decoded.id !== 'mock-id') {
+          const dbUser = await prisma.user.findUnique({ where: { id: decoded.id } });
+          if (dbUser?.email) email = dbUser.email;
+        }
+      } catch (e) {
+        // Token invalid, fallback to phone
+      }
     }
 
     if (!email) return res.status(401).json({ purchased: false, error: 'User not found' });
@@ -777,6 +811,31 @@ app.post('/api/chat/send', async (req: AuthRequest, res) => {
         timestamp: Date.now()
       }
     });
+
+    if (message.sender !== 'ADMIN') {
+      // Find if we already sent an auto-reply recently (e.g. in the last 12 hours)
+      const recentBotReply = await prisma.chatMessage.findFirst({
+        where: {
+          userId: sanitizeHTML(String(message.userId)),
+          sender: 'ADMIN',
+          text: 'سيتم الرد عليك خلال 24 ساعة',
+          timestamp: { gte: Date.now() - 12 * 60 * 60 * 1000 }
+        }
+      });
+
+      if (!recentBotReply) {
+        await prisma.chatMessage.create({
+          data: {
+            userId: sanitizeHTML(String(message.userId)),
+            userName: 'الدعم الفني',
+            text: 'سيتم الرد عليك خلال 24 ساعة',
+            sender: 'ADMIN',
+            timestamp: Date.now() + 1000
+          }
+        });
+      }
+    }
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });

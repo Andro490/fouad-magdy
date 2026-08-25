@@ -9,11 +9,12 @@ import AddCoaches from '../components/admin/AddCoaches';
 import CoachVideos from '../components/admin/CoachVideos';
 import SupportChatAdmin from '../components/admin/SupportChatAdmin';
 import SubAdminsManagement from '../components/admin/SubAdminsManagement';
+import SiteSettings from '../components/admin/SiteSettings';
 
 const Admin = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings'>('products');
 
   useEffect(() => {
     // Both ADMIN and SELLER can access this page
@@ -69,6 +70,12 @@ const Admin = () => {
             >
               الدعم الفني
             </button>
+            <button 
+              onClick={() => setActiveTab('settings')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'settings' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+            >
+              ⚙️ إعدادات الموقع
+            </button>
           </div>
         )}
         
@@ -81,6 +88,7 @@ const Admin = () => {
               {activeTab === 'coachVideos' && <CoachVideos />}
               {activeTab === 'support' && <SupportChatAdmin />}
               {activeTab === 'subadmins' && <SubAdminsManagement />}
+              {activeTab === 'settings' && <SiteSettings />}
             </>
           )}
         </div>

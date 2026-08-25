@@ -79,15 +79,19 @@ const ManagerDetails = () => {
         if (mVideo) setCoachVideo(mVideo);
       });
 
-    // Check if user already purchased this coach (secured with JWT)
-    if (id && user) {
+    // Check if user already purchased this coach
+    if (id) {
       // User-specific key prevents other accounts on same browser from getting free access
-      const userKey = `user_${user.id}_paid_${id}`;
+      const userKey = user ? `user_${user.id}_paid_${id}` : `guest_paid_${id}`;
+      const guestPhone = localStorage.getItem('guest_phone') || '';
+      const phoneToCheck = user?.phone || guestPhone;
       
       if (localStorage.getItem(userKey) === '1') {
         setHasPurchased(true);
-      } else {
-        fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&phone=${user?.phone || ''}`, {
+      } else if (user || guestPhone) {
+        const token = localStorage.getItem('authToken');
+        fetch(`${API_URL}/api/checkout/check-purchase?managerId=${id}&phone=${phoneToCheck}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
           credentials: 'include',
         })
           .then(r => r.json())

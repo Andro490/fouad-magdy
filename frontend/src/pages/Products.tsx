@@ -27,6 +27,17 @@ const Products = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(10);
+  const [showBanner, setShowBanner] = useState(false);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  // Fetch site settings (banner visibility)
+  useEffect(() => {
+    fetch(`${API_URL}/api/settings`)
+      .then(r => r.json())
+      .then(data => setShowBanner(!!data.showComingSoonBanner))
+      .catch(() => {});
+  }, [API_URL]);
 
   useEffect(() => {
     const fetchManagers = async () => {
@@ -43,7 +54,6 @@ const Products = () => {
         };
 
         // 1. جلب البيانات من السيرفر الخاص بنا مباشرة (من ملف coaches.json السريع جداً وبدون أي حظر)
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${API_URL}/api/managers?page=${currentPage}`);
         if (!res.ok) throw new Error('Failed to fetch from local API');
         
@@ -65,7 +75,7 @@ const Products = () => {
     };
 
     fetchManagers();
-  }, [currentPage]);
+  }, [currentPage, API_URL]);
 
   const filteredDisplay = managers.filter(manager => {
     const name = manager.name || manager.Name || manager.managerName || manager["姓名"] || manager.title || '';
@@ -95,6 +105,35 @@ const Products = () => {
             />
           </div>
         </div>
+
+        {/* ── Coming Soon Banner ── */}
+        {showBanner && (
+          <div className="relative mb-10 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-dark-lighter via-dark to-dark-lighter shadow-[0_0_40px_rgba(255,215,0,0.1)]">
+            {/* Animated glow line */}
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent animate-pulse" />
+            
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-7" dir="rtl">
+              <div className="flex items-center gap-5">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center animate-pulse">
+                    <span className="text-3xl">🚀</span>
+                  </div>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary animate-ping" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-1">ميزات جديدة قادمة قريباً!</h2>
+                  <p className="text-gray-400 text-sm">نعمل على تطوير تجربة المدربين لتكون أفضل وأكثر تفاعلاً. ترقّب التحديثات القادمة!</p>
+                </div>
+              </div>
+              <div className="flex-shrink-0">
+                <span className="inline-block px-6 py-3 rounded-xl bg-primary/20 border border-primary/50 text-primary font-black text-lg tracking-widest animate-bounce">
+                  COMING SOON
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">

@@ -55,7 +55,7 @@ const Navbar = () => {
           ))}
           {isAuthenticated ? (
             <>
-              {user?.role === 'ADMIN'
+              {user?.role === 'ADMIN' || user?.role === 'SELLER'
                 ? <Link to="/admin" className="text-green-400 hover:text-green-300 transition-colors">Admin Panel</Link>
                 : <Link to="/dashboard" className="text-green-400 hover:text-green-300 transition-colors">Dashboard</Link>
               }
@@ -144,7 +144,7 @@ const Navbar = () => {
                 <div className="mt-4 pt-4 border-t border-white/10 flex flex-col gap-1">
                   {isAuthenticated ? (
                     <>
-                      {user?.role === 'ADMIN' ? (
+                      {user?.role === 'ADMIN' || user?.role === 'SELLER' ? (
                         <Link to="/admin" onClick={() => setMenuOpen(false)}
                           className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-green-400 font-bold hover:bg-green-400/10 transition-all">
                           Admin Panel

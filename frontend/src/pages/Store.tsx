@@ -92,7 +92,7 @@ const Store = () => {
         {showTopupButton && topupPhone && (
           <div className="mb-12 flex justify-center">
             <a 
-              href={`https://t.me/${topupPhone.replace('+', '')}`} 
+              href={`https://t.me/${topupPhone}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1"

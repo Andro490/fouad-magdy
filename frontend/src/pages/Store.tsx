@@ -20,6 +20,7 @@ export interface StoreProduct {
 const Store = () => {
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [topupPhone, setTopupPhone] = useState<string | null>(null);
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
@@ -40,6 +41,20 @@ const Store = () => {
         setProducts(storedProducts);
         setLoading(false);
       });
+
+    // Fetch site settings for topup phone
+    fetch(`${API_URL}/api/settings`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.topupPhone) {
+          let formattedPhone = data.topupPhone.replace(/[^\d+]/g, '');
+          if (!formattedPhone.startsWith('+')) {
+            formattedPhone = `+${formattedPhone}`;
+          }
+          setTopupPhone(formattedPhone);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleBuy = (product: StoreProduct) => {
@@ -67,10 +82,27 @@ const Store = () => {
       <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/10 rounded-full blur-[120px] translate-x-1/2"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-4">المتجر</h1>
           <p className="text-gray-400 text-lg">أفضل العروض والمنتجات الحصرية بانتظارك.</p>
         </div>
+
+        {topupPhone && (
+          <div className="mb-12 flex justify-center">
+            <a 
+              href={`https://wa.me/${topupPhone.replace('+', '')}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300 hover:-translate-y-1"
+            >
+              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+              <span className="relative flex items-center gap-3">
+                <span className="text-2xl">💎</span>
+                للشحن في لعبة اضغط هنا
+              </span>
+            </a>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const SiteSettings = () => {
   const [showComingSoonBanner, setShowComingSoonBanner] = useState(true);
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
+  const [topupPhone, setTopupPhone] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -15,6 +16,7 @@ const SiteSettings = () => {
       .then(data => {
         setShowComingSoonBanner(!!data.showComingSoonBanner);
         if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
+        if (data.topupPhone) setTopupPhone(data.topupPhone);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -31,7 +33,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, paymentPhone })
+        body: JSON.stringify({ showComingSoonBanner, paymentPhone, topupPhone })
       });
       if (res.ok) {
         setSaved(true);
@@ -67,6 +69,20 @@ const SiteSettings = () => {
             className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-3 text-white text-xl font-bold text-center tracking-widest focus:border-primary focus:outline-none"
             dir="ltr"
             placeholder="01000000000"
+          />
+        </div>
+
+        {/* Topup Phone Number */}
+        <div className="bg-dark/40 border border-gray-700 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg">رقم الشحن في اللعبة (واتساب / تليجرام)</h3>
+          <p className="text-gray-400 text-sm">هذا الرقم يظهر للعملاء في المتجر كزر "للشحن في لعبة اضغط هنا".</p>
+          <input
+            type="text"
+            value={topupPhone}
+            onChange={e => setTopupPhone(e.target.value)}
+            className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-3 text-white text-xl font-bold text-center tracking-widest focus:border-primary focus:outline-none"
+            dir="ltr"
+            placeholder="+201xxxxxxxxx"
           />
         </div>
 

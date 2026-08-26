@@ -21,6 +21,7 @@ const Store = () => {
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [topupPhone, setTopupPhone] = useState<string | null>(null);
+  const [showTopupButton, setShowTopupButton] = useState(false);
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
@@ -46,6 +47,7 @@ const Store = () => {
     fetch(`${API_URL}/api/settings`)
       .then(r => r.json())
       .then(data => {
+        setShowTopupButton(!!data.showTopupButton);
         if (data.topupPhone) {
           let formattedPhone = data.topupPhone.replace(/[^\d+]/g, '');
           if (!formattedPhone.startsWith('+')) {
@@ -87,17 +89,17 @@ const Store = () => {
           <p className="text-gray-400 text-lg">أفضل العروض والمنتجات الحصرية بانتظارك.</p>
         </div>
 
-        {topupPhone && (
+        {showTopupButton && topupPhone && (
           <div className="mb-12 flex justify-center">
             <a 
-              href={`https://wa.me/${topupPhone.replace('+', '')}`} 
+              href={`https://t.me/${topupPhone.replace('+', '')}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300 hover:-translate-y-1"
+              className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1"
             >
               <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
               <span className="relative flex items-center gap-3">
-                <span className="text-2xl">💎</span>
+                <span className="text-2xl">🚀</span>
                 للشحن في لعبة اضغط هنا
               </span>
             </a>

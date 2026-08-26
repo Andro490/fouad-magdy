@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const SiteSettings = () => {
   const [showComingSoonBanner, setShowComingSoonBanner] = useState(true);
+  const [showTopupButton, setShowTopupButton] = useState(false);
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [topupPhone, setTopupPhone] = useState('');
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,7 @@ const SiteSettings = () => {
       .then(r => r.json())
       .then(data => {
         setShowComingSoonBanner(!!data.showComingSoonBanner);
+        setShowTopupButton(!!data.showTopupButton);
         if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
         if (data.topupPhone) setTopupPhone(data.topupPhone);
         setLoading(false);
@@ -33,7 +35,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, paymentPhone, topupPhone })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone })
       });
       if (res.ok) {
         setSaved(true);
@@ -84,6 +86,26 @@ const SiteSettings = () => {
             dir="ltr"
             placeholder="+201xxxxxxxxx"
           />
+        </div>
+
+        {/* Topup Button Toggle */}
+        <div className="flex items-center justify-between bg-dark/40 border border-gray-700 rounded-xl p-6">
+          <div>
+            <h3 className="text-white font-bold text-lg mb-1">زر "للشحن في لعبة اضغط هنا"</h3>
+            <p className="text-gray-400 text-sm">تفعيل أو إخفاء زر الشحن من صفحة المتجر.</p>
+          </div>
+          <button
+            onClick={() => setShowTopupButton(prev => !prev)}
+            className={`relative w-16 h-8 rounded-full transition-all duration-300 flex-shrink-0 ${
+              showTopupButton ? 'bg-primary' : 'bg-gray-700'
+            }`}
+          >
+            <span
+              className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${
+                showTopupButton ? 'right-1' : 'left-1'
+              }`}
+            />
+          </button>
         </div>
 
         {/* Coming Soon Banner Toggle */}

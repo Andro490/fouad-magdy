@@ -60,7 +60,7 @@ function MobileProfileCard() {
 
   return (
     <motion.div
-      className="md:hidden min-h-screen w-full bg-black flex flex-col"
+      className="md:hidden w-full bg-black flex flex-col"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -77,7 +77,7 @@ function MobileProfileCard() {
         </div>
 
         {/* ── Body ── */}
-        <div className="flex-1 px-5 pb-8 -mt-8 relative z-10 bg-black">
+        <div className="w-full px-5 pb-8 -mt-8 relative z-10 bg-black">
 
           {/* Name + Verified */}
           <motion.div

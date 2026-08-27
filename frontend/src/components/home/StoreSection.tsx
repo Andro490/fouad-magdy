@@ -24,7 +24,7 @@ export default function StoreSection() {
   if (products.length === 0) return null;
 
   return (
-    <section className="relative py-16 md:py-24 px-4 bg-black md:bg-gray-950/50 border-t border-white/5 overflow-hidden">
+    <section className="relative pt-8 pb-16 md:py-24 px-4 bg-black md:bg-gray-950/50 border-t border-white/5 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <SectionTitle en="PREMIUM STORE" ar="STORE" accent="STORE" />
         <motion.p

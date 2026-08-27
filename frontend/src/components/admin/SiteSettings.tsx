@@ -6,6 +6,8 @@ const SiteSettings = () => {
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [topupPhone, setTopupPhone] = useState('');
   const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
+  const [telegramBotToken, setTelegramBotToken] = useState('');
+  const [telegramChatId, setTelegramChatId] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -21,6 +23,8 @@ const SiteSettings = () => {
         if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
         if (data.topupPhone) setTopupPhone(data.topupPhone);
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
+        if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
+        if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -37,7 +41,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId })
       });
       if (res.ok) {
         setSaved(true);
@@ -162,6 +166,39 @@ const SiteSettings = () => {
             ? '✅ البانر ظاهر حالياً في الموقع' 
             : '❌ البانر مخفي حالياً في الموقع'
           }
+        </div>
+
+        {/* Telegram Config */}
+        <div className="bg-dark/40 border border-[#2AABEE]/30 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-[#2AABEE]">✈️</span> إعدادات تليجرام (طلبات الشراء)
+          </h3>
+          <p className="text-gray-400 text-sm">حدد الـ Token الخاص بالبوت والـ ID لمدير المتجر الذي ستصله الإشعارات لرسائل الدفع اليدوي.</p>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Bot Token</label>
+              <input
+                type="text"
+                value={telegramBotToken}
+                onChange={e => setTelegramBotToken(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
+                dir="ltr"
+                placeholder="123456789:ABCdefGHIjklmNOPQRstuvwXYZ"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Admin Chat ID</label>
+              <input
+                type="text"
+                value={telegramChatId}
+                onChange={e => setTelegramChatId(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
+                dir="ltr"
+                placeholder="123456789"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Save Button */}

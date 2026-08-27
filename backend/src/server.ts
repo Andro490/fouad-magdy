@@ -399,8 +399,9 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
     // Use phone as the primary identifier for guests
     let userEmail = phone || 'guest@unknown.com';
 
-    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const settings = readSettings();
+    const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_CHAT_ID = settings.telegramChatId || process.env.TELEGRAM_CHAT_ID;
     const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
     const API_URL = process.env.BACKEND_URL;
 

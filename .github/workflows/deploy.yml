@@ -1,0 +1,41 @@
+name: 🚀 Auto Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Hostinger VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔑 SSH into VPS and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            echo "📦 Pulling latest code from GitHub..."
+            cd /var/www/fouad-magdy
+            git pull origin main
+
+            echo "🔨 Building Backend..."
+            cd backend
+            npm install
+            chmod +x node_modules/.bin/*
+            npm run build
+            pm2 restart backend
+
+            echo "🎨 Building Frontend..."
+            cd ../frontend
+            npm install
+            chmod +x node_modules/.bin/*
+            npm run build
+
+            echo "🔄 Reloading Nginx..."
+            systemctl reload nginx
+
+            echo "✅ Deployment complete!"

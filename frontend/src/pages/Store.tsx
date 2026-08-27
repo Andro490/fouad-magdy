@@ -22,11 +22,22 @@ const Store = () => {
   const [loading, setLoading] = useState(true);
   const [topupPhone, setTopupPhone] = useState<string | null>(null);
   const [showTopupButton, setShowTopupButton] = useState(false);
+  const [isEgypt, setIsEgypt] = useState(true); // افتراضياً مصر
+  const [exchangeRate, setExchangeRate] = useState(50); // كم جنيه = 1 دولار
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+    // كشف البلد عن طريق IP
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        setIsEgypt(data.country_code === 'EG');
+      })
+      .catch(() => setIsEgypt(true)); // لو فشل افتراضياً مصر
+
     fetch(`${API_URL}/api/products`)
       .then(r => r.json())
       .then(data => {
@@ -43,11 +54,12 @@ const Store = () => {
         setLoading(false);
       });
 
-    // Fetch site settings for topup phone
+    // Fetch site settings for topup phone + exchange rate
     fetch(`${API_URL}/api/settings`)
       .then(r => r.json())
       .then(data => {
         setShowTopupButton(!!data.showTopupButton);
+        if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.topupPhone) {
           let formattedPhone = data.topupPhone.replace(/[^\d+]/g, '');
           if (!formattedPhone.startsWith('+')) {
@@ -58,6 +70,18 @@ const Store = () => {
       })
       .catch(console.error);
   }, []);
+
+  // دالة لعرض السعر بالعملة الصحيحة
+  const formatPrice = (priceEGP: number) => {
+    if (isEgypt) {
+      return `${priceEGP.toLocaleString()} EGP`;
+    } else {
+      const usd = (priceEGP / exchangeRate).toFixed(2);
+      return `$${usd} USD`;
+    }
+  };
+
+
 
   const handleBuy = (product: StoreProduct) => {
     if (!isAuthenticated) {
@@ -164,9 +188,11 @@ const Store = () => {
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-gray-300">السعر:</span>
                     {product.isSoldOut ? (
-                      <span className="text-gray-500 font-bold text-xl"><del>{product.price} EGP</del></span>
+                      <span className="text-gray-500 font-bold text-xl"><del>{formatPrice(product.price)}</del></span>
                     ) : (
-                      <span className="text-accent font-bold text-xl">{product.price} EGP</span>
+                      <span className={`font-bold text-xl ${isEgypt ? 'text-accent' : 'text-green-400'}`}>
+                        {formatPrice(product.price)}
+                      </span>
                     )}
                   </div>
                   

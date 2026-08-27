@@ -5,6 +5,7 @@ const SiteSettings = () => {
   const [showTopupButton, setShowTopupButton] = useState(false);
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [topupPhone, setTopupPhone] = useState('');
+  const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -19,6 +20,7 @@ const SiteSettings = () => {
         setShowTopupButton(!!data.showTopupButton);
         if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
         if (data.topupPhone) setTopupPhone(data.topupPhone);
+        if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -35,7 +37,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate })
       });
       if (res.ok) {
         setSaved(true);
@@ -59,6 +61,28 @@ const SiteSettings = () => {
       <h2 className="text-2xl font-bold text-white mb-8">⚙️ إعدادات الموقع</h2>
 
       <div className="glass-panel rounded-2xl p-8 space-y-6">
+
+        {/* Exchange Rate */}
+        <div className="bg-dark/40 border border-yellow-500/30 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg">💱 سعر الصرف (جنيه مصري مقابل الدولار)</h3>
+          <p className="text-gray-400 text-sm">حدد كم جنيه مصري يساوي 1 دولار أمريكي. سيتم تحويل الأسعار تلقائياً للزوار من خارج مصر.</p>
+          <div className="flex items-center gap-3">
+            <span className="text-gray-400 text-sm whitespace-nowrap">1 USD =</span>
+            <input
+              type="number"
+              value={exchangeRate}
+              onChange={e => setExchangeRate(Number(e.target.value))}
+              className="flex-1 bg-dark border border-yellow-500/50 rounded-lg px-4 py-3 text-yellow-400 text-xl font-bold text-center focus:border-yellow-400 focus:outline-none"
+              dir="ltr"
+              min="1"
+              placeholder="50"
+            />
+            <span className="text-gray-400 text-sm whitespace-nowrap">جنيه مصري</span>
+          </div>
+          <div className="text-center text-xs text-gray-500 bg-dark/50 rounded-lg p-2">
+            مثال: لو المنتج بـ 6500 جنيه → سيظهر للزوار من الخارج بـ {(6500 / exchangeRate).toFixed(2)} USD
+          </div>
+        </div>
 
         {/* Payment Phone Number */}
         <div className="bg-dark/40 border border-gray-700 rounded-xl p-6 space-y-3">

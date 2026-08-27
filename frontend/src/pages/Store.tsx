@@ -89,7 +89,6 @@ const Store = () => {
       navigate('/login');
       return;
     }
-    
     if (product.adminPhone) {
       let formattedPhone = product.adminPhone.replace(/[^\d+]/g, '');
       if (!formattedPhone.startsWith('+')) {
@@ -106,7 +105,6 @@ const Store = () => {
     <div className="min-h-screen pt-28 px-4 md:px-10 pb-20 relative">
       <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -translate-x-1/2"></div>
       <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/10 rounded-full blur-[120px] translate-x-1/2"></div>
-      
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-4">المتجر</h1>
@@ -115,9 +113,9 @@ const Store = () => {
 
         {showTopupButton && topupPhone && (
           <div className="mb-12 flex justify-center">
-            <a 
-              href={`https://t.me/${topupPhone}`} 
-              target="_blank" 
+            <a
+              href={`https://t.me/${topupPhone}`}
+              target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1"
             >
@@ -168,12 +166,12 @@ const Store = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="p-6 flex-1 flex flex-col relative">
                   <h3 className={`text-xl font-bold mb-1 ${product.isSoldOut ? 'text-gray-500 line-through' : 'text-white'}`}>{product.name}</h3>
                   {product.sellerName && (
                     <div className="text-xs text-primary mb-2 font-semibold flex items-center gap-1">
-                      <span className="text-gray-400">بائع:</span> 
+                      <span className="text-gray-400">بائع:</span>
                       {product.sellerId ? (
                         <Link to={`/seller/${product.sellerId}`} className="hover:underline hover:text-white transition-colors">
                           {product.sellerName}
@@ -184,7 +182,7 @@ const Store = () => {
                     </div>
                   )}
                   <p className="text-gray-400 text-sm mb-4 flex-1 line-clamp-3 break-words">{product.description}</p>
-                  
+
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-gray-300">السعر:</span>
                     {product.isSoldOut ? (
@@ -195,16 +193,16 @@ const Store = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   {product.isSoldOut ? (
-                    <button 
+                    <button
                       disabled
                       className="w-full mt-auto py-3 bg-red-500/20 text-red-500 font-bold rounded-lg border border-red-500/30 flex items-center justify-center gap-2 cursor-not-allowed opacity-80"
                     >
                       تم البيع
                     </button>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => handleBuy(product)}
                       className="w-full mt-auto py-3 bg-primary text-dark font-bold rounded-lg hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)] flex items-center justify-center gap-2"
                     >

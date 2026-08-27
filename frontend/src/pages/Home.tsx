@@ -1,4 +1,4 @@
-import HeroSection from '../components/home/HeroSection';
+import HeroSection, { MobileSocials } from '../components/home/HeroSection';
 import ExperienceSection from '../components/home/ExperienceSection';
 import StoreSection from '../components/home/StoreSection';
 import AboutSection from '../components/home/AboutSection';
@@ -13,6 +13,7 @@ export default function Home() {
         <ExperienceSection />
       </div>
       <StoreSection />
+      <MobileSocials />
       <div className="hidden md:block">
         <AboutSection />
         <CommunitySection />

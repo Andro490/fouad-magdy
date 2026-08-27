@@ -76,68 +76,85 @@ const Dashboard = () => {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!videoLink) return alert('يرجى إدخال رابط الفيديو');
     
     setIsAnalyzing(true);
     setResult(null);
     
-    // Simulate API analysis
-    setTimeout(() => {
-      // Mock random views and likes
-      const views = Math.floor(Math.random() * 50000) + 5000;
-      const likes = Math.floor(views * (Math.random() * 0.3 + 0.1)); // 10% to 40% of views
-      const earnedCoins = Math.floor(likes / 1000) * 50;
+    let views = 0;
+    let likes = 0;
 
-      const submission = {
-        id: Date.now().toString(),
-        streamerId: user?.id,
-        streamerName: user?.name,
-        videoLink,
-        views,
-        likes,
-        earnedCoins,
-        status: 'PENDING', // Admin will approve it
-        createdAt: new Date().toISOString()
-      };
+    try {
+      if (videoLink.includes('tiktok.com')) {
+        const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoLink)}`);
+        const data = await res.json();
+        
+        if (data && data.code === 0 && data.data) {
+          views = data.data.play_count || 0;
+          likes = data.data.digg_count || 0;
+        } else {
+          alert('تعذر جلب بيانات الفيديو من تيك توك. يرجى التأكد من أن الرابط صحيح وعام.');
+          setIsAnalyzing(false);
+          return;
+        }
+      } else {
+        alert('حالياً ندعم روابط تيك توك فقط لجلب الإحصائيات الدقيقة.');
+        setIsAnalyzing(false);
+        return;
+      }
+    } catch (error) {
+      alert('حدث خطأ أثناء الاتصال بالخادم لجلب بيانات الفيديو.');
+      setIsAnalyzing(false);
+      return;
+    }
 
-      // Save via API for Admin to see
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const saveSubmission = async () => {
-        let submissions = [];
-        try {
-          const res = await fetch(`${API_URL}/api/videos`);
-          if (res.ok) {
-            submissions = await res.json();
-            if (submissions.length === 0) {
-              submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
-            }
-          } else {
-            submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
-          }
-        } catch (err) {
+    const earnedCoins = Math.floor(likes / 1000) * 50;
+
+    const submission = {
+      id: Date.now().toString(),
+      streamerId: user?.id,
+      streamerName: user?.name,
+      videoLink,
+      views,
+      likes,
+      earnedCoins,
+      status: 'PENDING', // Admin will approve it
+      createdAt: new Date().toISOString()
+    };
+
+    // Save via API for Admin to see
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    let submissions = [];
+    try {
+      const res = await fetch(`${API_URL}/api/videos`);
+      if (res.ok) {
+        submissions = await res.json();
+        if (submissions.length === 0) {
           submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
         }
-        
-        submissions.push(submission);
-        
-        try {
-          await fetch(`${API_URL}/api/videos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(submissions)
-          });
-        } catch (err) {
-          localStorage.setItem('videoSubmissions', JSON.stringify(submissions));
-        }
-      };
-      
-      saveSubmission();
+      } else {
+        submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+      }
+    } catch (err) {
+      submissions = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+    }
+    
+    submissions.push(submission);
+    
+    try {
+      await fetch(`${API_URL}/api/videos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissions)
+      });
+    } catch (err) {
+      localStorage.setItem('videoSubmissions', JSON.stringify(submissions));
+    }
 
-      setResult(submission);
-      setIsAnalyzing(false);
-      setVideoLink('');
-    }, 2000);
+    setResult(submission);
+    setIsAnalyzing(false);
+    setVideoLink('');
   };
 
   if (!user) {

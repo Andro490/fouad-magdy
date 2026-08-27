@@ -153,7 +153,6 @@ function MobileProfileCard() {
             </svg>
           </motion.div>
 
-
           {/* Kick Full-Width Banner */}
           <motion.a
             href={siteConfig.socials.find(s => s.label === 'Kick')?.url || '#'}
@@ -198,63 +197,8 @@ function MobileProfileCard() {
             </div>
           </motion.a>
 
-          {/* MY SOCIALS Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mt-6"
-          >
-            <h2 className="text-white font-black text-sm tracking-[0.25em] uppercase text-center mb-4">
-              MY SOCIALS
-            </h2>
 
-            <div className="grid grid-cols-2 gap-3">
-              {siteConfig.socials.map((social, idx) => {
-                const icon = SocialIcons[social.label];
-                if (!icon) return null;
-                const style = socialStyles[social.label];
-                return (
-                  <motion.a
-                    key={social.label}
-                    href={social.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, scale: 0.92 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.95 + idx * 0.07 }}
-                    whileTap={{ scale: 0.96 }}
-                    className="relative rounded-2xl overflow-hidden cursor-pointer"
-                    style={{ aspectRatio: '4/3' }}
-                  >
-                    {/* Black background with subtle colored border */}
-                    <div className="absolute inset-0 bg-[#0a0a0a]" style={{ border: `1px solid ${style?.ring || 'rgba(255,255,255,0.1)'}` }} />
-                    
-                    {/* Big centered icon/text */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className={`w-12 h-12 mb-2 ${style?.text ?? 'text-white'} opacity-80 drop-shadow-[0_0_10px_currentColor]`}>
-                        {icon}
-                      </div>
-                      <span 
-                        className={`font-black tracking-widest uppercase ${style?.text ?? 'text-white'}`}
-                        style={{
-                          fontSize: '1rem',
-                          textShadow: '0 0 15px currentColor',
-                        }}
-                      >
-                        {social.label}
-                      </span>
-                    </div>
 
-                    {/* Subtle top-left icon just for consistency */}
-                    <div className={`absolute top-3 left-3 w-6 h-6 flex items-center justify-center ${style?.text ?? 'text-white'} opacity-50`}>
-                      {icon}
-                    </div>
-                  </motion.a>
-                );
-              })}
-            </div>
-          </motion.div>
 
         </div>
 
@@ -380,6 +324,73 @@ function DesktopHero() {
         <div className="w-px h-8 bg-gradient-to-b from-blue-400 to-transparent" />
       </motion.div>
     </section>
+  );
+}
+
+// ===================== MOBILE SOCIALS =====================
+export function MobileSocials() {
+  return (
+    <div className="md:hidden px-5 pb-8 bg-black">
+      {/* MY SOCIALS Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ delay: 0.2 }}
+        className="mt-6"
+      >
+        <h2 className="text-white font-black text-sm tracking-[0.25em] uppercase text-center mb-4">
+          MY SOCIALS
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          {siteConfig.socials.map((social, idx) => {
+            const icon = SocialIcons[social.label];
+            if (!icon) return null;
+            const style = socialStyles[social.label];
+            return (
+              <motion.a
+                key={social.label}
+                href={social.url}
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, scale: 0.92 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 + idx * 0.07 }}
+                whileTap={{ scale: 0.96 }}
+                className="relative rounded-2xl overflow-hidden cursor-pointer"
+                style={{ aspectRatio: '4/3' }}
+              >
+                {/* Black background with subtle colored border */}
+                <div className="absolute inset-0 bg-[#0a0a0a]" style={{ border: `1px solid ${style?.ring || 'rgba(255,255,255,0.1)'}` }} />
+                
+                {/* Big centered icon/text */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className={`w-12 h-12 mb-2 ${style?.text ?? 'text-white'} opacity-80 drop-shadow-[0_0_10px_currentColor]`}>
+                    {icon}
+                  </div>
+                  <span 
+                    className={`font-black tracking-widest uppercase ${style?.text ?? 'text-white'}`}
+                    style={{
+                      fontSize: '1rem',
+                      textShadow: '0 0 15px currentColor',
+                    }}
+                  >
+                    {social.label}
+                  </span>
+                </div>
+
+                {/* Subtle top-left icon just for consistency */}
+                <div className={`absolute top-3 left-3 w-6 h-6 flex items-center justify-center ${style?.text ?? 'text-white'} opacity-50`}>
+                  {icon}
+                </div>
+              </motion.a>
+            );
+          })}
+        </div>
+      </motion.div>
+    </div>
   );
 }
 

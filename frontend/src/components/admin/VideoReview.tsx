@@ -78,6 +78,29 @@ const VideoReview = () => {
     alert('تم الموافقة على التقرير وإضافة الكوينز للستريمر!');
   };
 
+  const handleRejectVideo = async (id: string) => {
+    const updatedSubmissions = videoSubmissions.map(sub => {
+      if (sub.id === id && sub.status === 'PENDING') {
+        return { ...sub, status: 'REJECTED' };
+      }
+      return sub;
+    });
+
+    setVideoSubmissions(updatedSubmissions);
+    
+    try {
+      await fetch(`${API_URL}/api/videos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedSubmissions)
+      });
+    } catch (err) {
+      localStorage.setItem('videoSubmissions', JSON.stringify(updatedSubmissions));
+    }
+
+    alert('تم رفض التقرير!');
+  };
+
   return (
     <div className="glass-panel p-6 rounded-2xl w-full">
       <h2 className="text-2xl font-bold mb-6 text-white">تقارير فيديوهات الستريمرز</h2>
@@ -111,13 +134,23 @@ const VideoReview = () => {
                   <td className="py-4 px-2 text-center">
                     {sub.status === 'APPROVED' ? (
                       <span className="text-green-500 font-bold bg-green-500/10 px-3 py-1 rounded">تمت الموافقة</span>
+                    ) : sub.status === 'REJECTED' ? (
+                      <span className="text-red-500 font-bold bg-red-500/10 px-3 py-1 rounded">مرفوض</span>
                     ) : (
-                      <button 
-                        onClick={() => handleApproveVideo(sub.id)}
-                        className="bg-primary text-dark font-bold px-4 py-1 rounded hover:bg-primary/90 transition-colors"
-                      >
-                        موافقة
-                      </button>
+                      <div className="flex justify-center gap-2">
+                        <button 
+                          onClick={() => handleApproveVideo(sub.id)}
+                          className="bg-primary text-dark font-bold px-4 py-1 rounded hover:bg-primary/90 transition-colors"
+                        >
+                          موافقة
+                        </button>
+                        <button 
+                          onClick={() => handleRejectVideo(sub.id)}
+                          className="bg-red-500 text-white font-bold px-4 py-1 rounded hover:bg-red-600 transition-colors"
+                        >
+                          رفض
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>

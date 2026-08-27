@@ -172,18 +172,30 @@ const SupportChat = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSend} className="p-3 bg-dark-lighter border-t border-gray-800 flex gap-2">
-            <input 
-              type="text" 
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="اكتب رسالتك..."
-              className="flex-1 bg-dark rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-primary border border-transparent transition-colors"
-            />
-            <button type="submit" disabled={!message.trim()} className="bg-primary text-dark p-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors">
-              <Send size={18} />
-            </button>
-          </form>
+          {user ? (
+            <form onSubmit={handleSend} className="p-3 bg-dark-lighter border-t border-gray-800 flex gap-2">
+              <input 
+                type="text" 
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="اكتب رسالتك..."
+                className="flex-1 bg-dark rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-primary border border-transparent transition-colors"
+              />
+              <button type="submit" disabled={!message.trim()} className="bg-primary text-dark p-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                <Send size={18} />
+              </button>
+            </form>
+          ) : (
+            <div className="p-3 bg-dark-lighter border-t border-gray-800 text-center">
+              <p className="text-gray-400 text-sm mb-2">يجب تسجيل الدخول أولاً للتواصل معنا</p>
+              <button 
+                onClick={() => { setIsOpen(false); navigate('/login'); }}
+                className="bg-primary text-dark text-sm font-bold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors w-full"
+              >
+                تسجيل الدخول
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <button 

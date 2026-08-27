@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [currentCoins, setCurrentCoins] = useState(user?.coins || 0);
+  const [mySubmissions, setMySubmissions] = useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -38,6 +39,28 @@ const Dashboard = () => {
     };
     fetchUser();
   }, [user]);
+
+  React.useEffect(() => {
+    if (user?.id && user?.role === 'STREAMER') {
+      const fetchVideos = async () => {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        try {
+          const res = await fetch(`${API_URL}/api/videos`);
+          if (res.ok) {
+            const data = await res.json();
+            setMySubmissions(data.filter((v: any) => v.streamerId === user.id));
+          } else {
+            const stored = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+            setMySubmissions(stored.filter((v: any) => v.streamerId === user.id));
+          }
+        } catch {
+          const stored = JSON.parse(localStorage.getItem('videoSubmissions') || '[]');
+          setMySubmissions(stored.filter((v: any) => v.streamerId === user.id));
+        }
+      };
+      fetchVideos();
+    }
+  }, [user, result]);
 
   const dispatch = useDispatch();
 
@@ -222,6 +245,35 @@ const Dashboard = () => {
                     <p className="text-gray-400 text-xs mb-1">الكوينز المتوقعة</p>
                     <p className="font-bold text-accent">+{result.earnedCoins}</p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {mySubmissions.length > 0 && (
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <h4 className="text-lg font-bold mb-4 text-white">سجل روابطك السابقة</h4>
+                <div className="space-y-3">
+                  {mySubmissions.slice().reverse().map(sub => (
+                    <div key={sub.id} className="bg-dark/40 border border-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                      <a href={sub.videoLink} target="_blank" rel="noreferrer" className="text-accent hover:underline text-sm w-full md:w-auto truncate block max-w-[200px]" dir="ltr">
+                        {sub.videoLink}
+                      </a>
+                      <div className="flex gap-4 text-xs text-gray-400">
+                        <span>👀 {sub.views?.toLocaleString()}</span>
+                        <span>❤️ {sub.likes?.toLocaleString()}</span>
+                        <span className="text-accent">💰 +{sub.earnedCoins}</span>
+                      </div>
+                      <div>
+                        {sub.status === 'APPROVED' ? (
+                          <span className="text-green-500 font-bold bg-green-500/10 px-3 py-1 rounded text-sm">مقبول</span>
+                        ) : sub.status === 'REJECTED' ? (
+                          <span className="text-red-500 font-bold bg-red-500/10 px-3 py-1 rounded text-sm">مرفوض</span>
+                        ) : (
+                          <span className="text-yellow-500 font-bold bg-yellow-500/10 px-3 py-1 rounded text-sm">قيد المراجعة</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

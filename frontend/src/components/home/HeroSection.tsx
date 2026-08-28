@@ -4,7 +4,7 @@ import { siteConfig } from '../../config/siteConfig';
 import { staggerContainer, itemUp } from './Shared';
 import fouadImg from '../../assets/FOUAD.png';
 import backgrondImg from '../../assets/backgrond.png';
-import AnimatedVerified from '../AnimatedVerified';
+import VerifiedBadge from '../VerifiedBadge';
 
 // Social Media SVG Icons
 const SocialIcons: Record<string, JSX.Element> = {
@@ -91,7 +91,7 @@ function MobileProfileCard() {
               {siteConfig.name}
             </h1>
             {/* Verified badge */}
-            <AnimatedVerified className="w-6 h-6" />
+            <VerifiedBadge className="w-6 h-6" />
           </motion.div>
 
           {/* Handle */}

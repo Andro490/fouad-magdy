@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { Loader2 } from 'lucide-react';
 import { loginSuccess } from '../store/authSlice';
-import AnimatedVerified from '../components/AnimatedVerified';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -196,7 +196,7 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold flex items-center gap-2">
               {user.name}
               {(user.role === 'ADMIN' || user.role === 'SELLER' || user.role === 'STREAMER') && (
-                <AnimatedVerified className="w-6 h-6" />
+                <VerifiedBadge className="w-6 h-6" />
               )}
             </h2>
             <p className="text-gray-400">

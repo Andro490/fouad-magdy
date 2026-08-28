@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { Loader2 } from 'lucide-react';
 import { loginSuccess } from '../store/authSlice';
+import AnimatedVerified from '../components/AnimatedVerified';
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -192,7 +193,12 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row items-center gap-6 mb-8 bg-dark-lighter p-6 rounded-2xl border border-white/5">
           <img src={`https://ui-avatars.com/api/?name=${user.name}&background=141414&color=FFD700`} alt={user.name} className="w-20 h-20 rounded-full border-2 border-primary" />
           <div className="flex-1">
-            <h2 className="text-2xl font-bold">{user.name}</h2>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              {user.name}
+              {(user.role === 'ADMIN' || user.role === 'SELLER' || user.role === 'STREAMER') && (
+                <AnimatedVerified className="w-6 h-6" />
+              )}
+            </h2>
             <p className="text-gray-400">
               {user.role === 'STREAMER' ? 'صانع محتوى معتمد' : user.role === 'SELLER' ? 'بائع (أدمن فرعي)' : user.role === 'ADMIN' ? 'المدير' : 'مستخدم عادي'}
             </p>

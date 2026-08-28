@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Loader2, MapPin, Phone, MessageCircle, ShoppingCart } from 'lucide-react';
 import type { StoreProduct } from './Store';
+import AnimatedVerified from '../components/AnimatedVerified';
 
 interface SellerProfileData {
   id: string;
@@ -69,7 +70,10 @@ const SellerProfile = () => {
           </div>
           
           <div className="flex-1 text-center md:text-right">
-            <h1 className="text-4xl font-bold text-white mb-2">{profile.name}</h1>
+            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+              <h1 className="text-4xl font-bold text-white">{profile.name}</h1>
+              <AnimatedVerified className="w-8 h-8" />
+            </div>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-400 mt-4">
               {profile.location && (
                 <div className="flex items-center gap-2 bg-dark/40 px-4 py-2 rounded-lg">

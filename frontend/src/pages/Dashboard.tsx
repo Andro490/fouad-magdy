@@ -133,7 +133,7 @@ const Dashboard = () => {
       return;
     }
 
-    const earnedCoins = Math.floor(likes / 1000) * 50;
+    const earnedCoins = Math.floor(views / 20000) * 50;
 
     const submission = {
       id: Date.now().toString(),
@@ -212,7 +212,7 @@ const Dashboard = () => {
         {user.role === 'STREAMER' && (
           <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8">
             <h3 className="text-xl font-bold mb-4 text-primary">تحليل أداء الفيديو</h3>
-            <p className="text-gray-400 mb-6 text-sm">أدخل رابط الفيديو الخاص بك (يوتيوب أو تيك توك). سيقوم النظام بتحليل المشاهدات والإعجابات. كل 1000 إعجاب يمنحك 50 كوينز بعد موافقة الإدارة.</p>
+            <p className="text-gray-400 mb-6 text-sm">أدخل رابط الفيديو الخاص بك (يوتيوب أو تيك توك). سيقوم النظام بتحليل المشاهدات والإعجابات. كل 20,000 مشاهدة تمنحك 50 كوينز بعد موافقة الإدارة.</p>
             
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <input 
@@ -306,12 +306,12 @@ const Dashboard = () => {
             
             <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl w-full text-center">
               <h3 className="text-2xl font-bold text-white mb-2">هل أنت صانع محتوى؟ 🎥</h3>
-              <p className="text-gray-300 mb-6">قم بترقية حسابك الآن إلى "ستريمر" لتتمكن من إضافة فيديوهاتك والحصول على كوينز مقابل الإعجابات والمشاهدات!</p>
+              <p className="text-gray-300 mb-6">قم بترقية حسابك الآن إلى "Clipper" لتتمكن من إضافة فيديوهاتك والحصول على كوينز مقابل الإعجابات والمشاهدات!</p>
               <button 
                 onClick={handleUpgradeToStreamer}
                 className="bg-primary text-dark font-bold px-8 py-3 rounded-lg hover:bg-accent hover:text-white transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)]"
               >
-                ترقية حسابي لستريمر الآن!
+                ترقية حسابي لـ Clipper الآن!
               </button>
             </div>
           </div>

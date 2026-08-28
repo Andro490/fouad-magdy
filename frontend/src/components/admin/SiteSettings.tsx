@@ -112,7 +112,7 @@ const SiteSettings = () => {
             onChange={e => setTopupPhone(e.target.value)}
             className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-3 text-white text-xl font-bold text-center tracking-widest focus:border-primary focus:outline-none"
             dir="ltr"
-            placeholder="+201xxxxxxxxx"
+            placeholder="+201xxxxxxxxx أو @username"
           />
         </div>
 

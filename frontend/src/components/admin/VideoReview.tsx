@@ -75,7 +75,7 @@ const VideoReview = () => {
       }
     }
     
-    alert('تم الموافقة على التقرير وإضافة الكوينز للستريمر!');
+    alert('تم الموافقة على التقرير وإضافة الكوينز للـ Clipper!');
   };
 
   const handleRejectVideo = async (id: string) => {
@@ -105,7 +105,7 @@ const VideoReview = () => {
 
   return (
     <div className="glass-panel p-6 rounded-2xl w-full">
-      <h2 className="text-2xl font-bold mb-6 text-white">تقارير فيديوهات الستريمرز</h2>
+      <h2 className="text-2xl font-bold mb-6 text-white">تقارير فيديوهات الـ Clippers</h2>
       {pendingSubmissions.length === 0 ? (
         <p className="text-gray-400">لا توجد تقارير جديدة.</p>
       ) : (
@@ -113,7 +113,7 @@ const VideoReview = () => {
           <table className="w-full text-right">
             <thead className="text-gray-400 border-b border-gray-700">
               <tr>
-                <th className="pb-3 px-2">اسم الستريمر</th>
+                <th className="pb-3 px-2">اسم الـ Clipper</th>
                 <th className="pb-3 px-2">رابط الفيديو</th>
                 <th className="pb-3 px-2 text-center">المشاهدات</th>
                 <th className="pb-3 px-2 text-center">الإعجابات</th>

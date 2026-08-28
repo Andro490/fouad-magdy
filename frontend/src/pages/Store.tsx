@@ -62,9 +62,14 @@ const Store = () => {
         setShowTopupButton(!!data.showTopupButton);
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.topupPhone) {
-          let formattedPhone = data.topupPhone.replace(/[^\d+]/g, '');
-          if (!formattedPhone.startsWith('+')) {
-            formattedPhone = `+${formattedPhone}`;
+          let formattedPhone = data.topupPhone.trim();
+          if (formattedPhone.startsWith('@')) {
+            formattedPhone = formattedPhone.substring(1);
+          } else if (!/[a-zA-Z]/.test(formattedPhone)) {
+            formattedPhone = formattedPhone.replace(/[^\d+]/g, '');
+            if (!formattedPhone.startsWith('+') && formattedPhone.length > 0) {
+              formattedPhone = `+${formattedPhone}`;
+            }
           }
           setTopupPhone(formattedPhone);
         }

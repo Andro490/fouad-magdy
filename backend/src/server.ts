@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
@@ -582,25 +583,39 @@ app.post('/api/auth/admin-login', async (req, res) => {
     const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';
     const adminPassword = process.env.ADMIN_PASSWORD || 'Foadmagdy0152020';
 
+    // First check admin
     if (phone === adminPhone && password === adminPassword) {
       const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
       const token = generateToken('admin', 'ADMIN');
       return res.json({ user, token });
     }
 
-    // Check if it's a sub-admin (SELLER)
-    const seller = await prisma.user.findFirst({
+    // Then check sellers & users
+    const dbUser = await prisma.user.findFirst({
       where: {
-        email: phone, // We use email field to store the phone/ID for sellers
-        password: password,
-        role: 'SELLER'
+        OR: [
+          { email: phone },
+          { phone: phone }
+        ]
       }
     });
 
-    if (seller) {
-      const user = { id: seller.id, name: seller.name, role: 'SELLER', email: seller.email };
-      const token = generateToken(seller.id, 'SELLER');
-      return res.json({ user, token });
+    if (dbUser) {
+      // Validate password
+      let isMatch = false;
+      if (dbUser.password && (dbUser.password.startsWith('$2a$') || dbUser.password.startsWith('$2b$'))) {
+        isMatch = await bcrypt.compare(password, dbUser.password);
+      } else if (dbUser.password === password) {
+        // Fallback for old plain-text passwords
+        isMatch = true;
+        // Optionally update it to hash here, but we will let /api/users handle it
+      }
+
+      if (isMatch) {
+        const user = { id: dbUser.id, name: dbUser.name, role: dbUser.role, email: dbUser.email, phone: dbUser.phone, coins: dbUser.coins };
+        const token = generateToken(dbUser.id, dbUser.role);
+        return res.json({ user, token });
+      }
     }
 
     res.status(401).json({ error: 'Unauthorized' });
@@ -608,6 +623,44 @@ app.post('/api/auth/admin-login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+    const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Foadmagdy0152020';
+
+    if (phone === adminPhone && password === adminPassword) {
+      const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
+      const token = generateToken('admin', 'ADMIN');
+      return res.json({ user, token });
+    }
+
+    const dbUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: phone },
+          { phone: phone }
+        ]
+      }
+    });
+
+    if (dbUser) {
+      let isMatch = false;
+      if (dbUser.password && (dbUser.password.startsWith('$2a$') || dbUser.password.startsWith('$2b$'))) {
+        isMatch = await bcrypt.compare(password, dbUser.password);
+      } else if (dbUser.password === password) {
+        isMatch = true;
+      }
+
+      if (isMatch) {
+        const user = { id: dbUser.id, name: dbUser.name, role: dbUser.role, email: dbUser.email, phone: dbUser.phone, coins: dbUser.coins };
+        const token = generateToken(dbUser.id, dbUser.role);
+        return res.json({ user, token });
+      }
+    }
+
+    res.status(401).json({ error: 'Unauthorized' });
 
 app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res) => {
   try {
@@ -662,22 +715,31 @@ app.post('/api/users', async (req, res) => {
     if (!Array.isArray(users)) return res.status(400).json({ error: 'Expected an array' });
     
     for (const u of users) {
+      const emailToUse = u.email || u.phone || `user_${Date.now()}@mock.com`;
+      
       const updateData: any = {
         name: u.name,
         role: u.role,
-        coins: Number(u.coins || 0)
+        coins: Number(u.coins || 0),
+        phone: u.phone
       };
+
       if (u.password) {
-        updateData.password = u.password;
+        if (u.password.startsWith('$2a$') || u.password.startsWith('$2b$')) {
+          updateData.password = u.password;
+        } else {
+          updateData.password = await bcrypt.hash(u.password, 10);
+        }
       }
       
       await prisma.user.upsert({
-        where: { email: u.email }, // Using email as unique identifier
+        where: { email: emailToUse }, // Using email as unique identifier
         update: updateData,
         create: {
           name: u.name,
-          email: u.email,
-          password: u.password ?? undefined,
+          email: emailToUse,
+          phone: u.phone,
+          password: updateData.password ?? undefined,
           role: u.role ?? 'USER',
           coins: Number(u.coins ?? 0)
         }

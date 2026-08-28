@@ -78,10 +78,10 @@ const Login = () => {
     e.preventDefault();
     setError('');
     
-    // Try admin login via backend first for security (so password isn't exposed in frontend code)
+    // Try login via backend first for security (so password isn't exposed and hashes are compared properly)
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch(`${API_URL}/api/auth/admin-login`, { 
+      const res = await fetch(`${API_URL}/api/auth/login`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
@@ -89,33 +89,37 @@ const Login = () => {
       if (res.ok) {
         const data = await res.json();
         dispatch(loginSuccess({ user: data.user, token: data.token }));
-        navigate('/admin');
+        if (data.user.role === 'ADMIN' || data.user.role === 'SELLER') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+        return;
+      } else if (res.status === 401) {
+        setError('رقم الهاتف أو كلمة المرور غير صحيحة');
         return;
       }
     } catch (err) {
-      console.error('Admin login error', err);
+      console.error('Backend login error, falling back to local storage', err);
     }
 
+    // Fallback if backend is down
     let users = [];
     try {
-      const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });
-      if (res.ok) {
-        users = await res.json();
-        if (users.length === 0) {
-          users = JSON.parse(localStorage.getItem('users') || '[]');
-        }
-      } else {
-        users = JSON.parse(localStorage.getItem('users') || '[]');
-      }
-    } catch (err) {
       users = JSON.parse(localStorage.getItem('users') || '[]');
+    } catch (err) {
+      users = [];
     }
 
-    const foundUser = users.find((u: Record<string, any>) => u.phone === phone && u.password === password);
+    const foundUser = users.find((u: Record<string, any>) => (u.phone === phone || u.email === phone) && u.password === password);
     
     if (foundUser) {
       dispatch(loginSuccess({ user: { id: foundUser.id, name: foundUser.name, phone: foundUser.phone, email: foundUser.email, role: foundUser.role, coins: foundUser.coins || 0 } }));
-      navigate('/');
+      if (foundUser.role === 'ADMIN' || foundUser.role === 'SELLER') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else {
       setError('رقم الهاتف أو كلمة المرور غير صحيحة');
     }

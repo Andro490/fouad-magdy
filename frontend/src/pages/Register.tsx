@@ -97,7 +97,7 @@ const Register = () => {
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors"
             >
               <option value="USER">مستخدم عادي</option>
-              <option value="STREAMER">صانع محتوى (Clipper)</option>
+              <option value="STREAMER">Clipper</option>
             </select>
           </div>
           <button 

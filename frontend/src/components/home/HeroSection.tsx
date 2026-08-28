@@ -198,7 +198,20 @@ function MobileProfileCard() {
           </motion.a>
 
 
-
+          {/* Swipe Down for Store Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 1 }}
+            className="mt-8 flex flex-col items-center justify-center gap-2 animate-bounce"
+          >
+            <span className="text-[#53fc18] text-xs font-bold tracking-widest text-center" dir="rtl">
+              لشراء حسابات اسحب للاسفل
+            </span>
+            <svg className="w-5 h-5 text-[#53fc18]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </motion.div>
 
         </div>
 

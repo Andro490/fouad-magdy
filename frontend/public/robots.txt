@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://fouad-magdy.vercel.app/sitemap.xml
+Sitemap: https://fouadf9.network/sitemap.xml

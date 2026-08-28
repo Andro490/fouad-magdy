@@ -3,6 +3,7 @@ import { Loader2, ShoppingCart } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useNavigate, Link } from 'react-router-dom';
+import AnimatedVerified from '../components/AnimatedVerified';
 
 export interface StoreProduct {
   id: string;
@@ -173,11 +174,15 @@ const Store = () => {
                     <div className="text-xs text-primary mb-2 font-semibold flex items-center gap-1">
                       <span className="text-gray-400">بائع:</span>
                       {product.sellerId ? (
-                        <Link to={`/seller/${product.sellerId}`} className="hover:underline hover:text-white transition-colors">
+                        <Link to={`/seller/${product.sellerId}`} className="hover:underline hover:text-white transition-colors flex items-center gap-1">
                           {product.sellerName}
+                          <AnimatedVerified className="w-5 h-5 -mr-1" />
                         </Link>
                       ) : (
-                        <span>{product.sellerName}</span>
+                        <span className="flex items-center gap-1">
+                          {product.sellerName}
+                          <AnimatedVerified className="w-5 h-5 -mr-1" />
+                        </span>
                       )}
                     </div>
                   )}

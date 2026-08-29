@@ -20,7 +20,7 @@ const Checkout = () => {
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [copied, setCopied] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
   useEffect(() => {
     fetch(`${API_URL}/api/settings`)
@@ -54,7 +54,7 @@ const Checkout = () => {
 
     if (paymentMethod === 'visa') {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
         const managerId = location.state?.managerId;
         const successParams = new URLSearchParams();
         if (managerId) successParams.append('managerId', managerId);
@@ -109,7 +109,7 @@ const Checkout = () => {
           managerId: location.state?.managerId
         };
 
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
         const response = await fetch(`${API_URL}/api/checkout/manual`, {
           method: 'POST',

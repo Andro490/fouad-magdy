@@ -29,7 +29,7 @@ const Products = () => {
   const [totalPages, setTotalPages] = useState(10);
   const [showBanner, setShowBanner] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
   // Fetch site settings (banner visibility)
   useEffect(() => {

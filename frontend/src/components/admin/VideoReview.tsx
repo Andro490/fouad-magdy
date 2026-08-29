@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const VideoReview = () => {
   const [videoSubmissions, setVideoSubmissions] = useState<any[]>([]);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
   useEffect(() => {
     fetch(`${API_URL}/api/videos`)

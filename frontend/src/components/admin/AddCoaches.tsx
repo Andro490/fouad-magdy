@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const AddCoaches = () => {
   const [jsonInput, setJsonInput] = useState('');
   const [isSubmittingJson, setIsSubmittingJson] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
   const handleAddCoaches = async () => {
     if (!jsonInput.trim()) return alert('الرجاء إدخال البيانات بصيغة JSON');

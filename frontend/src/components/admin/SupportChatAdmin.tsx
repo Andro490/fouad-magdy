@@ -8,7 +8,7 @@ const SupportChatAdmin = () => {
 
   const fetchChatUsers = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
       const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/chat/users`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -19,7 +19,7 @@ const SupportChatAdmin = () => {
 
   const fetchAdminMessages = async (userId: string) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
       const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/chat/admin/messages?userId=${userId}`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -47,7 +47,7 @@ const SupportChatAdmin = () => {
     if (!adminReply.trim() || !selectedUserId) return;
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
       const token = localStorage.getItem('authToken');
       await fetch(`${API_URL}/api/chat/admin/send`, {
         method: 'POST',
@@ -71,7 +71,7 @@ const SupportChatAdmin = () => {
     if (!window.confirm('هل أنت متأكد من حذف هذه المحادثة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.')) return;
     
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
       const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/chat/admin/messages/${userId}`, {
         method: 'DELETE',

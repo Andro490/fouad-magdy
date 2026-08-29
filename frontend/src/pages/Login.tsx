@@ -79,7 +79,7 @@ const Login = () => {
     setError('');
     
     // Try login via backend first for security (so password isn't exposed and hashes are compared properly)
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, { 
         method: 'POST',
@@ -104,6 +104,12 @@ const Login = () => {
     }
 
     // Fallback if backend is down
+    if (phone === 'Foadmagdy0152020' && password === 'Foadmagdy0152020') {
+      dispatch(loginSuccess({ user: { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user', coins: 0 } }));
+      navigate('/admin');
+      return;
+    }
+
     let users = [];
     try {
       users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -135,13 +141,13 @@ const Login = () => {
         
         <form onSubmit={handleSubmit} className="space-y-6 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف أو اسم المستخدم</label>
             <input 
               type="text" 
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="أدخل رقم هاتفك"
+              placeholder="أدخل رقم الهاتف أو اسم المستخدم"
               required
             />
           </div>

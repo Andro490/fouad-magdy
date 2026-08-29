@@ -18,7 +18,7 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
     // If user already paid before (local token or db check)
     if (alreadyPurchased === '1' && managerId) {

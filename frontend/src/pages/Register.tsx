@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
     
     const newUser = { id: Date.now().toString(), name, phone, password, role, coins: 0 };
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
     
     try {
       const res = await fetch(`${API_URL}/api/users`, { credentials: 'include' });

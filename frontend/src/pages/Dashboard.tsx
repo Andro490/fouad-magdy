@@ -16,7 +16,7 @@ const Dashboard = () => {
   React.useEffect(() => {
     const fetchUser = async () => {
       if (user?.id) {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
         let users = [];
         try {
           const res = await fetch(`${API_URL}/api/users`);
@@ -44,7 +44,7 @@ const Dashboard = () => {
   React.useEffect(() => {
     if (user?.id && user?.role === 'STREAMER') {
       const fetchVideos = async () => {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
         try {
           const res = await fetch(`${API_URL}/api/videos`);
           if (res.ok) {
@@ -66,7 +66,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const handleUpgradeToStreamer = async () => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
     let users = [];
     try {
       const res = await fetch(`${API_URL}/api/users`);
@@ -148,7 +148,7 @@ const Dashboard = () => {
     };
 
     // Save via API for Admin to see
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
     let submissions = [];
     try {
       const res = await fetch(`${API_URL}/api/videos`);

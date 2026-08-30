@@ -1182,6 +1182,45 @@ async function seedCoachesIfEmpty() {
   }
 }
 
+// ─────────────────────────────────────────
+// EFHUB PLAYER CARD PROXY (bypass CORS)
+// GET /api/player-card?name=Messi
+// ─────────────────────────────────────────
+app.get('/api/player-card', async (req, res) => {
+  try {
+    const name = req.query.name as string;
+    if (!name) return res.status(400).json({ error: 'name is required' });
+
+    // Search by last name for better results
+    const lastName = name.split(' ').pop() || name;
+    const apiUrl = `https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=10`;
+
+    const response = await fetch(apiUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+    });
+
+    if (!response.ok) return res.json({ imageUrl: null });
+
+    const data = await response.json();
+    const list: any[] = Array.isArray(data) ? data : (data.data || data.players || []);
+
+    if (list.length === 0) return res.json({ imageUrl: null });
+
+    // Prefer Epic (playerType 5), then closest rating match
+    const targetRating = parseInt(req.query.rating as string) || 100;
+    const epic = list.find((p: any) => p.playerType === 5 && p.imageUrl);
+    const closest = list.reduce((best: any, p: any) => {
+      if (!p.imageUrl) return best;
+      return (!best || Math.abs(p.overallRating - targetRating) < Math.abs(best.overallRating - targetRating)) ? p : best;
+    }, null);
+
+    const chosen = epic || closest;
+    res.json({ imageUrl: chosen?.imageUrl || null, playerType: chosen?.playerType });
+  } catch (err: any) {
+    res.json({ imageUrl: null, error: err.message });
+  }
+});
+
 // Start Server
 app.listen(PORT, async () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

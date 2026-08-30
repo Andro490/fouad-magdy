@@ -192,25 +192,15 @@ const TeamBuilder = () => {
       setStarters(allPlayers.slice(0, 11));
       setSubs(allPlayers.slice(11));
 
-      // جلب صور كروت اللاعبين من EFHub API
+      // جلب صور كروت اللاعبين عبر الباكيند (لتجنب CORS)
       setProgressStatus('جاري جلب صور الكروت...');
       const images: Record<string, string> = {};
       await Promise.all(allPlayers.map(async (player) => {
         try {
-          const lastName = player.name.split(' ').pop() || player.name;
-          const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=10`);
+          const res = await fetch(`/api/player-card?name=${encodeURIComponent(player.name)}&rating=${player.rating}`);
           if (!res.ok) return;
-          const apiData = await res.json();
-          const list: any[] = Array.isArray(apiData) ? apiData : (apiData.data || apiData.players || []);
-          if (list.length === 0) return;
-          // نفضل Epic (نوع 5) ثم أعلى تقييم أقرب لتقييم اللاعب
-          const epic = list.find(p => p.playerType === 5 && p.imageUrl);
-          const bestRating = list.reduce((best: any, p: any) => {
-            if (!p.imageUrl) return best;
-            return (!best || Math.abs(p.overallRating - player.rating) < Math.abs(best.overallRating - player.rating)) ? p : best;
-          }, null);
-          const chosen = epic || bestRating;
-          if (chosen?.imageUrl) images[player.name] = chosen.imageUrl;
+          const d = await res.json();
+          if (d.imageUrl) images[player.name] = d.imageUrl;
         } catch { /* تجاهل الأخطاء لكل لاعب */ }
       }));
       setPlayerImages(images);

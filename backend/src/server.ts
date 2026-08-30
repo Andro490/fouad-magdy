@@ -768,6 +768,7 @@ app.get('/api/users/:id/profile', async (req, res) => {
         phone: true,
         location: true,
         bio: true,
+        avatar: true,
         screenshots: true
       }
     });
@@ -793,7 +794,7 @@ app.put('/api/users/profile', authenticateToken, async (req: AuthRequest, res) =
   try {
     if (!req.user?.id) return res.status(401).json({ error: 'Unauthorized' });
     
-    const { phone, location, bio, screenshots } = req.body;
+    const { phone, location, bio, avatar, screenshots } = req.body;
     
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
@@ -801,6 +802,7 @@ app.put('/api/users/profile', authenticateToken, async (req: AuthRequest, res) =
         phone: phone ?? undefined,
         location: location ?? undefined,
         bio: bio ?? undefined,
+        avatar: avatar ?? undefined,
         screenshots: screenshots ?? undefined
       }
     });

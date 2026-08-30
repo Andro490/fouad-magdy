@@ -128,6 +128,19 @@ const TeamBuilder = () => {
         }
       `;
 
+      // جلب قائمة النماذج الفعالة حالياً من Groq لضمان عدم استخدام نموذج ملغى
+      const modelsRes = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      const modelsData = await modelsRes.json();
+      const allModels = modelsData.data || [];
+      
+      // البحث عن نموذج رؤية فعال (سواء Llama أو Qwen الجديد)
+      let activeVisionModel = allModels.find((m: any) => m.id.includes('vision') && !m.id.includes('preview'))?.id;
+      if (!activeVisionModel) activeVisionModel = allModels.find((m: any) => m.id.includes('vision'))?.id;
+      if (!activeVisionModel) activeVisionModel = allModels.find((m: any) => m.id.includes('qwen') && m.id.includes('27b'))?.id;
+      if (!activeVisionModel) activeVisionModel = 'qwen/qwen3.6-27b'; // الاحتياطي
+
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -135,7 +148,7 @@ const TeamBuilder = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.2-90b-vision-preview', // نستخدم 90b لأن 11b تم إيقافه من الشركة
+          model: activeVisionModel,
           messages: [
             {
               role: 'user',

@@ -12,6 +12,7 @@ import Checkout from './pages/Checkout';
 import Leaderboard from './pages/Leaderboard';
 import PaymentSuccess from './pages/PaymentSuccess';
 import SellerProfile from './pages/SellerProfile';
+import TeamBuilder from './pages/TeamBuilder';
 import SupportChat from './components/SupportChat';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
+          <Route path="/team-builder" element={<TeamBuilder />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

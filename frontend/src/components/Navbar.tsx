@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
   { label: 'Home', path: '/' },
+  { label: 'كوّن خططك', path: '/team-builder' },
   { label: 'Coaches & Tactics', path: '/products' },
   { label: 'Account Store', path: '/store' },
   { label: 'Creator Board', path: '/leaderboard' },

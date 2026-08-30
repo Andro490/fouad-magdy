@@ -20,7 +20,7 @@ RUN npm ci
 
 # Copy source and build
 COPY . .
-RUN npm run build
+RUN chmod +x node_modules/.bin/* && npm run build
 
 # ─────────────────────────────────────────────────────────────
 # Production: serve with Nginx

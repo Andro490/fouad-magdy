@@ -135,7 +135,7 @@ const TeamBuilder = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.2-11b-vision-preview', // نموذج 11b أسرع وأكثر استقراراً
+          model: 'llama-3.2-90b-vision-preview', // نستخدم 90b لأن 11b تم إيقافه من الشركة
           messages: [
             {
               role: 'user',

@@ -109,69 +109,20 @@ const TeamBuilder = () => {
         reader.readAsDataURL(file);
       });
 
-      const prompt = `
-        You are a precise eFootball screen parser. Analyze the uploaded screenshot of the eFootball team squad.
-        You must extract EXACTLY 11 starting players from the pitch and up to 7 substitute players from the right sidebar bench. Do NOT hallucinate or repeat players.
-
-        Return ONLY a JSON object in this exact structure, containing real player names based on their face/card, their exact yellow rating number, and green position:
-        {
-          "starters": [
-            {"name": "Player Name", "rating": 99, "position": "GK"},
-            {"name": "Player Name", "rating": 98, "position": "CB"}
-            // استخرج باقي الـ 11 لاعب الأساسيين بنفس الطريقة
-          ],
-          "subs": [
-            {"name": "P. Cech", "rating": 106, "position": "GK"}
-          ]
-        }
-      `;
-
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyA6eo5N9LuWuZC2l59tRUyjc8wAKfhmjqA";
-
-      // إزالة الهيدر الخاص بـ Base64
-      const base64Data = base64Image.split(',')[1];
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+      // إرسال الصورة للباكيند ليقوم هو بتحليلها عبر مفتاح Gemini الخاص به (المحفوظ في الإعدادات)
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+      const response = await fetch(`${API_URL}/api/analyze-team`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt },
-                {
-                  inline_data: {
-                    mime_type: 'image/jpeg',
-                    data: base64Data
-                  }
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.0,
-            responseMimeType: "application/json"
-          }
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64Image })
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || "فشل الاتصال بالذكاء الاصطناعي البصري");
+        throw new Error(data.error || "فشل الاتصال بالذكاء الاصطناعي البصري");
       }
 
-      const data = await response.json();
-      const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!content) throw new Error("لم يتمكن Gemini من استخراج البيانات");
-      
-      // استخراج الـ JSON من الرد
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("Gemini لم يرجع البيانات بصيغة صحيحة");
-
-      const result = JSON.parse(jsonMatch[0]);
+      const result = data;
 
       if (!result.starters || result.starters.length === 0) {
         throw new Error("لم يتم العثور على أي لاعبين، يرجى رفع صورة أوضح");

@@ -8,6 +8,7 @@ const SiteSettings = () => {
   const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
+  const [geminiApiKey, setGeminiApiKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -25,6 +26,7 @@ const SiteSettings = () => {
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
+        if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -41,7 +43,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey })
       });
       if (res.ok) {
         setSaved(true);
@@ -199,6 +201,28 @@ const SiteSettings = () => {
               />
             </div>
           </div>
+        </div>
+
+        {/* Gemini AI Key */}
+        <div className="bg-dark/40 border border-purple-500/30 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-purple-400">🤖</span> مفتاح Gemini AI (تحليل التشكيلات)
+          </h3>
+          <p className="text-gray-400 text-sm">أضف مفتاح Gemini API من Google AI Studio لتفعيل ميزة قراءة التشكيلات. المفتاح يُحفظ على السيرفر بشكل آمن.</p>
+          <input
+            type="password"
+            value={geminiApiKey}
+            onChange={e => setGeminiApiKey(e.target.value)}
+            className="w-full bg-dark border border-purple-500/50 rounded-lg px-4 py-2 text-white text-sm focus:border-purple-400 focus:outline-none"
+            dir="ltr"
+            placeholder="AIzaSy..."
+          />
+          {geminiApiKey && (
+            <p className="text-green-400 text-xs">✅ المفتاح محفوظ - ميزة Team Builder مفعّلة</p>
+          )}
+          {!geminiApiKey && (
+            <p className="text-yellow-400 text-xs">⚠️ بدون مفتاح لن تعمل ميزة تحليل التشكيلات</p>
+          )}
         </div>
 
         {/* Save Button */}

@@ -20,6 +20,11 @@ interface AIAnalysis {
     tactic: string;
     compatibility: string;
   };
+  playerRoles?: {
+    position: string;
+    role: string;
+    reason: string;
+  }[];
 }
 
 // Fallback / Mock Data in case OCR misses players or no image provided
@@ -190,64 +195,29 @@ const TeamBuilder = () => {
   };
 
   /**
-   * تحليل التشكيلة باستخدام الذكاء الاصطناعي (Groq API)
+   * تحليل التشكيلة باستخدام الذكاء الاصطناعي عبر الباكيند
    */
   const analyzeWithAI = async () => {
     setIsProcessing(true);
-    setProgressStatus('يتم الآن التحليل المعمق للتشكيلة عبر الذكاء الاصطناعي...');
+    setProgressStatus('يتم الآن التحليل المعمق للتشكيلة وتحديد أفضل أساليب اللعب عبر الذكاء الاصطناعي...');
     
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY; // يجب إضافته في ملف .env
-      
-      // Prompt للذكاء الاصطناعي
-      const prompt = `
-        You are an expert eFootball tactical analyst. I have a team with the following starting 11 players:
-        ${starters.map(p => `${p.name} (${p.position}, Rating: ${p.rating})`).join(', ')}
-        
-        Analyze this team and provide the absolute best tactical setup. Return the response ONLY in JSON format:
-        {
-          "formation": "e.g. 4-3-3",
-          "playstyle": {
-            "name": "e.g. الهجمة المرتدة السريعة (Quick Counter)",
-            "description": "Short explanation in Arabic of why this playstyle suits the players",
-            "score": 92
-          },
-          "manager": {
-            "name": "e.g. Zeitzler (Klopp)",
-            "tactic": "e.g. 4-3-3 الهجومي",
-            "compatibility": "كفاءة عالية"
-          }
-        }
-      `;
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+      const response = await fetch(`${API_URL}/api/tactical-advice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ starters, subs })
+      });
 
-      if (apiKey) {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'llama3-8b-8192',
-            messages: [{ role: 'user', content: prompt }],
-            temperature: 0.3,
-            response_format: { type: 'json_object' }
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const analysis = JSON.parse(data.choices[0].message.content);
-          setAiAnalysis(analysis);
-        } else {
-          throw new Error('API request failed');
-        }
-      } else {
-        throw new Error('No API Key');
+      if (!response.ok) {
+        throw new Error('فشل في جلب التحليل التكتيكي من السيرفر');
       }
+
+      const analysis = await response.json();
+      setAiAnalysis(analysis);
     } catch (error) {
-      console.warn('AI Analysis failed or no API key, using mock response:', error);
-      // Mock Response Fallback if API fails or is not configured
+      console.warn('AI Analysis failed, using mock response:', error);
+      // Mock Response Fallback if API fails
       setAiAnalysis({
         formation: "4-3-3",
         playstyle: {
@@ -259,7 +229,11 @@ const TeamBuilder = () => {
           name: "Zeitzler (Klopp)",
           tactic: "4-3-3 الهجومي",
           compatibility: "كفاءة عالية مع فريقك"
-        }
+        },
+        playerRoles: [
+          { position: "CB", role: "بناء لعب (Build Up)", reason: "المدافع يمتلك تمريرات متقنة من الخلف" },
+          { position: "CB", role: "محطم (Destroyer)", reason: "المدافع الآخر يتميز بالقوة البدنية وقطع الكرات لعمل توازن" }
+        ]
       });
     } finally {
       setIsProcessing(false);
@@ -662,6 +636,29 @@ const TeamBuilder = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Player Roles Panel */}
+                {aiAnalysis.playerRoles && aiAnalysis.playerRoles.length > 0 && (
+                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+                    <h3 className="text-xl font-bold mb-4 text-purple-400 flex items-center gap-2">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                      </svg>
+                      أدوار اللاعبين التكتيكية
+                    </h3>
+                    <div className="space-y-3">
+                      {aiAnalysis.playerRoles.map((role, idx) => (
+                        <div key={idx} className="bg-black/30 rounded-xl p-3 border border-white/5">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-bold text-white">{role.position}</span>
+                            <span className="text-xs font-bold bg-purple-500/20 text-purple-400 px-2 py-1 rounded">{role.role}</span>
+                          </div>
+                          <p className="text-xs text-gray-400">{role.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <button
                   onClick={prevStage}

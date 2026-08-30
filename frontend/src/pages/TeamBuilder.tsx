@@ -429,32 +429,39 @@ const TeamBuilder = () => {
                   اللاعبون الأساسيون (11) الذي تم استخراجهم
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {starters.map((player, idx) => (
-                    <div key={`starter-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-green-500/50 transition-colors group">
-                      <div className="relative w-20 h-20 mx-auto mb-3">
-                        <img
-                          src={`https://efimg.com/images/player/${encodeURIComponent(player.name.replace('.', '').trim())}.png`}
-                          alt={player.name}
-                          className="w-full h-full object-contain rounded-lg"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              const fallback = parent.querySelector('.fallback-rating') as HTMLElement;
-                              if (fallback) fallback.style.display = 'flex';
-                            }
-                          }}
-                        />
-                        <div className="fallback-rating absolute inset-0 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-green-500/30 items-center justify-center group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]" style={{display:'none'}}>
-                          <span className="text-xl font-black text-white">{player.rating}</span>
+                  {starters.map((player, idx) => {
+                    const cleanName = player.name.replace(/[^a-zA-Z ]/g, '').trim().toLowerCase().replace(/ /g, '-');
+                    const imgUrl = `https://efimg.com/images/efootball/players/${cleanName}.png`;
+                    return (
+                    <div key={`starter-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-green-500/50 transition-all group cursor-pointer">
+                      <div className="relative w-20 h-24 mx-auto mb-2">
+                        {/* eFootball-style card */}
+                        <div className="w-full h-full rounded-lg overflow-hidden relative" style={{
+                          background: 'linear-gradient(145deg, #1a2a1a 0%, #0d1a0d 40%, #162516 100%)',
+                          border: '1.5px solid rgba(34,197,94,0.3)',
+                          boxShadow: '0 0 10px rgba(34,197,94,0.1)'
+                        }}>
+                          <img
+                            src={imgUrl}
+                            alt={player.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                            }}
+                          />
+                          {/* Position badge */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-0.5">
+                            <span className="text-green-400 text-[9px] font-black">{player.position}</span>
+                          </div>
                         </div>
-                        <span className="absolute -top-2 -right-2 bg-[#1a3822] border border-green-500 text-green-400 text-xs font-black px-1.5 py-0.5 rounded-md">{player.rating}</span>
+                        {/* Rating badge */}
+                        <span className="absolute -top-1.5 -right-1.5 bg-[#0f1f0f] border border-green-400 text-green-300 text-[10px] font-black px-1 py-0.5 rounded shadow-lg">{player.rating}</span>
                       </div>
-                      <p className="font-bold text-xs truncate">{player.name}</p>
-                      <p className="text-xs text-green-400 font-semibold mt-0.5">{player.position}</p>
+                      <p className="font-bold text-[10px] truncate text-white/90">{player.name}</p>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -464,32 +471,36 @@ const TeamBuilder = () => {
                   دكة البدلاء
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {subs.map((player, idx) => (
-                    <div key={`sub-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-blue-500/50 transition-colors group">
-                      <div className="relative w-20 h-20 mx-auto mb-3">
-                        <img
-                          src={`https://efimg.com/images/player/${encodeURIComponent(player.name.replace('.', '').trim())}.png`}
-                          alt={player.name}
-                          className="w-full h-full object-contain rounded-lg"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              const fallback = parent.querySelector('.fallback-rating-sub') as HTMLElement;
-                              if (fallback) fallback.style.display = 'flex';
-                            }
-                          }}
-                        />
-                        <div className="fallback-rating-sub absolute inset-0 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-blue-500/30 items-center justify-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]" style={{display:'none'}}>
-                          <span className="text-xl font-black text-white">{player.rating}</span>
+                  {subs.map((player, idx) => {
+                    const cleanName = player.name.replace(/[^a-zA-Z ]/g, '').trim().toLowerCase().replace(/ /g, '-');
+                    const imgUrl = `https://efimg.com/images/efootball/players/${cleanName}.png`;
+                    return (
+                    <div key={`sub-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-blue-500/50 transition-all group cursor-pointer">
+                      <div className="relative w-20 h-24 mx-auto mb-2">
+                        <div className="w-full h-full rounded-lg overflow-hidden relative" style={{
+                          background: 'linear-gradient(145deg, #1a1a2e 0%, #0d0d1f 40%, #161625 100%)',
+                          border: '1.5px solid rgba(59,130,246,0.3)',
+                          boxShadow: '0 0 10px rgba(59,130,246,0.1)'
+                        }}>
+                          <img
+                            src={imgUrl}
+                            alt={player.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                            }}
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-0.5">
+                            <span className="text-blue-400 text-[9px] font-black">{player.position}</span>
+                          </div>
                         </div>
-                        <span className="absolute -top-2 -right-2 bg-[#0d1a3a] border border-blue-500 text-blue-400 text-xs font-black px-1.5 py-0.5 rounded-md">{player.rating}</span>
+                        <span className="absolute -top-1.5 -right-1.5 bg-[#0f0f1f] border border-blue-400 text-blue-300 text-[10px] font-black px-1 py-0.5 rounded shadow-lg">{player.rating}</span>
                       </div>
-                      <p className="font-bold text-xs truncate">{player.name}</p>
-                      <p className="text-xs text-blue-400 font-semibold mt-0.5">{player.position}</p>
+                      <p className="font-bold text-[10px] truncate text-white/90">{player.name}</p>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

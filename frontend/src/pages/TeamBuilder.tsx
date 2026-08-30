@@ -542,8 +542,15 @@ const TeamBuilder = () => {
                    <div className="flex flex-col justify-around h-full w-1/3 py-10">
                      {starters.slice(8, 11).map((p, i) => (
                        <div key={`att-${i}`} className="flex flex-col items-center">
-                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-red-500 flex items-center justify-center mb-1 shadow-lg">{p.rating}</div>
-                         <span className="bg-black/70 px-2 rounded truncate max-w-[80px]">{p.name}</span>
+                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-red-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
+                           {playerImages[p.name] ? (
+                             <img src={playerImages[p.name]} alt={p.name} className="w-full h-full object-cover" />
+                           ) : (
+                             <span className="text-white text-xs">{p.rating}</span>
+                           )}
+                           {!playerImages[p.name] && <div className="absolute inset-0 bg-red-500/20" />}
+                         </div>
+                         <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{p.name}</span>
                        </div>
                      ))}
                    </div>
@@ -552,8 +559,15 @@ const TeamBuilder = () => {
                    <div className="flex flex-col justify-around h-[80%] w-1/3">
                      {starters.slice(5, 8).map((p, i) => (
                        <div key={`mid-${i}`} className="flex flex-col items-center">
-                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-green-500 flex items-center justify-center mb-1 shadow-lg">{p.rating}</div>
-                         <span className="bg-black/70 px-2 rounded truncate max-w-[80px]">{p.name}</span>
+                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-green-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
+                           {playerImages[p.name] ? (
+                             <img src={playerImages[p.name]} alt={p.name} className="w-full h-full object-cover" />
+                           ) : (
+                             <span className="text-white text-xs">{p.rating}</span>
+                           )}
+                           {!playerImages[p.name] && <div className="absolute inset-0 bg-green-500/20" />}
+                         </div>
+                         <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{p.name}</span>
                        </div>
                      ))}
                    </div>
@@ -562,8 +576,15 @@ const TeamBuilder = () => {
                    <div className="flex flex-col justify-around h-full w-1/3 py-4">
                      {starters.slice(1, 5).map((p, i) => (
                        <div key={`def-${i}`} className="flex flex-col items-center">
-                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-blue-500 flex items-center justify-center mb-1 shadow-lg">{p.rating}</div>
-                         <span className="bg-black/70 px-2 rounded truncate max-w-[80px]">{p.name}</span>
+                         <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-blue-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
+                           {playerImages[p.name] ? (
+                             <img src={playerImages[p.name]} alt={p.name} className="w-full h-full object-cover" />
+                           ) : (
+                             <span className="text-white text-xs">{p.rating}</span>
+                           )}
+                           {!playerImages[p.name] && <div className="absolute inset-0 bg-blue-500/20" />}
+                         </div>
+                         <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{p.name}</span>
                        </div>
                      ))}
                    </div>
@@ -571,8 +592,15 @@ const TeamBuilder = () => {
                    {/* GK */}
                    {starters[0] && (
                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                       <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-yellow-500 flex items-center justify-center mb-1 shadow-lg">{starters[0].rating}</div>
-                       <span className="bg-black/70 px-2 rounded truncate max-w-[80px]">{starters[0].name}</span>
+                       <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-yellow-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
+                         {playerImages[starters[0].name] ? (
+                           <img src={playerImages[starters[0].name]} alt={starters[0].name} className="w-full h-full object-cover" />
+                         ) : (
+                           <span className="text-white text-xs">{starters[0].rating}</span>
+                         )}
+                         {!playerImages[starters[0].name] && <div className="absolute inset-0 bg-yellow-500/20" />}
+                       </div>
+                       <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{starters[0].name}</span>
                      </div>
                    )}
                 </div>

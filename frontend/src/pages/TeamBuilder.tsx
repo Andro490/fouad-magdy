@@ -106,7 +106,7 @@ const TeamBuilder = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.2-90b-vision-preview', // نموذج الرؤية الخاص بـ Groq
+          model: 'llama-3.2-11b-vision-preview', // نموذج 11b أسرع وأكثر استقراراً
           messages: [
             {
               role: 'user',
@@ -122,7 +122,8 @@ const TeamBuilder = () => {
       });
 
       if (!response.ok) {
-        throw new Error("فشل الاتصال بالذكاء الاصطناعي البصري");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || "فشل الاتصال بالذكاء الاصطناعي البصري");
       }
 
       const data = await response.json();

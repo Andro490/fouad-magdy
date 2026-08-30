@@ -2,6 +2,11 @@
 .env
 .env.local
 .env.*.local
+.env.production
+backend/.env.production
+
+# SSL Certificates - never commit!
+nginx/ssl/
 
 # Node modules
 node_modules/

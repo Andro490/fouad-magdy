@@ -661,6 +661,10 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     res.status(401).json({ error: 'Unauthorized' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res) => {
   try {

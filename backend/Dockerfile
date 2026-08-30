@@ -39,8 +39,8 @@ COPY src/data/ ./src/data/
 # Copy prisma schema for migrations
 COPY prisma/ ./prisma/
 
-# Install curl and netcat for healthcheck & postgres wait
-RUN apk add --no-cache curl netcat-openbsd
+# Install curl, netcat and openssl for healthcheck & postgres wait & prisma engine
+RUN apk add --no-cache curl netcat-openbsd openssl
 
 # ── Entrypoint script: يشغل migration أولاً ثم السيرفر ──────
 COPY entrypoint.sh ./entrypoint.sh

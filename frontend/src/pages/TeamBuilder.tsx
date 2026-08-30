@@ -56,6 +56,7 @@ const TeamBuilder = () => {
   const [starters, setStarters] = useState<Player[]>(mockStarters);
   const [subs, setSubs] = useState<Player[]>(mockSubs);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [playerImages, setPlayerImages] = useState<Record<string, string>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -184,8 +185,35 @@ const TeamBuilder = () => {
          position: p.position || 'CMF'
       });
 
-      setStarters(result.starters.map(formatPlayer).slice(0, 11));
-      setSubs((result.subs || []).map(formatPlayer).slice(0, 7));
+      const allPlayers = [
+        ...result.starters.map(formatPlayer).slice(0, 11),
+        ...(result.subs || []).map(formatPlayer).slice(0, 7)
+      ];
+      setStarters(allPlayers.slice(0, 11));
+      setSubs(allPlayers.slice(11));
+
+      // جلب صور كروت اللاعبين من EFHub API
+      setProgressStatus('جاري جلب صور الكروت...');
+      const images: Record<string, string> = {};
+      await Promise.all(allPlayers.map(async (player) => {
+        try {
+          const lastName = player.name.split(' ').pop() || player.name;
+          const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=10`);
+          if (!res.ok) return;
+          const apiData = await res.json();
+          const list: any[] = Array.isArray(apiData) ? apiData : (apiData.data || apiData.players || []);
+          if (list.length === 0) return;
+          // نفضل Epic (نوع 5) ثم أعلى تقييم أقرب لتقييم اللاعب
+          const epic = list.find(p => p.playerType === 5 && p.imageUrl);
+          const bestRating = list.reduce((best: any, p: any) => {
+            if (!p.imageUrl) return best;
+            return (!best || Math.abs(p.overallRating - player.rating) < Math.abs(best.overallRating - player.rating)) ? p : best;
+          }, null);
+          const chosen = epic || bestRating;
+          if (chosen?.imageUrl) images[player.name] = chosen.imageUrl;
+        } catch { /* تجاهل الأخطاء لكل لاعب */ }
+      }));
+      setPlayerImages(images);
 
       setIsProcessing(false);
       setStage(2);
@@ -430,8 +458,8 @@ const TeamBuilder = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {starters.map((player, idx) => {
-                    const cleanName = player.name.replace(/[^a-zA-Z ]/g, '').trim().toLowerCase().replace(/ /g, '-');
-                    const imgUrl = `https://efimg.com/images/efootball/players/${cleanName}.png`;
+                    const imgUrl = playerImages[player.name]
+                      || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=0d2b1a&color=22c55e&bold=true&size=128&font-size=0.4&length=2&rounded=false`;
                     return (
                     <div key={`starter-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-green-500/50 transition-all group cursor-pointer">
                       <div className="relative w-20 h-24 mx-auto mb-2">
@@ -472,8 +500,8 @@ const TeamBuilder = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {subs.map((player, idx) => {
-                    const cleanName = player.name.replace(/[^a-zA-Z ]/g, '').trim().toLowerCase().replace(/ /g, '-');
-                    const imgUrl = `https://efimg.com/images/efootball/players/${cleanName}.png`;
+                    const imgUrl = playerImages[player.name]
+                      || `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=0d0d2b&color=60a5fa&bold=true&size=128&font-size=0.4&length=2&rounded=false`;
                     return (
                     <div key={`sub-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-blue-500/50 transition-all group cursor-pointer">
                       <div className="relative w-20 h-24 mx-auto mb-2">

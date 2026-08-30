@@ -113,18 +113,15 @@ const TeamBuilder = () => {
       });
 
       const prompt = `
-        You are an expert eFootball game analyst. I have uploaded a screenshot of my team.
-        Your task is to accurately extract EVERY player's information from their card on the pitch (starters) and on the bench (subs).
-        
-        CRITICAL RULES FOR EXTRACTION:
-        1. RATING: The large bright yellow number on each card (e.g., 104, 107, 109, 106). Look at the numbers carefully! Do not guess.
-        2. POSITION: The green text at the top-left of each card (e.g., GK, CB, LB, RB, DMF, CMF, AMF, LWF, RWF, CF).
-        3. NAME: The small white text at the bottom of the card. DO NOT repeat names like "Messi" or "Ramos" for everyone. Every card has a different face and a different name! Use the player's face, rating, and position to deduce the real name if the text is blurry (e.g., 109 AMF from Argentina is Messi. 104 LWF from Brazil is Ronaldinho. 106 CB from Italy is Cannavaro. 106 DMF is Makelele).
-        
-        Return ONLY a JSON object in this exact format (no markdown, no extra text):
+        You are a precise eFootball screen parser. Analyze the uploaded screenshot of the eFootball team squad.
+        You must extract EXACTLY 11 starting players from the pitch and up to 7 substitute players from the right sidebar bench. Do NOT hallucinate or repeat players.
+
+        Return ONLY a JSON object in this exact structure, containing real player names based on their face/card, their exact yellow rating number, and green position:
         {
           "starters": [
-            {"name": "L. Messi", "rating": 109, "position": "AMF"}
+            {"name": "Player Name", "rating": 99, "position": "GK"},
+            {"name": "Player Name", "rating": 98, "position": "CB"}
+            // استخرج باقي الـ 11 لاعب الأساسيين بنفس الطريقة
           ],
           "subs": [
             {"name": "P. Cech", "rating": 106, "position": "GK"}
@@ -163,7 +160,7 @@ const TeamBuilder = () => {
             }
           ],
           temperature: 0.0,
-          max_tokens: 2048
+          max_tokens: 4096
         })
       });
 

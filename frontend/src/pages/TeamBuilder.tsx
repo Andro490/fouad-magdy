@@ -70,31 +70,48 @@ const TeamBuilder = () => {
     const validPositions = ['GK', 'CB', 'LB', 'RB', 'DMF', 'CMF', 'AMF', 'LMF', 'RMF', 'RWF', 'LWF', 'SS', 'CF'];
 
     let currentId = 1;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].toUpperCase();
-      const posMatch = validPositions.find(p => line.includes(p));
-      const ratingMatch = line.match(/\b([5-9][0-9]|100)\b/); // تقييم بين 50 و 100
       
-      // إذا وجدنا مركز أو تقييم في السطر، نعتبره لاعباً
+      // نبحث عن المركز في السطر (مع تجاهل المسافات الزائدة)
+      const posMatch = validPositions.find(p => line.includes(p) || line.replace(/\s/g, '').includes(p));
+      
+      // التقييمات في إيفوتبول قد تصل إلى 106 أو أكثر الآن (نبحث عن أرقام بين 50 و 115)
+      const ratingMatch = line.match(/\b([5-9][0-9]|10[0-9]|11[0-5])\b/); 
+      
       if (posMatch || ratingMatch) {
+        // محاولة استخراج الاسم: إذا كان السطر السابق عبارة عن حروف، فهو غالباً الاسم
+        let extractedName = 'Unknown Player';
+        if (i > 0 && /[A-Za-z]/.test(lines[i-1])) {
+          extractedName = lines[i-1].replace(/[^A-Za-z\s-]/g, '').trim(); // تنظيف الاسم من الأرقام والرموز
+        }
+        
+        // إذا كان الاسم قصيراً جداً أو فارغاً، نبحث في السطر الذي يسبقه
+        if (extractedName.length <= 2 && i > 1 && /[A-Za-z]/.test(lines[i-2])) {
+           extractedName = lines[i-2].replace(/[^A-Za-z\s-]/g, '').trim();
+        }
+
         players.push({
           id: (currentId++).toString(),
-          name: i > 0 && lines[i-1].length > 2 ? lines[i-1] : 'Player', // استخراج الاسم غالباً من السطر السابق
+          name: extractedName.length > 2 ? extractedName : 'Unknown Player',
           rating: ratingMatch ? parseInt(ratingMatch[0]) : 85,
           position: posMatch || 'CMF'
         });
       }
     }
 
-    // لضمان عمل الواجهة بشكل صحيح حتى لو فشل الـ OCR في قراءة بعض اللاعبين
-    // نكمل النواقص من البيانات الوهمية
-    const allMocks = mockStarters.concat(mockSubs);
-    while (players.length < 18) {
-      players.push(allMocks[players.length % allMocks.length]);
+    // إزالة التكرار (في حال قرأ الـ OCR نفس اللاعب مرتين بالخطأ) بناءً على التقييم والاسم
+    const uniquePlayers = players.filter((player, index, self) =>
+      index === self.findIndex((p) => (p.name === player.name && p.rating === player.rating))
+    );
+
+    // إذا لم يجد شيئاً إطلاقاً بسبب رداءة الصورة
+    if (uniquePlayers.length === 0) {
+      return []; 
     }
 
-    // إزالة التكرار إن وجد بناءً على الاسم تقريبياً
-    return players.slice(0, 18);
+    return uniquePlayers;
   };
 
   /**
@@ -119,15 +136,23 @@ const TeamBuilder = () => {
       setProgressStatus('جاري ترتيب وتصنيف اللاعبين...');
       
       const parsedPlayers = parseOCRText(text);
-      setStarters(parsedPlayers.slice(0, 11));
-      setSubs(parsedPlayers.slice(11, 18));
+      
+      if (parsedPlayers.length === 0) {
+        throw new Error("لم يتم العثور على أي لاعبين، يرجى رفع صورة أوضح");
+      }
+
+      // إذا قرأ عدداً أقل من 11، نضعهم كلهم كأساسيين
+      const numStarters = Math.min(parsedPlayers.length, 11);
+      
+      setStarters(parsedPlayers.slice(0, numStarters));
+      setSubs(parsedPlayers.slice(numStarters, 18)); // ما يتبقى يذهب للدكة (بحد أقصى 7)
 
       setIsProcessing(false);
       setStage(2);
     } catch (error) {
       console.error('OCR Error:', error);
-      setProgressStatus('حدث خطأ، يرجى المحاولة مرة أخرى.');
-      setTimeout(() => setIsProcessing(false), 2000);
+      setProgressStatus(error instanceof Error ? error.message : 'حدث خطأ في القراءة، الصورة غير واضحة.');
+      setTimeout(() => setIsProcessing(false), 3000);
     }
   };
 

@@ -71,10 +71,6 @@ const TeamBuilder = () => {
     setProgressStatus('جاري فحص الصورة بالذكاء الاصطناعي البصري...');
 
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-      if (!apiKey) {
-        throw new Error('يرجى إضافة VITE_GROQ_API_KEY في ملف .env');
-      }
 
       // تحويل الصورة وضغطها (Canvas) لتقليل الحجم قبل الإرسال لتجنب خطأ 400 Bad Request
       const base64Image = await new Promise<string>((resolve, reject) => {
@@ -129,38 +125,34 @@ const TeamBuilder = () => {
         }
       `;
 
-      // جلب قائمة النماذج الفعالة حالياً من Groq لضمان عدم استخدام نموذج ملغى
-      const modelsRes = await fetch('https://api.groq.com/openai/v1/models', {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-      });
-      const modelsData = await modelsRes.json();
-      const allModels = modelsData.data || [];
-      
-      // البحث عن نموذج رؤية فعال (سواء Llama أو Qwen الجديد)
-      let activeVisionModel = allModels.find((m: any) => m.id.includes('vision') && !m.id.includes('preview'))?.id;
-      if (!activeVisionModel) activeVisionModel = allModels.find((m: any) => m.id.includes('vision'))?.id;
-      if (!activeVisionModel) activeVisionModel = allModels.find((m: any) => m.id.includes('qwen') && m.id.includes('27b'))?.id;
-      if (!activeVisionModel) activeVisionModel = 'qwen/qwen3.6-27b'; // الاحتياطي
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyA6eo5N9LuWuZC2l59tRUyjc8wAKfhmjqA";
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      // إزالة الهيدر الخاص بـ Base64
+      const base64Data = base64Image.split(',')[1];
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: activeVisionModel,
-          messages: [
+          contents: [
             {
-              role: 'user',
-              content: [
-                { type: 'text', text: prompt },
-                { type: 'image_url', image_url: { url: base64Image } }
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: 'image/jpeg',
+                    data: base64Data
+                  }
+                }
               ]
             }
           ],
-          temperature: 0.0,
-          max_tokens: 4096
+          generationConfig: {
+            temperature: 0.0,
+            responseMimeType: "application/json"
+          }
         })
       });
 
@@ -170,11 +162,13 @@ const TeamBuilder = () => {
       }
 
       const data = await response.json();
-      const content = data.choices[0].message.content;
+      const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
-      // استخراج الـ JSON من الرد في حال أضاف الـ AI نصوصاً أخرى
+      if (!content) throw new Error("لم يتمكن Gemini من استخراج البيانات");
+      
+      // استخراج الـ JSON من الرد
       const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("لم يتمكن الذكاء الاصطناعي من استخراج البيانات بصيغة صحيحة");
+      if (!jsonMatch) throw new Error("Gemini لم يرجع البيانات بصيغة صحيحة");
 
       const result = JSON.parse(jsonMatch[0]);
 

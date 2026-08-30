@@ -1274,20 +1274,39 @@ app.post('/api/tactical-advice', async (req, res) => {
     const { starters, subs } = req.body;
     if (!starters || !Array.isArray(starters)) return res.status(400).json({ error: 'starters array is required' });
 
-    const playersText = starters.map((p: any) => `${p.name} (Rating: ${p.rating}, Pos: ${p.position})`).join(', ');
+    // Fetch actual playstyles from EFHub for better AI accuracy
+    const startersWithPlaystyles = await Promise.all(starters.map(async (p: any) => {
+      try {
+        const lastName = p.name.split(' ').pop() || p.name;
+        const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=5`);
+        if (res.ok) {
+          const data = await res.json();
+          const list = Array.isArray(data) ? data : (data.data || data.players || []);
+          const match = list.find((ep: any) => Math.abs(ep.overallRating - p.rating) <= 7) || list[0];
+          if (match && match.playingStyle) {
+            return { ...p, actualPlaystyle: match.playingStyle };
+          }
+        }
+      } catch (err) {}
+      return { ...p, actualPlaystyle: 'Standard' };
+    }));
 
-    const prompt = `You are an expert eFootball tactical manager. Analyze this team of 11 starting players:
+    const playersText = startersWithPlaystyles.map((p: any) => 
+      `- ${p.name} (Pos: ${p.position}, Rating: ${p.rating}, Actual eFootball Playstyle: ${p.actualPlaystyle})`
+    ).join('\n');
+
+    const prompt = `You are an expert eFootball tactical manager. Analyze this team of 11 starting players and their ACTUAL eFootball playstyles:
 ${playersText}
 
-Based on these exact players, their ratings, and positions, determine the absolute best tactical setup.
-Pay special attention to assigning specific in-game playstyles to positions (e.g., if there are 3 CBs, maybe 1 Build Up and 2 Destroyers, or if 2 CBs, 1 Build up and 1 Destroyer, etc. according to the players).
+Based on these exact players, their positions, and their ACTUAL playstyles provided above, determine the absolute best tactical setup.
+When outputting 'playerRoles', YOU MUST USE the player's 'Actual eFootball Playstyle' (e.g. Build Up, Destroyer, Creative Playmaker, Anchor Man) as the 'role', and explain why this specific playstyle is useful for the team.
 
 Return ONLY a JSON object exactly matching this structure in Arabic:
 {
   "formation": "e.g. 4-3-3",
   "playstyle": {
     "name": "e.g. الهجمة المرتدة السريعة (Quick Counter)",
-    "description": "شرح تفصيلي باللغة العربية لماذا هذا الأسلوب هو الأفضل لهذه التشكيلة تحديداً",
+    "description": "شرح تفصيلي باللغة العربية لماذا هذا الأسلوب هو الأفضل لهذه التشكيلة تحديداً بناءً على أساليب اللاعبين",
     "score": 92
   },
   "manager": {
@@ -1296,9 +1315,9 @@ Return ONLY a JSON object exactly matching this structure in Arabic:
     "compatibility": "كفاءة ممتازة"
   },
   "playerRoles": [
-    { "position": "قلب دفاع أيمن (CB)", "role": "محطم (Destroyer)", "reason": "يحتاج الفريق لمدافع شرس يقطع الكرات بجانب المدافع الآخر" },
-    { "position": "قلب دفاع أيسر (CB)", "role": "بناء لعب (Build Up)", "reason": "يمتلك قدرة على التمرير الطويل وبناء الهجمة من الخلف" }
-    // أضف أهم 3-5 أدوار تكتيكية فقط (مثل DMF, AMF, CF) التي تصنع فارقاً في هذه الخطة
+    { "position": "قلب دفاع أيمن - اسم اللاعب", "role": "الأسلوب الفعلي للاعب (e.g. Destroyer)", "reason": "شرح كيف يفيد أسلوب هذا اللاعب التشكيلة" },
+    { "position": "صانع ألعاب - اسم اللاعب", "role": "الأسلوب الفعلي للاعب (e.g. Creative Playmaker)", "reason": "شرح التأثير" }
+    // اذكر أدوار أهم اللاعبين في التشكيلة (5 لاعبين على الأقل) باستخدام أساليبهم الحقيقية
   ]
 }`;
 

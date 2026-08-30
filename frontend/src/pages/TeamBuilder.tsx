@@ -430,12 +430,29 @@ const TeamBuilder = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {starters.map((player, idx) => (
-                    <div key={`starter-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-4 text-center hover:border-green-500/50 transition-colors group">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-green-500/30 flex items-center justify-center mb-3 group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                        <span className="text-xl font-black text-white">{player.rating}</span>
+                    <div key={`starter-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-green-500/50 transition-colors group">
+                      <div className="relative w-20 h-20 mx-auto mb-3">
+                        <img
+                          src={`https://efimg.com/images/player/${encodeURIComponent(player.name.replace('.', '').trim())}.png`}
+                          alt={player.name}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const fallback = parent.querySelector('.fallback-rating') as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="fallback-rating absolute inset-0 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-green-500/30 items-center justify-center group-hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]" style={{display:'none'}}>
+                          <span className="text-xl font-black text-white">{player.rating}</span>
+                        </div>
+                        <span className="absolute -top-2 -right-2 bg-[#1a3822] border border-green-500 text-green-400 text-xs font-black px-1.5 py-0.5 rounded-md">{player.rating}</span>
                       </div>
-                      <p className="font-bold text-sm truncate">{player.name}</p>
-                      <p className="text-xs text-green-400 font-semibold mt-1">{player.position}</p>
+                      <p className="font-bold text-xs truncate">{player.name}</p>
+                      <p className="text-xs text-green-400 font-semibold mt-0.5">{player.position}</p>
                     </div>
                   ))}
                 </div>
@@ -448,12 +465,29 @@ const TeamBuilder = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {subs.map((player, idx) => (
-                    <div key={`sub-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-4 text-center hover:border-blue-500/50 transition-colors group">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-blue-500/30 flex items-center justify-center mb-3 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                        <span className="text-xl font-black text-white">{player.rating}</span>
+                    <div key={`sub-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3 text-center hover:border-blue-500/50 transition-colors group">
+                      <div className="relative w-20 h-20 mx-auto mb-3">
+                        <img
+                          src={`https://efimg.com/images/player/${encodeURIComponent(player.name.replace('.', '').trim())}.png`}
+                          alt={player.name}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const fallback = parent.querySelector('.fallback-rating-sub') as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="fallback-rating-sub absolute inset-0 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-blue-500/30 items-center justify-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]" style={{display:'none'}}>
+                          <span className="text-xl font-black text-white">{player.rating}</span>
+                        </div>
+                        <span className="absolute -top-2 -right-2 bg-[#0d1a3a] border border-blue-500 text-blue-400 text-xs font-black px-1.5 py-0.5 rounded-md">{player.rating}</span>
                       </div>
-                      <p className="font-bold text-sm truncate">{player.name}</p>
-                      <p className="text-xs text-blue-400 font-semibold mt-1">{player.position}</p>
+                      <p className="font-bold text-xs truncate">{player.name}</p>
+                      <p className="text-xs text-blue-400 font-semibold mt-0.5">{player.position}</p>
                     </div>
                   ))}
                 </div>

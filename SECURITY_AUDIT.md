@@ -10,7 +10,7 @@ This project had multiple real security issues in the backend and frontend auth 
 
 ## Vulnerabilities Found and Fixed
 
-### 1) JWT bypass via mock tokens
+### 1 JWT bypass via mock tokens
 
 Issue:
 

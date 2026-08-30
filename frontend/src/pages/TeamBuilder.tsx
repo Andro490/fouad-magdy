@@ -83,8 +83,8 @@ const TeamBuilder = () => {
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 1200;
-            const MAX_HEIGHT = 1200;
+            const MAX_WIDTH = 1920;
+            const MAX_HEIGHT = 1920;
             let width = img.width;
             let height = img.height;
 
@@ -103,8 +103,8 @@ const TeamBuilder = () => {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx?.drawImage(img, 0, 0, width, height);
-            // ضغط الصورة بصيغة JPEG بجودة 80% لتصغير الحجم جداً
-            resolve(canvas.toDataURL('image/jpeg', 0.8));
+            // ضغط الصورة بجودة 95% للحفاظ على وضوح الأسماء الصغيرة جداً
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
           };
           img.onerror = reject;
           img.src = event.target?.result as string;
@@ -113,17 +113,21 @@ const TeamBuilder = () => {
       });
 
       const prompt = `
-        Analyze this eFootball 2024/2025 team screenshot.
-        Identify all players on the pitch (starters) and on the bench (subs).
-        Look at the player faces, positions (like LWF, CF, CMF, CB), and ratings (like 104, 109, 103).
+        You are an expert eFootball game analyst. I have uploaded a screenshot of my team.
+        Your task is to accurately extract EVERY player's information from their card on the pitch (starters) and on the bench (subs).
+        
+        CRITICAL RULES FOR EXTRACTION:
+        1. RATING: The large bright yellow number on each card (e.g., 104, 107, 109, 106). Look at the numbers carefully! Do not guess.
+        2. POSITION: The green text at the top-left of each card (e.g., GK, CB, LB, RB, DMF, CMF, AMF, LWF, RWF, CF).
+        3. NAME: The small white text at the bottom of the card. DO NOT repeat names like "Messi" or "Ramos" for everyone. Every card has a different face and a different name! Use the player's face, rating, and position to deduce the real name if the text is blurry (e.g., 109 AMF from Argentina is Messi. 104 LWF from Brazil is Ronaldinho. 106 CB from Italy is Cannavaro. 106 DMF is Makelele).
         
         Return ONLY a JSON object in this exact format (no markdown, no extra text):
         {
           "starters": [
-            {"name": "Player Name", "rating": 104, "position": "LWF"}
+            {"name": "L. Messi", "rating": 109, "position": "AMF"}
           ],
           "subs": [
-            {"name": "Player Name", "rating": 103, "position": "CB"}
+            {"name": "P. Cech", "rating": 106, "position": "GK"}
           ]
         }
       `;
@@ -158,8 +162,8 @@ const TeamBuilder = () => {
               ]
             }
           ],
-          temperature: 0.1,
-          max_tokens: 1024
+          temperature: 0.0,
+          max_tokens: 2048
         })
       });
 

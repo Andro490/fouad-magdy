@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Tesseract from 'tesseract.js';
 
 interface Player {
   id: string;
@@ -61,97 +60,100 @@ const TeamBuilder = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * دالة مساعدة لتنظيف نصوص OCR واستخراج اللاعبين
-   * تعتمد على البحث عن المراكز وتقييمات اللاعبين من النص المستخرج
-   */
-  const parseOCRText = (text: string): Player[] => {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const players: Player[] = [];
-    const validPositions = ['GK', 'CB', 'LB', 'RB', 'DMF', 'CMF', 'AMF', 'LMF', 'RMF', 'RWF', 'LWF', 'SS', 'CF'];
-
-    let currentId = 1;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].toUpperCase();
-      
-      // نبحث عن المركز في السطر (مع تجاهل المسافات الزائدة)
-      const posMatch = validPositions.find(p => line.includes(p) || line.replace(/\s/g, '').includes(p));
-      
-      // التقييمات في إيفوتبول قد تصل إلى 106 أو أكثر الآن (نبحث عن أرقام بين 50 و 115)
-      const ratingMatch = line.match(/\b([5-9][0-9]|10[0-9]|11[0-5])\b/); 
-      
-      if (posMatch || ratingMatch) {
-        // محاولة استخراج الاسم: إذا كان السطر السابق عبارة عن حروف، فهو غالباً الاسم
-        let extractedName = 'Unknown Player';
-        if (i > 0 && /[A-Za-z]/.test(lines[i-1])) {
-          extractedName = lines[i-1].replace(/[^A-Za-z\s-]/g, '').trim(); // تنظيف الاسم من الأرقام والرموز
-        }
-        
-        // إذا كان الاسم قصيراً جداً أو فارغاً، نبحث في السطر الذي يسبقه
-        if (extractedName.length <= 2 && i > 1 && /[A-Za-z]/.test(lines[i-2])) {
-           extractedName = lines[i-2].replace(/[^A-Za-z\s-]/g, '').trim();
-        }
-
-        players.push({
-          id: (currentId++).toString(),
-          name: extractedName.length > 2 ? extractedName : 'Unknown Player',
-          rating: ratingMatch ? parseInt(ratingMatch[0]) : 85,
-          position: posMatch || 'CMF'
-        });
-      }
-    }
-
-    // إزالة التكرار (في حال قرأ الـ OCR نفس اللاعب مرتين بالخطأ) بناءً على التقييم والاسم
-    const uniquePlayers = players.filter((player, index, self) =>
-      index === self.findIndex((p) => (p.name === player.name && p.rating === player.rating))
-    );
-
-    // إذا لم يجد شيئاً إطلاقاً بسبب رداءة الصورة
-    if (uniquePlayers.length === 0) {
-      return []; 
-    }
-
-    return uniquePlayers;
-  };
-
-  /**
-   * معالجة الصورة باستخدام Tesseract.js (تعمل محلياً في المتصفح)
+   * معالجة الصورة باستخدام الذكاء الاصطناعي البصري (Vision AI)
+   * نستبدل الـ OCR العادي لأن صور اللعبة لا تحتوي على أسماء صريحة، والخطوط معقدة
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsProcessing(true);
-    setProgressStatus('تهيئة محرك القراءة...');
+    setProgressStatus('جاري فحص الصورة بالذكاء الاصطناعي البصري...');
 
     try {
-      const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            setProgressStatus(`جاري قراءة وتفكيك الصورة... ${Math.round(m.progress * 100)}%`);
-          }
-        }
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) {
+        throw new Error('يرجى إضافة VITE_GROQ_API_KEY في ملف .env');
+      }
+
+      // تحويل الصورة إلى صيغة Base64 لإرسالها للـ AI
+      const base64Image = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
       });
 
-      setProgressStatus('جاري ترتيب وتصنيف اللاعبين...');
+      const prompt = `
+        Analyze this eFootball 2024/2025 team screenshot.
+        Identify all players on the pitch (starters) and on the bench (subs).
+        Look at the player faces, positions (like LWF, CF, CMF, CB), and ratings (like 104, 109, 103).
+        
+        Return ONLY a JSON object in this exact format (no markdown, no extra text):
+        {
+          "starters": [
+            {"name": "Player Name", "rating": 104, "position": "LWF"}
+          ],
+          "subs": [
+            {"name": "Player Name", "rating": 103, "position": "CB"}
+          ]
+        }
+      `;
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.2-90b-vision-preview', // نموذج الرؤية الخاص بـ Groq
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: prompt },
+                { type: 'image_url', image_url: { url: base64Image } }
+              ]
+            }
+          ],
+          temperature: 0.1,
+          max_tokens: 1024
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("فشل الاتصال بالذكاء الاصطناعي البصري");
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
       
-      const parsedPlayers = parseOCRText(text);
-      
-      if (parsedPlayers.length === 0) {
+      // استخراج الـ JSON من الرد في حال أضاف الـ AI نصوصاً أخرى
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("لم يتمكن الذكاء الاصطناعي من استخراج البيانات بصيغة صحيحة");
+
+      const result = JSON.parse(jsonMatch[0]);
+
+      if (!result.starters || result.starters.length === 0) {
         throw new Error("لم يتم العثور على أي لاعبين، يرجى رفع صورة أوضح");
       }
 
-      // إذا قرأ عدداً أقل من 11، نضعهم كلهم كأساسيين
-      const numStarters = Math.min(parsedPlayers.length, 11);
-      
-      setStarters(parsedPlayers.slice(0, numStarters));
-      setSubs(parsedPlayers.slice(numStarters, 18)); // ما يتبقى يذهب للدكة (بحد أقصى 7)
+      let idCounter = 1;
+      const formatPlayer = (p: any) => ({
+         id: (idCounter++).toString(),
+         name: p.name || 'Unknown',
+         rating: parseInt(p.rating) || 85,
+         position: p.position || 'CMF'
+      });
+
+      setStarters(result.starters.map(formatPlayer).slice(0, 11));
+      setSubs((result.subs || []).map(formatPlayer).slice(0, 7));
 
       setIsProcessing(false);
       setStage(2);
     } catch (error) {
-      console.error('OCR Error:', error);
-      setProgressStatus(error instanceof Error ? error.message : 'حدث خطأ في القراءة، الصورة غير واضحة.');
+      console.error('Vision AI Error:', error);
+      setProgressStatus(error instanceof Error ? error.message : 'حدث خطأ في القراءة، تأكد من مفتاح API.');
       setTimeout(() => setIsProcessing(false), 3000);
     }
   };

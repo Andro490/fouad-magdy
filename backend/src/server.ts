@@ -1208,17 +1208,18 @@ Your task is to extract:
 2. The substitute players listed on the right sidebar bench.
 
 For every single player, accurately identify:
-- "name": The exact, standard full player name matching standard eFootball databases like EFHub (e.g., "Lionel Messi", "James Rodríguez", "Ronaldinho", "Zlatan Ibrahimović", "Andrés Iniesta"). Do NOT use abbreviations or fake names. Match the player face and card accurately.
-- "rating": The exact yellow/gold number rating displayed on their card (e.g., 107, 106, 104, 103, 105).
+- "name": The exact, standard full player name matching standard eFootball databases like EFHub. Do NOT use abbreviations or fake names.
+- "rating": The exact yellow/gold number rating displayed on their card (e.g., 107, 106, 104).
 - "position": The exact green position code shown on the card (e.g., GK, CB, LB, RB, DMF, CMF, AMF, LWF, RWF, CF, SS, LMF).
+- "box": A 2D bounding box enclosing the ENTIRE player card in the format [ymin, xmin, ymax, xmax], with coordinates normalized to 0-1000.
 
 Return ONLY a valid JSON object matching this precise structure, with no extra text or markdown formatting outside the JSON block:
 {
   "starters": [
-    {"name": "Player Full Name", "rating": 104, "position": "CB"}
+    {"name": "Player Full Name", "rating": 104, "position": "CB", "box": [450, 320, 600, 410]}
   ],
   "subs": [
-    {"name": "Player Full Name", "rating": 103, "position": "DMF"}
+    {"name": "Player Full Name", "rating": 103, "position": "DMF", "box": [200, 850, 350, 940]}
   ]
 }`;
 

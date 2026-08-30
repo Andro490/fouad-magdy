@@ -133,7 +133,8 @@ const TeamBuilder = () => {
          id: (idCounter++).toString(),
          name: p.name || 'Unknown',
          rating: parseInt(p.rating) || 85,
-         position: p.position || 'CMF'
+         position: p.position || 'CMF',
+         box: p.box
       });
 
       const allPlayers = [
@@ -143,17 +144,40 @@ const TeamBuilder = () => {
       setStarters(allPlayers.slice(0, 11));
       setSubs(allPlayers.slice(11));
 
-      // جلب صور كروت اللاعبين عبر الباكيند (لتجنب CORS)
-      setProgressStatus('جاري جلب صور الكروت...');
+      // قص صور الكروت مباشرة من الصورة المرفوعة بناءً على الإحداثيات من Gemini
+      setProgressStatus('جاري استخراج صور اللاعبين من التشكيلة...');
       const images: Record<string, string> = {};
-      await Promise.all(allPlayers.map(async (player) => {
-        try {
-          const res = await fetch(`${API_URL}/api/player-card?name=${encodeURIComponent(player.name)}&rating=${player.rating}`);
-          if (!res.ok) return;
-          const d = await res.json();
-          if (d.imageUrl) images[player.name] = d.imageUrl;
-        } catch { /* تجاهل الأخطاء لكل لاعب */ }
-      }));
+      
+      try {
+        const img = new Image();
+        img.src = base64Image;
+        await new Promise(resolve => { img.onload = resolve; });
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (ctx) {
+          allPlayers.forEach(player => {
+            // box: [ymin, xmin, ymax, xmax] normalized 0-1000
+            if (player.box && player.box.length === 4) {
+              const [ymin, xmin, ymax, xmax] = player.box;
+              const sourceX = (xmin / 1000) * img.width;
+              const sourceY = (ymin / 1000) * img.height;
+              const sourceWidth = ((xmax - xmin) / 1000) * img.width;
+              const sourceHeight = ((ymax - ymin) / 1000) * img.height;
+              
+              canvas.width = sourceWidth;
+              canvas.height = sourceHeight;
+              
+              ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+              images[player.name] = canvas.toDataURL('image/jpeg', 0.9);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to crop images from canvas', err);
+      }
+      
       setPlayerImages(images);
 
       setIsProcessing(false);

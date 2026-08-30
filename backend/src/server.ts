@@ -1200,17 +1200,25 @@ app.post('/api/analyze-team', async (req, res) => {
 
     const base64Data = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
 
-    const prompt = `You are a precise eFootball screen parser. Analyze the uploaded screenshot of the eFootball team squad.
-You must extract EXACTLY 11 starting players from the pitch and up to 7 substitute players from the right sidebar bench. Do NOT hallucinate or repeat players.
+    const prompt = `You are an expert eFootball game data analyst and vision AI. 
+Analyze the uploaded eFootball squad screenshot thoroughly. 
 
-Return ONLY a JSON object in this exact structure, containing real player names based on their face/card, their exact yellow rating number, and green position:
+Your task is to extract:
+1. The 11 starting players positioned on the main pitch (from the bottom goalkeeper up to the center-forward).
+2. The substitute players listed on the right sidebar bench.
+
+For every single player, accurately identify:
+- "name": The exact, standard full player name matching standard eFootball databases like EFHub (e.g., "Lionel Messi", "James Rodríguez", "Ronaldinho", "Zlatan Ibrahimović", "Andrés Iniesta"). Do NOT use abbreviations or fake names. Match the player face and card accurately.
+- "rating": The exact yellow/gold number rating displayed on their card (e.g., 107, 106, 104, 103, 105).
+- "position": The exact green position code shown on the card (e.g., GK, CB, LB, RB, DMF, CMF, AMF, LWF, RWF, CF, SS, LMF).
+
+Return ONLY a valid JSON object matching this precise structure, with no extra text or markdown formatting outside the JSON block:
 {
   "starters": [
-    {"name": "Player Name", "rating": 107, "position": "GK"},
-    {"name": "Player Name", "rating": 104, "position": "CB"}
+    {"name": "Player Full Name", "rating": 104, "position": "CB"}
   ],
   "subs": [
-    {"name": "Player Name", "rating": 106, "position": "GK"}
+    {"name": "Player Full Name", "rating": 103, "position": "DMF"}
   ]
 }`;
 

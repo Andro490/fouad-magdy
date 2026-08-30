@@ -148,7 +148,7 @@ const TeamBuilder = () => {
       const images: Record<string, string> = {};
       await Promise.all(allPlayers.map(async (player) => {
         try {
-          const res = await fetch(`/api/player-card?name=${encodeURIComponent(player.name)}&rating=${player.rating}`);
+          const res = await fetch(`${API_URL}/api/player-card?name=${encodeURIComponent(player.name)}&rating=${player.rating}`);
           if (!res.ok) return;
           const d = await res.json();
           if (d.imageUrl) images[player.name] = d.imageUrl;

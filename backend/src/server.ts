@@ -1275,14 +1275,15 @@ app.get('/api/player-card', async (req, res) => {
 
     // Prefer Epic (playerType 5), then closest rating match
     const targetRating = parseInt(req.query.rating as string) || 100;
-    const epic = list.find((p: any) => p.playerType === 5 && p.imageUrl);
+    const epic = list.find((p: any) => p.playerType === 5 && p.id);
     const closest = list.reduce((best: any, p: any) => {
-      if (!p.imageUrl) return best;
+      if (!p.id) return best;
       return (!best || Math.abs(p.overallRating - targetRating) < Math.abs(best.overallRating - targetRating)) ? p : best;
     }, null);
 
     const chosen = epic || closest;
-    res.json({ imageUrl: chosen?.imageUrl || null, playerType: chosen?.playerType });
+    const finalUrl = chosen?.id ? `https://efimg.com/efootballhub22/images/player_cards/${chosen.id}_l.png` : null;
+    res.json({ imageUrl: finalUrl, playerType: chosen?.playerType });
   } catch (err: any) {
     res.json({ imageUrl: null, error: err.message });
   }

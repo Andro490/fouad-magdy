@@ -353,6 +353,178 @@ const TeamBuilder = () => {
           </p>
         </motion.div>
 
+        {/* ─── Video Section ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(34,197,94,0.12)] max-w-4xl mx-auto"
+        >
+          <video
+            src="/foud.mp4"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full object-cover"
+            style={{ maxHeight: '480px' }}
+          />
+        </motion.div>
+
+        {/* ─── Pricing Plans ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-14 max-w-5xl mx-auto"
+        >
+          <h2 className="text-3xl font-black text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400">
+            اختر خطتك
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+
+            {/* ── Plan 1: Basic ── */}
+            <motion.div
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="relative bg-white/5 border border-white/10 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl"
+            >
+              <div className="text-center">
+                <span className="text-4xl mb-2 block">⚙️</span>
+                <h3 className="text-xl font-black text-white mb-1">الخطة الأساسية</h3>
+                <p className="text-gray-500 text-sm">للمبتدئين</p>
+              </div>
+
+              <ul className="space-y-3 flex-1 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  أساليب اللاعبين حسب مركزهم
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  خطة تكتيكية منظمة على حسب التشكيلة
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  اسم المدرب الأنسب لفريقك
+                </li>
+              </ul>
+
+              <button
+                onClick={() => document.getElementById('team-builder-start')?.scrollIntoView({ behavior: 'smooth' })}
+                className="mt-2 w-full py-3 rounded-xl font-black bg-white/10 border border-white/20 hover:bg-white/20 transition-all text-white"
+              >
+                ابدأ مجاناً
+              </button>
+            </motion.div>
+
+            {/* ── Plan 2: Premium ── */}
+            <motion.div
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="relative bg-gradient-to-b from-green-900/40 to-blue-900/30 border border-green-400/40 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl shadow-[0_0_30px_rgba(34,197,94,0.2)]"
+            >
+              {/* Most Popular Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="bg-gradient-to-r from-green-500 to-blue-600 text-white text-xs font-black px-5 py-1.5 rounded-full shadow-lg">
+                  🔥 الأكثر طلباً
+                </span>
+              </div>
+
+              <div className="text-center mt-3">
+                <span className="text-4xl mb-2 block">⚡</span>
+                <h3 className="text-xl font-black text-white mb-1">الخطة المتقدمة</h3>
+                <p className="text-gray-400 text-sm">للمحترفين</p>
+              </div>
+
+              <ul className="space-y-3 flex-1 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  أساليب اللاعبين حسب مركزهم
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  خطة تكتيكية منظمة على حسب التشكيلة
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  اسم المدرب الأنسب لفريقك
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-400 font-bold">✦</span>
+                  <span className="text-blue-300 font-bold">خطة هجومية متكاملة</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-400 font-bold">✦</span>
+                  <span className="text-blue-300 font-bold">خطة دفاعية متكاملة</span>
+                </li>
+              </ul>
+
+              <button
+                onClick={() => document.getElementById('team-builder-start')?.scrollIntoView({ behavior: 'smooth' })}
+                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-400 hover:to-blue-500 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+              >
+                اختر هذه الخطة
+              </button>
+            </motion.div>
+
+            {/* ── Plan 3: VIP ── */}
+            <motion.div
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="relative bg-gradient-to-b from-yellow-900/30 to-orange-900/20 border border-yellow-400/30 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl"
+            >
+              <div className="text-center">
+                <span className="text-4xl mb-2 block">👑</span>
+                <h3 className="text-xl font-black text-white mb-1">خطة VIP</h3>
+                <p className="text-gray-400 text-sm">جلسة خاصة مع فوائد مجدي</p>
+              </div>
+
+              <ul className="space-y-3 flex-1 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  أساليب اللاعبين حسب مركزهم
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  خطة تكتيكية منظمة على حسب التشكيلة
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-400 font-bold">✓</span>
+                  اسم المدرب الأنسب لفريقك
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-400 font-bold">✦</span>
+                  خطة هجومية ودفاعية متكاملة
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-yellow-400 font-bold">★</span>
+                  <span className="text-yellow-300 font-bold">تواصل مباشر مع فوائد مجدي على تيليغرام</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-yellow-400 font-bold">★</span>
+                  <span className="text-yellow-300 font-bold">جلسة تحليل خاصة لفريقك</span>
+                </li>
+              </ul>
+
+              <a
+                href="https://t.me/FouadMagdyF9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 transition-all text-black text-center shadow-[0_0_20px_rgba(234,179,8,0.3)] block"
+              >
+                📩 تواصل على تيليغرام
+              </a>
+            </motion.div>
+
+          </div>
+        </motion.div>
+
+        {/* ─── Team Builder Tool ─── */}
+        <div id="team-builder-start" />
+
         {/* Progress Bar */}
         <div className="flex items-center justify-center gap-4 mb-12">
           {[1, 2, 3].map((step) => (

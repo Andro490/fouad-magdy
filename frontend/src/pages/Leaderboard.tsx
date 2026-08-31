@@ -103,8 +103,9 @@ export default function Leaderboard() {
             </div>
           ) : streamers.length === 0 ? (
             <div className="text-center py-10 text-gray-400">
-              <p className="text-xl">لا يوجد صناع محتوى حالياً.</p>
-              <p className="text-sm mt-2">قم بالموافقة على تقارير الفيديوهات في لوحة الإدارة لتظهر هنا!</p>
+              <p className="text-2xl mb-3">🎬</p>
+              <p className="text-xl text-white font-bold mb-2">لا يوجد صناع محتوى حالياً</p>
+              <p className="text-sm mt-2">ارفع رابط فيديوهاتك في <span className="text-accent font-bold">لوحة التحكم</span> وانتظر حتى يتم معاينته من الإدارة</p>
             </div>
           ) : (
             <AnimatePresence>

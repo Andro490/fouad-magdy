@@ -764,15 +764,19 @@ app.post('/api/users/reset-points', authenticateToken, async (req: AuthRequest, 
       return res.status(403).json({ error: 'هذه العملية للأدمن فقط' });
     }
 
-    // Reset coins to 0 for ALL users in one query
-    const result = await prisma.user.updateMany({
+    // 1. Reset coins to 0 for ALL users
+    const usersResult = await prisma.user.updateMany({
       data: { coins: 0 }
     });
 
+    // 2. Delete ALL video reports (leaderboard is built from approved videos)
+    const videosResult = await prisma.videoReport.deleteMany({});
+
     res.json({
       success: true,
-      message: `تم تصفير نقاط ${result.count} حساب بنجاح 🎯`,
-      count: result.count
+      message: `تم تصفير نقاط ${usersResult.count} حساب وحذف ${videosResult.count} فيديو بنجاح 🎯`,
+      usersReset: usersResult.count,
+      videosDeleted: videosResult.count
     });
   } catch (err: any) {
     console.error('Reset points error:', err);

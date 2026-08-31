@@ -28,7 +28,7 @@ const ResetPoints = () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setResetCount(data.count);
+        setResetCount(data.usersReset ?? data.count ?? 0);
         setResultMsg(data.message);
         setStep('success');
       } else {

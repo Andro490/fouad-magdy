@@ -17,7 +17,7 @@ const ResetPoints = () => {
   const handleReset = async () => {
     setStep('loading');
     try {
-      const token = localStorage.getItem('token') || '';
+      const token = localStorage.getItem('authToken') || '';
       const res = await fetch(`${API_URL}/api/users/reset-points`, {
         method: 'POST',
         headers: {

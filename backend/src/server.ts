@@ -1274,20 +1274,34 @@ app.post('/api/tactical-advice', async (req, res) => {
     const { starters, subs } = req.body;
     if (!starters || !Array.isArray(starters)) return res.status(400).json({ error: 'starters array is required' });
 
-    // Fetch actual playstyles from EFHub for better AI accuracy
+    // Fetch actual playstyles from EFHub using pagination
     const startersWithPlaystyles = await Promise.all(starters.map(async (p: any) => {
       try {
         const lastName = p.name.split(' ').pop() || p.name;
-        // نستخدم limit كبير لنجلب كل النسخ (ابيك 5، شوتايم 8، الخ) في طلب واحد سريع
-        const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=50`);
-        if (res.ok) {
-          const data = await res.json();
-          const list = Array.isArray(data) ? data : (data.data || data.players || []);
-          // نبحث عن أقرب تقييم للبطاقة، هذا سيجلب البطاقة الصحيحة (سواء كانت Epic أو غيره)
-          const match = list.find((ep: any) => Math.abs(ep.overallRating - p.rating) <= 5) || list[0];
-          if (match && match.playingStyle) {
-            return { ...p, actualPlaystyle: match.playingStyle };
+        let match = null;
+        let fallback = null;
+        
+        for (let page = 1; page <= 4; page++) {
+          const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&page=${page}`);
+          if (res.ok) {
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.data || data.players || []);
+            if (list.length === 0) break;
+            if (page === 1) fallback = list[0];
+            
+            const exact = list.find((ep: any) => Math.abs(ep.overallRating - p.rating) <= 4);
+            if (exact) {
+              match = exact;
+              break;
+            }
+          } else {
+            break;
           }
+        }
+        
+        const finalMatch = match || fallback;
+        if (finalMatch && finalMatch.playingStyle) {
+          return { ...p, actualPlaystyle: finalMatch.playingStyle };
         }
       } catch (err) {}
       return { ...p, actualPlaystyle: 'Standard' };
@@ -1357,30 +1371,34 @@ app.get('/api/player-card', async (req, res) => {
     const name = req.query.name as string;
     if (!name) return res.status(400).json({ error: 'name is required' });
 
-    // Search by last name for better results
+    // Search by last name and paginate to find the exact match
     const lastName = name.split(' ').pop() || name;
-    const apiUrl = `https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=10`;
-
-    const response = await fetch(apiUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
-    });
-
-    if (!response.ok) return res.json({ imageUrl: null });
-
-    const data = await response.json();
-    const list: any[] = Array.isArray(data) ? data : (data.data || data.players || []);
-
-    if (list.length === 0) return res.json({ imageUrl: null });
-
-    // Prefer Epic (playerType 5), then closest rating match
     const targetRating = parseInt(req.query.rating as string) || 100;
-    const epic = list.find((p: any) => p.playerType === 5 && p.id);
-    const closest = list.reduce((best: any, p: any) => {
-      if (!p.id) return best;
-      return (!best || Math.abs(p.overallRating - targetRating) < Math.abs(best.overallRating - targetRating)) ? p : best;
-    }, null);
+    let match = null;
+    let fallback = null;
 
-    const chosen = epic || closest;
+    for (let page = 1; page <= 4; page++) {
+      const apiUrl = `https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&page=${page}`;
+      const response = await fetch(apiUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) break;
+
+      const data = await response.json();
+      const list: any[] = Array.isArray(data) ? data : (data.data || data.players || []);
+      
+      if (list.length === 0) break;
+      if (page === 1) fallback = list.find((p: any) => p.playerType === 5) || list[0]; // Prefer Epic as fallback
+
+      const exact = list.find((p: any) => Math.abs(p.overallRating - targetRating) <= 4);
+      if (exact) {
+        match = exact;
+        break;
+      }
+    }
+
+    const chosen = match || fallback;
     const finalUrl = chosen?.id ? `https://efimg.com/efootballhub22/images/player_cards/${chosen.id}_l.png` : null;
     res.json({ imageUrl: finalUrl, playerType: chosen?.playerType });
   } catch (err: any) {

@@ -243,6 +243,18 @@ const TeamBuilder = () => {
 
   const prevStage = () => setStage((prev) => Math.max(prev - 1, 1));
 
+  // ترتيب اللاعبين على الملعب حسب مراكزهم الفعلية
+  const sortOrder: Record<string, number> = {
+    'LWF': 1, 'SS': 2, 'CF': 3, 'RWF': 4,
+    'LMF': 1, 'AMF': 2, 'CMF': 3, 'DMF': 4, 'RMF': 5,
+    'LB': 1, 'CB': 2, 'RB': 3
+  };
+
+  const pitchAttackers = starters.filter(p => ['CF', 'SS', 'LWF', 'RWF'].includes(p.position)).sort((a, b) => (sortOrder[a.position] || 9) - (sortOrder[b.position] || 9));
+  const pitchMidfielders = starters.filter(p => ['AMF', 'CMF', 'DMF', 'LMF', 'RMF'].includes(p.position)).sort((a, b) => (sortOrder[a.position] || 9) - (sortOrder[b.position] || 9));
+  const pitchDefenders = starters.filter(p => ['CB', 'LB', 'RB'].includes(p.position)).sort((a, b) => (sortOrder[a.position] || 9) - (sortOrder[b.position] || 9));
+  const pitchGk = starters.find(p => p.position === 'GK') || starters[0];
+
   return (
     <div className="min-h-screen bg-[#030510] text-white pt-24 pb-12 px-5 md:px-10 overflow-hidden relative" dir="rtl">
       {/* Background Effects */}
@@ -512,9 +524,9 @@ const TeamBuilder = () => {
                 <div className="absolute top-1/4 -left-4 w-1/4 h-1/2 border-2 border-white/30 pointer-events-none" />
 
                 <div className="relative z-10 w-full h-full text-sm font-bold flex flex-row-reverse items-center">
-                   {/* Attackers (First 3) */}
+                   {/* Attackers */}
                    <div className="flex flex-col justify-around h-full w-1/3 py-10">
-                     {starters.slice(8, 11).map((p, i) => (
+                     {pitchAttackers.map((p, i) => (
                        <div key={`att-${i}`} className="flex flex-col items-center">
                          <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-red-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
                            {playerImages[p.name] ? (
@@ -529,9 +541,9 @@ const TeamBuilder = () => {
                      ))}
                    </div>
 
-                   {/* Midfielders (Next 3) */}
+                   {/* Midfielders */}
                    <div className="flex flex-col justify-around h-[80%] w-1/3">
-                     {starters.slice(5, 8).map((p, i) => (
+                     {pitchMidfielders.map((p, i) => (
                        <div key={`mid-${i}`} className="flex flex-col items-center">
                          <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-green-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
                            {playerImages[p.name] ? (
@@ -546,9 +558,9 @@ const TeamBuilder = () => {
                      ))}
                    </div>
 
-                   {/* Defenders (Next 4) */}
+                   {/* Defenders */}
                    <div className="flex flex-col justify-around h-full w-1/3 py-4">
-                     {starters.slice(1, 5).map((p, i) => (
+                     {pitchDefenders.map((p, i) => (
                        <div key={`def-${i}`} className="flex flex-col items-center">
                          <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-blue-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
                            {playerImages[p.name] ? (
@@ -564,17 +576,17 @@ const TeamBuilder = () => {
                    </div>
 
                    {/* GK */}
-                   {starters[0] && (
+                   {pitchGk && (
                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
                        <div className="w-12 h-12 bg-gray-900 rounded-full border-2 border-yellow-500 flex items-center justify-center mb-1 shadow-lg overflow-hidden relative">
-                         {playerImages[starters[0].name] ? (
-                           <img src={playerImages[starters[0].name]} alt={starters[0].name} className="w-full h-full object-cover" />
+                         {playerImages[pitchGk.name] ? (
+                           <img src={playerImages[pitchGk.name]} alt={pitchGk.name} className="w-full h-full object-cover" />
                          ) : (
-                           <span className="text-white text-xs">{starters[0].rating}</span>
+                           <span className="text-white text-xs">{pitchGk.rating}</span>
                          )}
-                         {!playerImages[starters[0].name] && <div className="absolute inset-0 bg-yellow-500/20" />}
+                         {!playerImages[pitchGk.name] && <div className="absolute inset-0 bg-yellow-500/20" />}
                        </div>
-                       <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{starters[0].name}</span>
+                       <span className="bg-black/80 px-2 py-0.5 rounded text-[10px] truncate max-w-[70px] border border-white/10">{pitchGk.name}</span>
                      </div>
                    )}
                 </div>

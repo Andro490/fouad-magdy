@@ -1278,11 +1278,13 @@ app.post('/api/tactical-advice', async (req, res) => {
     const startersWithPlaystyles = await Promise.all(starters.map(async (p: any) => {
       try {
         const lastName = p.name.split(' ').pop() || p.name;
-        const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=5`);
+        // نستخدم limit كبير لنجلب كل النسخ (ابيك 5، شوتايم 8، الخ) في طلب واحد سريع
+        const res = await fetch(`https://efhub.com/api/public/players?search=${encodeURIComponent(lastName)}&limit=50`);
         if (res.ok) {
           const data = await res.json();
           const list = Array.isArray(data) ? data : (data.data || data.players || []);
-          const match = list.find((ep: any) => Math.abs(ep.overallRating - p.rating) <= 7) || list[0];
+          // نبحث عن أقرب تقييم للبطاقة، هذا سيجلب البطاقة الصحيحة (سواء كانت Epic أو غيره)
+          const match = list.find((ep: any) => Math.abs(ep.overallRating - p.rating) <= 5) || list[0];
           if (match && match.playingStyle) {
             return { ...p, actualPlaystyle: match.playingStyle };
           }

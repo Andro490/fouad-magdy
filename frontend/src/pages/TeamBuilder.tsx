@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Player {
@@ -64,6 +64,42 @@ const TeamBuilder = () => {
   const [playerImages, setPlayerImages] = useState<Record<string, string>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [telegramVerified, setTelegramVerified] = useState(localStorage.getItem('telegram_verified') === 'true');
+  const [botInfo, setBotInfo] = useState({ enabled: false, botUsername: '', channelUsername: '' });
+  const [sessionId, setSessionId] = useState('');
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+
+  useEffect(() => {
+    let sid = localStorage.getItem('telegram_session_id');
+    if (!sid) {
+      sid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('telegram_session_id', sid);
+    }
+    setSessionId(sid);
+
+    fetch(`${API_URL}/api/telegram/bot-info`)
+      .then(r => r.json())
+      .then(d => setBotInfo(d))
+      .catch(console.error);
+  }, [API_URL]);
+
+  useEffect(() => {
+    if (!telegramVerified && botInfo.enabled && sessionId) {
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch(`${API_URL}/api/telegram/verify-session?sessionId=${sessionId}`);
+          const data = await res.json();
+          if (data.verified) {
+            localStorage.setItem('telegram_verified', 'true');
+            setTelegramVerified(true);
+            clearInterval(interval);
+          }
+        } catch (e) {}
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [telegramVerified, botInfo.enabled, sessionId, API_URL]);
 
   /**
    * معالجة الصورة باستخدام الذكاء الاصطناعي البصري (Vision AI)
@@ -264,6 +300,46 @@ const TeamBuilder = () => {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
+        {/* Telegram Verification Modal */}
+        <AnimatePresence>
+          {!telegramVerified && botInfo.enabled && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#030510]/90 backdrop-blur-sm p-4"
+            >
+              <div className="bg-[#0f172a] border border-blue-500/30 rounded-3xl p-8 max-w-md w-full shadow-[0_0_50px_rgba(59,130,246,0.1)] relative overflow-hidden text-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl" />
+                
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-green-400 rounded-full mx-auto flex items-center justify-center mb-6 shadow-lg shadow-green-500/20">
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.892-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                  </svg>
+                </div>
+
+                <h2 className="text-2xl font-bold text-white mb-3">اشترك بقناتنا أول</h2>
+                <p className="text-gray-400 mb-6 leading-relaxed">
+                  هذه الميزة مجانية، وشرطها الوحيد إنك تكون بقناتنا على تلغرام {botInfo.channelUsername} — منها تجيك الأخبار والتسريبات أول بأول.
+                </p>
+
+                <a
+                  href={`https://t.me/${botInfo.botUsername}?start=${sessionId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-black font-black text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(52,211,153,0.4)] hover:scale-105"
+                >
+                  افتح القناة واشترك ✈️
+                </a>
+
+                <p className="text-xs text-gray-600 mt-6 font-bold">
+                  التحقق يصير عند تلغرام نفسه — إحنا ما نشوف حسابك ولا رسائلك.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

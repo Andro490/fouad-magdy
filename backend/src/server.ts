@@ -1406,6 +1406,95 @@ app.get('/api/player-card', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────
+// TELEGRAM FORCE SUBSCRIBE BOT LOGIC
+// ─────────────────────────────────────────
+let telegramLastUpdateId = 0;
+const verifiedSessions = new Set<string>();
+let isPollingTelegram = false;
+
+async function pollTelegramBot() {
+  if (isPollingTelegram) return;
+  isPollingTelegram = true;
+  
+  try {
+    const settings = readSettings();
+    const token = settings.telegramBotToken;
+    const channelId = settings.telegramChatId; // e.g. @fouadmgdym
+    
+    if (token && channelId) {
+      const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${telegramLastUpdateId + 1}&timeout=30`);
+      if (res.ok) {
+        const data = await res.json();
+        for (const update of (data.result || [])) {
+          telegramLastUpdateId = update.update_id;
+          if (update.message && update.message.text && update.message.text.startsWith('/start ')) {
+            const sessionId = update.message.text.split(' ')[1];
+            const userId = update.message.from.id;
+            const chatId = update.message.chat.id;
+
+            // Check channel membership
+            const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${channelId}&user_id=${userId}`);
+            const memberData = await memberRes.json();
+            const status = memberData.result?.status;
+
+            if (status === 'member' || status === 'administrator' || status === 'creator') {
+              verifiedSessions.add(sessionId);
+              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: '✅ تمام!\n\nارجع للتطبيق — راح يفتح خلال ثوانٍ.'
+                })
+              });
+            } else {
+              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القناة ${channelId} ثم المحاولة مرة أخرى.`
+                })
+              });
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {}
+  
+  isPollingTelegram = false;
+  setTimeout(pollTelegramBot, 2000);
+}
+
+// Start polling
+setTimeout(pollTelegramBot, 2000);
+
+app.get('/api/telegram/bot-info', async (req, res) => {
+  const token = readSettings().telegramBotToken;
+  const channel = readSettings().telegramChatId;
+  if (!token || !channel) return res.json({ enabled: false });
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+    const d = await r.json();
+    if (d.ok) {
+      return res.json({ enabled: true, botUsername: d.result.username, channelUsername: channel });
+    }
+    return res.json({ enabled: false });
+  } catch {
+    return res.json({ enabled: false });
+  }
+});
+
+app.get('/api/telegram/verify-session', (req, res) => {
+  const { sessionId } = req.query;
+  if (verifiedSessions.has(sessionId as string)) {
+    return res.json({ verified: true });
+  }
+  return res.json({ verified: false });
+});
+
 // Start Server
 app.listen(PORT, async () => {
   console.log(`StreamHub API is running on http://localhost:${PORT}`);

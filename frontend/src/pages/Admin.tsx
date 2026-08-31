@@ -11,11 +11,12 @@ import SupportChatAdmin from '../components/admin/SupportChatAdmin';
 import SubAdminsManagement from '../components/admin/SubAdminsManagement';
 import SiteSettings from '../components/admin/SiteSettings';
 import SellerProfileSettings from '../components/admin/SellerProfileSettings';
+import ResetPoints from '../components/admin/ResetPoints';
 
 const Admin = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings' | 'sellerProfile'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings' | 'sellerProfile' | 'resetPoints'>('products');
 
   useEffect(() => {
     // Both ADMIN and SELLER can access this page
@@ -100,6 +101,12 @@ const Admin = () => {
             >
               إعدادات حسابي (صور الثقة)
             </button>
+            <button 
+              onClick={() => setActiveTab('resetPoints')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'resetPoints' ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-dark-lighter text-red-400 hover:text-red-300 border border-red-800/40'}`}
+            >
+              🔁 تصفير نقاط المسابقة
+            </button>
           </div>
         )}
         
@@ -114,6 +121,7 @@ const Admin = () => {
               {activeTab === 'support' && <SupportChatAdmin />}
               {activeTab === 'subadmins' && <SubAdminsManagement />}
               {activeTab === 'settings' && <SiteSettings />}
+              {activeTab === 'resetPoints' && <ResetPoints />}
             </>
           )}
         </div>

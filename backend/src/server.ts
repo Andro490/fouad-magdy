@@ -755,6 +755,31 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────
+// RESET ALL USERS POINTS (Admin only - Monthly Competition Reset)
+// ─────────────────────────────────────────
+app.post('/api/users/reset-points', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'هذه العملية للأدمن فقط' });
+    }
+
+    // Reset coins to 0 for ALL users in one query
+    const result = await prisma.user.updateMany({
+      data: { coins: 0 }
+    });
+
+    res.json({
+      success: true,
+      message: `تم تصفير نقاط ${result.count} حساب بنجاح 🎯`,
+      count: result.count
+    });
+  } catch (err: any) {
+    console.error('Reset points error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Public: GET seller profile by ID
 app.get('/api/users/:id/profile', async (req, res) => {
   try {

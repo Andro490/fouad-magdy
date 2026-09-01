@@ -1340,29 +1340,38 @@ app.post('/api/tactical-advice', async (req, res) => {
       `- ${p.name} (Pos: ${p.position}, Rating: ${p.rating}, Actual eFootball Playstyle: ${p.actualPlaystyle})`
     ).join('\n');
 
-    const prompt = `You are an expert eFootball tactical manager. Analyze this team of 11 starting players and their ACTUAL eFootball playstyles:
+    const prompt = `أنت محلل تكتيكي محترف في لعبة eFootball. مهمتك تحليل هذا الفريق من 11 لاعب أساسي بناءً على أساليب لعبهم الحقيقية في اللعبة:
+
 ${playersText}
 
-Based on these exact players, their positions, and their ACTUAL playstyles provided above, determine the absolute best tactical setup.
-When outputting 'playerRoles', YOU MUST USE the player's 'Actual eFootball Playstyle' (e.g. Build Up, Destroyer, Creative Playmaker, Anchor Man) as the 'role', and explain why this specific playstyle is useful for the team.
+⚠️ قاعدة صارمة جداً: يجب أن تختار الخطة من هذه القائمة المحددة فقط ولا تخرج عنها أبداً:
 
-Return ONLY a JSON object exactly matching this structure in Arabic:
+1. 4-2-1-3 (بها 2 CF + 1 SS في الهجوم) — مناسبة عند وجود لاعبين CF قويين ولاعب SS يصنع الألعاب بين الخطوط
+2. 4-3-1-2 (بها 2 CF في الهجوم + 1 AMF خلفهم) — مناسبة عند وجود قلبين هجوميين ولاعب وسط هجومي يدعمهم
+3. 4-2-2-2 (بها 2 AMF + 2 CF) — مناسبة عند وجود لاعبي وسط هجوميين قويين مع مهاجمين من أعلى مستوى
+
+اختر الخطة الأنسب بناءً على:
+- مراكز اللاعبين الفعلية الموجودة في التشكيلة (CF، SS، AMF، إلخ)
+- أسلوب لعب كل لاعب (Build Up، Destroyer، Anchor Man، Creative Playmaker، إلخ)
+- التناسق الهجومي والدفاعي بين اللاعبين
+
+عند كتابة "playerRoles" يجب أن تستخدم الأسلوب الفعلي للاعب (Actual eFootball Playstyle) كـ "role" وتشرح فائدته للفريق.
+
+أرجع JSON فقط بهذه البنية باللغة العربية بدون أي نص خارج الـ JSON:
 {
-  "formation": "e.g. 4-3-3",
+  "formation": "اكتب هنا إحدى الخطط الثلاث فقط: 4-2-1-3 أو 4-3-1-2 أو 4-2-2-2",
   "playstyle": {
-    "name": "e.g. الهجمة المرتدة السريعة (Quick Counter)",
-    "description": "شرح تفصيلي باللغة العربية لماذا هذا الأسلوب هو الأفضل لهذه التشكيلة تحديداً بناءً على أساليب اللاعبين",
-    "score": 92
+    "name": "مثال: الهجوم الثنائي المتوازن (Balanced Attack)",
+    "description": "شرح تفصيلي بالعربي لماذا هذه الخطة هي الأنسب لهذا الفريق تحديداً بناءً على أساليب اللاعبين ومراكزهم",
+    "score": 90
   },
   "manager": {
-    "name": "e.g. Zeitzler (Klopp)",
-    "tactic": "e.g. 4-3-3 الهجومي",
-    "compatibility": "كفاءة ممتازة"
+    "name": "اسم المدرب الأنسب في eFootball مثال: Zeitzler (Klopp)",
+    "tactic": "اسم التكتيك مثال: 4-2-1-3 الهجومي",
+    "compatibility": "وصف مستوى التوافق مثال: كفاءة عالية جداً مع الفريق"
   },
   "playerRoles": [
-    { "position": "قلب دفاع أيمن - اسم اللاعب", "role": "الأسلوب الفعلي للاعب (e.g. Destroyer)", "reason": "شرح كيف يفيد أسلوب هذا اللاعب التشكيلة" },
-    { "position": "صانع ألعاب - اسم اللاعب", "role": "الأسلوب الفعلي للاعب (e.g. Creative Playmaker)", "reason": "شرح التأثير" }
-    // اذكر أدوار أهم اللاعبين في التشكيلة (5 لاعبين على الأقل) باستخدام أساليبهم الحقيقية
+    { "position": "المركز والاسم مثال: قلب دفاع أيمن - Van Dijk", "role": "الأسلوب الفعلي للاعب مثال: Destroyer", "reason": "شرح كيف يفيد هذا الأسلوب الفريق" }
   ]
 }`;
 

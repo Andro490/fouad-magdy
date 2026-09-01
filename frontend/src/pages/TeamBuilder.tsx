@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import foudVideo from '../assets/foud.mp4';
 
 interface Player {
   id: string;
@@ -362,7 +363,7 @@ const TeamBuilder = () => {
           className="mb-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(34,197,94,0.12)] max-w-4xl mx-auto"
         >
           <video
-            src="/foud.mp4"
+            src={foudVideo}
             controls
             autoPlay
             muted
@@ -438,27 +439,27 @@ const TeamBuilder = () => {
               className="relative bg-white/5 border border-white/10 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl"
             >
               <div className="text-center">
-                <span className="text-4xl mb-2 block">⚙️</span>
-                <h3 className="text-xl font-black text-white mb-1">الخطة الأساسية</h3>
-                <p className="text-gray-500 text-sm">للمبتدئين</p>
+                <span className="text-4xl mb-2 block">💬</span>
+                <h3 className="text-xl font-black text-white mb-1">الباقة الأولى</h3>
+                <p className="text-gray-500 text-sm">تواصل تليجرام</p>
               </div>
 
               <div className="text-center">
                 <span className="text-3xl font-black text-white">199 <span className="text-lg text-gray-400">ج</span></span>
               </div>
 
+              <p className="text-gray-400 text-xs text-center">
+                للي عايز يتطور ويعرف أخطاءه ويحصل على التوجيه المناسب.
+              </p>
+
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  أساليب اللاعبين حسب مركزهم
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>تواصل مباشر على تليجرام.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  خطة تكتيكية منظمة على حسب التشكيلة
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  اسم المدرب الأنسب لفريقك
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>هتبعت خطتك ولاعيبتك ويتم إرسال ليك التعديل علي الخطه وأحسن أسلوب لعب مناسب ليك .</span>
                 </li>
               </ul>
 
@@ -466,9 +467,9 @@ const TeamBuilder = () => {
                 href="https://t.me/fouadmgdym"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 w-full py-3 rounded-xl font-black bg-white/10 border border-white/20 hover:bg-white/20 transition-all text-white text-center block"
+                className="mt-2 w-full py-3 rounded-xl font-black bg-blue-500 hover:bg-blue-400 transition-all text-white text-center block"
               >
-                تواصل على تيليغرام ✈
+                تواصل على تليجرام ✈
               </a>
             </motion.div>
 
@@ -478,43 +479,40 @@ const TeamBuilder = () => {
               transition={{ type: 'spring', stiffness: 300 }}
               className="relative bg-gradient-to-b from-green-900/40 to-blue-900/30 border border-green-400/40 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl shadow-[0_0_30px_rgba(34,197,94,0.2)]"
             >
-              {/* Most Popular Badge */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-gradient-to-r from-green-500 to-blue-600 text-white text-xs font-black px-5 py-1.5 rounded-full shadow-lg">
-                  🔥 الأكثر طلباً
-                </span>
-              </div>
-
               <div className="text-center mt-3">
-                <span className="text-4xl mb-2 block">⚡</span>
-                <h3 className="text-xl font-black text-white mb-1">الخطة المتقدمة</h3>
-                <p className="text-gray-400 text-sm">للمحترفين</p>
+                <span className="text-4xl mb-2 block">📱</span>
+                <h3 className="text-xl font-black text-white mb-1">الباقة الثانية</h3>
+                <p className="text-gray-400 text-sm">تواصل واتساب شخصي مره واحده فقط</p>
               </div>
 
               <div className="text-center">
                 <span className="text-3xl font-black text-green-300">399 <span className="text-lg text-gray-400">ج</span></span>
               </div>
 
+              <p className="text-gray-400 text-xs text-center">
+                متابعة أكثر خصوصية وخطه مناسبة لأسلوب لعبك.
+              </p>
+
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  أساليب اللاعبين حسب مركزهم
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>تواصل شخصي على واتساب.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  خطة تكتيكية منظمة على حسب التشكيلة
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>هبعتلك التعليمات الفردية المناسبة للخطه اللي هنلعب بيها .</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  اسم المدرب الأنسب لفريقك
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>اختيار أفضل خطة تناسب أسلوب لعبك.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-blue-400 font-bold">✦</span>
-                  <span className="text-blue-300 font-bold">خطة هجومية متكاملة</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>اختيار الخطة بناءً على اللعيبة اللي في فريقك .</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-blue-400 font-bold">✦</span>
-                  <span className="text-blue-300 font-bold">خطة دفاعية متكاملة</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 font-bold mt-1">✓</span>
+                  <span>تعديلات ونصائح لو محتاج تشكيله غير اللي معاك تساعدك تستغل تشكيلتك بأفضل شكل.</span>
                 </li>
               </ul>
 
@@ -522,7 +520,7 @@ const TeamBuilder = () => {
                 href="https://wa.me/message/fouadf9"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-400 hover:to-blue-500 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] text-center block"
+                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] text-center block"
               >
                 تواصل على واتساب 📲
               </a>
@@ -532,48 +530,62 @@ const TeamBuilder = () => {
             <motion.div
               whileHover={{ y: -6, scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="relative bg-gradient-to-b from-yellow-900/30 to-orange-900/20 border border-yellow-400/30 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl"
+              className="relative bg-gradient-to-b from-yellow-900/30 to-orange-900/20 border border-yellow-400/30 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl md:-mt-4"
             >
-              <div className="text-center">
-                <span className="text-4xl mb-2 block">👑</span>
-                <h3 className="text-xl font-black text-white mb-1">خطة VIP</h3>
-                <p className="text-gray-400 text-sm">جلسة خاصة مع فوائد مجدي</p>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs font-black px-5 py-1.5 rounded-full shadow-lg">
+                  ⭐ VIP
+                </span>
               </div>
 
+              <div className="text-center mt-3">
+                <span className="text-4xl mb-2 block">👑</span>
+                <h3 className="text-xl font-black text-white mb-1">الباقة الثالثة</h3>
+                <p className="text-gray-400 text-sm">المتابعة الشخصية VIP</p>
+              </div>
+
+              <div className="text-center">
+                <span className="text-3xl font-black text-yellow-400">999 <span className="text-lg text-gray-400">ج</span></span>
+              </div>
+
+              <p className="text-gray-400 text-xs text-center">
+                أعلى مستوى من المتابعة. تحصل علي كل ما يخص الباقتين الل فاتو بالاضافه الي خطة خاصة بيك + دعم لمدة شهر كامل.
+              </p>
+
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  أساليب اللاعبين حسب مركزهم
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>تواصل شخصي مباشر على واتساب علي مدار شهر كامل .</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  خطة تكتيكية منظمة على حسب التشكيلة
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>نعمل لك خطة خاصة بالكامل بطريقة لعبك.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-400 font-bold">✓</span>
-                  اسم المدرب الأنسب لفريقك
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>ضبط التشكيلة والتعليمات بما يناسب أسلوبك واللعيبة اللي معاك.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-blue-400 font-bold">✦</span>
-                  خطة هجومية ودفاعية متكاملة
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>تواجد داخل كميونيتي Discord الخاصة بالبطولات.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-yellow-400 font-bold">★</span>
-                  <span className="text-yellow-300 font-bold">تواصل مباشر مع فوائد مجدي على تيليغرام</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>متابعة لمدة شهر كامل وتقدر ترجعلي خلال الشهر.</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-yellow-400 font-bold">★</span>
-                  <span className="text-yellow-300 font-bold">جلسة تحليل خاصة لفريقك</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-400 font-bold mt-1">★</span>
+                  <span>الاستفسار عن: الخطة، التكتيك، المدرب، التشكيلة، التعليمات، البكجات.</span>
                 </li>
               </ul>
 
               <a
-                href="https://t.me/FouadMagdyF9"
+                href="https://wa.me/message/fouadf9"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 transition-all text-black text-center shadow-[0_0_20px_rgba(234,179,8,0.3)] block"
               >
-                📩 تواصل على تيليغرام
+                تواصل على واتساب VIP 👑
               </a>
             </motion.div>
 

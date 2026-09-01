@@ -592,6 +592,16 @@ const TeamBuilder = () => {
           }}
         />
 
+        <AnimatePresence>
+          {selectedPlan === 'free' && (
+            <motion.div
+              key="builder-tool"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+
         {/* Progress Bar */}
         <div className="flex items-center justify-center gap-4 mb-12">
           {[1, 2, 3].map((step) => (
@@ -973,6 +983,10 @@ const TeamBuilder = () => {
                   إعادة التحليل أو تعديل التشكيلة
                 </button>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
             </motion.div>
           )}
         </AnimatePresence>

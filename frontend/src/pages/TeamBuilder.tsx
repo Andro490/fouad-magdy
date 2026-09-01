@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import foudVideo from '../assets/foud.mp4';
 
 interface Player {
@@ -54,6 +55,7 @@ const mockSubs: Player[] = [
 ];
 
 const TeamBuilder = () => {
+  const navigate = useNavigate();
   const [stage, setStage] = useState(1);
   const [isManual, setIsManual] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'basic' | 'premium' | 'vip' | null>(null);
@@ -463,14 +465,12 @@ const TeamBuilder = () => {
                 </li>
               </ul>
 
-              <a
-                href="https://t.me/fouadmgdym"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الأولى - تواصل تليجرام', price: '199 ج' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-blue-500 hover:bg-blue-400 transition-all text-white text-center block"
               >
-                تواصل على تليجرام ✈
-              </a>
+                اشترك الآن ✈
+              </button>
             </motion.div>
 
             {/* ── Plan 2: Premium ── */}
@@ -516,14 +516,12 @@ const TeamBuilder = () => {
                 </li>
               </ul>
 
-              <a
-                href="https://wa.me/message/fouadf9"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثانية - واتساب شخصي', price: '399 ج' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] text-center block"
               >
-                تواصل على واتساب 📲
-              </a>
+                اشترك الآن 📲
+              </button>
             </motion.div>
 
             {/* ── Plan 3: VIP ── */}
@@ -579,14 +577,12 @@ const TeamBuilder = () => {
                 </li>
               </ul>
 
-              <a
-                href="https://wa.me/message/fouadf9"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثالثة - المتابعة الشخصية VIP', price: '999 ج' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 transition-all text-black text-center shadow-[0_0_20px_rgba(234,179,8,0.3)] block"
               >
-                تواصل على واتساب VIP 👑
-              </a>
+                اشترك الآن VIP 👑
+              </button>
             </motion.div>
 
           </div>

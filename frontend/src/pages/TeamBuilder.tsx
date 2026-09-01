@@ -55,6 +55,7 @@ const mockSubs: Player[] = [
 const TeamBuilder = () => {
   const [stage, setStage] = useState(1);
   const [isManual, setIsManual] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'basic' | 'premium' | 'vip' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressStatus, setProgressStatus] = useState('');
   
@@ -383,7 +384,52 @@ const TeamBuilder = () => {
             اختر خطتك
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+
+            {/* ── Plan 0: FREE (NEW) ── */}
+            <motion.div
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="relative bg-gradient-to-b from-emerald-900/30 to-teal-900/20 border border-emerald-400/40 rounded-3xl p-7 flex flex-col gap-4 backdrop-blur-xl shadow-[0_0_25px_rgba(52,211,153,0.12)]"
+            >
+              <div className="text-center">
+                <span className="text-4xl mb-2 block">🎁</span>
+                <h3 className="text-xl font-black text-white mb-1">مجاناً</h3>
+                <p className="text-gray-400 text-sm">ارفع صورة تشكيلتك</p>
+              </div>
+
+              <div className="text-center">
+                <span className="text-3xl font-black text-emerald-400">0 ج</span>
+              </div>
+
+              <ul className="space-y-3 flex-1 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  رفع صورة التشكيلة
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  استخراج اللاعبين بالـ AI
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  تحليل تكتيكي أساسي
+                </li>
+              </ul>
+
+              <button
+                onClick={() => {
+                  setSelectedPlan('free');
+                  setTimeout(() => {
+                    document.getElementById('team-builder-upload')?.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('team-builder-upload')?.click();
+                  }, 100);
+                }}
+                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 transition-all text-white shadow-[0_0_15px_rgba(52,211,153,0.3)]"
+              >
+                ابدأ مجاناً 🚀
+              </button>
+            </motion.div>
 
             {/* ── Plan 1: Basic ── */}
             <motion.div
@@ -395,6 +441,10 @@ const TeamBuilder = () => {
                 <span className="text-4xl mb-2 block">⚙️</span>
                 <h3 className="text-xl font-black text-white mb-1">الخطة الأساسية</h3>
                 <p className="text-gray-500 text-sm">للمبتدئين</p>
+              </div>
+
+              <div className="text-center">
+                <span className="text-3xl font-black text-white">199 <span className="text-lg text-gray-400">ج</span></span>
               </div>
 
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
@@ -412,12 +462,14 @@ const TeamBuilder = () => {
                 </li>
               </ul>
 
-              <button
-                onClick={() => document.getElementById('team-builder-start')?.scrollIntoView({ behavior: 'smooth' })}
-                className="mt-2 w-full py-3 rounded-xl font-black bg-white/10 border border-white/20 hover:bg-white/20 transition-all text-white"
+              <a
+                href="https://t.me/fouadmgdym"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 w-full py-3 rounded-xl font-black bg-white/10 border border-white/20 hover:bg-white/20 transition-all text-white text-center block"
               >
-                ابدأ مجاناً
-              </button>
+                تواصل على تيليغرام ✈
+              </a>
             </motion.div>
 
             {/* ── Plan 2: Premium ── */}
@@ -437,6 +489,10 @@ const TeamBuilder = () => {
                 <span className="text-4xl mb-2 block">⚡</span>
                 <h3 className="text-xl font-black text-white mb-1">الخطة المتقدمة</h3>
                 <p className="text-gray-400 text-sm">للمحترفين</p>
+              </div>
+
+              <div className="text-center">
+                <span className="text-3xl font-black text-green-300">399 <span className="text-lg text-gray-400">ج</span></span>
               </div>
 
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
@@ -462,12 +518,14 @@ const TeamBuilder = () => {
                 </li>
               </ul>
 
-              <button
-                onClick={() => document.getElementById('team-builder-start')?.scrollIntoView({ behavior: 'smooth' })}
-                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-400 hover:to-blue-500 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+              <a
+                href="https://wa.me/message/fouadf9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-400 hover:to-blue-500 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] text-center block"
               >
-                اختر هذه الخطة
-              </button>
+                تواصل على واتساب 📲
+              </a>
             </motion.div>
 
             {/* ── Plan 3: VIP ── */}
@@ -524,6 +582,15 @@ const TeamBuilder = () => {
 
         {/* ─── Team Builder Tool ─── */}
         <div id="team-builder-start" />
+
+        {/* Free plan upload trigger anchor */}
+        <div
+          id="team-builder-upload"
+          className="sr-only"
+          onClick={() => {
+            if (fileInputRef.current) fileInputRef.current.click();
+          }}
+        />
 
         {/* Progress Bar */}
         <div className="flex items-center justify-center gap-4 mb-12">

@@ -13,6 +13,7 @@ import Leaderboard from './pages/Leaderboard';
 import PaymentSuccess from './pages/PaymentSuccess';
 import SellerProfile from './pages/SellerProfile';
 import TeamBuilder from './pages/TeamBuilder';
+import Packages from './pages/Packages';
 import SupportChat from './components/SupportChat';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
           <Route path="/team-builder" element={<TeamBuilder />} />
+          <Route path="/packages" element={<Packages />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

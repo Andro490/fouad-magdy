@@ -12,7 +12,24 @@ import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
 
+// Try to import rate-limit (optional - won't crash if not installed yet)
+let rateLimit: any;
+try { rateLimit = require('express-rate-limit'); } catch { rateLimit = null; }
+
+// Try to import zod (optional)
+let z: any;
+try { z = require('zod').z; } catch { z = null; }
+
 dotenv.config();
+
+// ─── Startup Security Checks ───────────────────────────────────────────────
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+  console.error('[SECURITY] ⚠️  JWT_SECRET is missing or too short! Set a strong secret in .env');
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1); // Hard stop in production
+  }
+}
+
 
 // Basic HTML Sanitizer to prevent XSS (Cross-Site Scripting)
 const sanitizeHTML = (str: string | undefined | null) => {
@@ -41,10 +58,43 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// Body size — tight limit to avoid large payload attacks
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(morgan('dev'));
+
+// ─── Rate Limiters ─────────────────────────────────────────────────────────
+const createLimiter = (max: number, windowMin: number, message: string) => {
+  if (!rateLimit) return (_req: any, _res: any, next: any) => next(); // no-op if not installed
+  return rateLimit({ windowMs: windowMin * 60 * 1000, max, message: { error: message }, standardHeaders: true, legacyHeaders: false });
+};
+
+const authLimiter      = createLimiter(10, 15, 'محاولات كثيرة جداً — يرجى الانتظار 15 دقيقة.');
+const checkoutLimiter  = createLimiter(5,  10, 'محاولات دفع كثيرة — يرجى الانتظار.');
+const generalLimiter   = createLimiter(100, 1, 'طلبات كثيرة جداً — يرجى الانتظار.');
+
+// ─── Input Validators (Zod) ────────────────────────────────────────────────
+const validateCheckoutPayload = (body: any) => {
+  const errors: string[] = [];
+  if (!body.name || typeof body.name !== 'string' || body.name.length > 100) errors.push('name');
+  if (!body.phone || typeof body.phone !== 'string' || !/^[0-9+\-\s]{7,20}$/.test(body.phone)) errors.push('phone');
+  if (!body.productName || typeof body.productName !== 'string' || body.productName.length > 200) errors.push('productName');
+  if (!body.price || typeof body.price !== 'string') errors.push('price');
+  return errors;
+};
+
+const validateReceiptBase64 = (base64: string | undefined): boolean => {
+  if (!base64) return false;
+  // Check it's a valid data URL image (jpeg, png, gif, webp)
+  const match = base64.match(/^data:(image\/(jpeg|jpg|png|gif|webp));base64,/);
+  if (!match) return false;
+  // Estimate file size: base64 length * 0.75 bytes ≈ real size
+  const sizeBytes = (base64.length * 3) / 4;
+  const maxBytes = 5 * 1024 * 1024; // 5 MB
+  return sizeBytes <= maxBytes;
+};
+
 
 const cookieOptions = {
   httpOnly: true,
@@ -393,12 +443,24 @@ app.get('/api/checkout/check-purchase', async (req: express.Request, res) => {
 // ─────────────────────────────────────────────────────────────
 // MANUAL PAYMENT (TELEGRAM INTEGRATION)
 // ─────────────────────────────────────────────────────────────
-app.post('/api/checkout/manual', async (req: express.Request, res) => {
+app.post('/api/checkout/manual', checkoutLimiter, async (req: express.Request, res) => {
   try {
     const { name, phone, gameId, productName, price, receiptBase64, managerId } = req.body;
     
+    // ── Input Validation ──────────────────────────────────────────────────
+    const validationErrors = validateCheckoutPayload(req.body);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ error: `بيانات غير صالحة: ${validationErrors.join(', ')}` });
+    }
+
+    // ── Receipt Image Validation ──────────────────────────────────────────
+    if (receiptBase64 && !validateReceiptBase64(receiptBase64)) {
+      return res.status(400).json({ error: 'صورة الإيصال غير صالحة. يجب أن تكون صورة (JPEG/PNG) بحجم أقل من 5 ميجابايت.' });
+    }
+
     // Use phone as the primary identifier for guests
     let userEmail = phone || 'guest@unknown.com';
+
 
     const settings = readSettings();
     const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
@@ -421,15 +483,21 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
       return res.status(500).json({ error: 'TELEGRAM_SECRET is not configured.' });
     }
 
+    const safeName = sanitizeHTML(name);
+    const safePhone = sanitizeHTML(phone);
+    const safeProduct = sanitizeHTML(productName);
+    const safePrice = sanitizeHTML(price);
+    const safeEmail = sanitizeHTML(userEmail);
+
     const caption = `💰 <b>طلب شراء جديد (دفع يدوي)</b>\n\n` +
-      `👤 <b>الاسم:</b> ${name}\n` +
-      `📧 <b>الإيميل:</b> ${userEmail}\n` +
-      `📱 <b>الهاتف:</b> ${phone}\n` +
-      `🛍️ <b>المنتج:</b> ${productName}\n` +
-      `💵 <b>السعر:</b> ${price}\n\n` +
+      `👤 <b>الاسم:</b> ${safeName}\n` +
+      `📧 <b>الإيميل/الهاتف:</b> ${safeEmail}\n` +
+      `📱 <b>الهاتف:</b> ${safePhone}\n` +
+      `🛍️ <b>المنتج:</b> ${safeProduct}\n` +
+      `💵 <b>السعر:</b> ${safePrice}\n\n` +
       `يرجى مراجعة الإيصال المرفق والموافقة أو الرفض.`;
 
-    const mIdParam = managerId ? `&managerId=${managerId}` : '';
+    const mIdParam = managerId ? `&managerId=${encodeURIComponent(managerId)}` : '';
     
     const replyMarkup = JSON.stringify({
       inline_keyboard: [
@@ -534,26 +602,30 @@ app.get('/api/checkout/manual-approve', async (req, res) => {
       return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
     }
 
-    if (!managerId || !email) {
-      return res.status(400).send('<h1>خطأ: بيانات ناقصة</h1>');
+    if (!email) {
+      return res.status(400).send('<h1>خطأ: بيانات ناقصة (البريد/الهاتف مفقود)</h1>');
     }
 
-    // Give access
-    await (prisma as any).coachPurchase.upsert({
-      where: { userEmail_managerId: { userEmail: email, managerId } },
-      update: { sessionId: 'manual_' + Date.now() },
-      create: { userEmail: email, managerId, sessionId: 'manual_' + Date.now() }
-    });
+    const safeEmail = sanitizeHTML(email);
+
+    // If managerId exists, give access to coach plan
+    if (managerId) {
+      await (prisma as any).coachPurchase.upsert({
+        where: { userEmail_managerId: { userEmail: email, managerId } },
+        update: { sessionId: 'manual_' + Date.now() },
+        create: { userEmail: email, managerId, sessionId: 'manual_' + Date.now() }
+      });
+    }
 
     res.send(`
       <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px; direction: rtl;">
         <h1 style="color: green;">✅ تم التفعيل بنجاح!</h1>
-        <p>تم منح المستخدم (${email}) الصلاحية للدخول على الخطة.</p>
+        <p>تم تسجبل الموافقة للعميل (<b>${safeEmail}</b>)${managerId ? ' وتم منح الصلاحية للخطة' : ' (طلب متجر)'}.</p>
         <script>setTimeout(() => window.close(), 3000);</script>
       </div>
     `);
   } catch (err: any) {
-    res.status(500).send(`<h1>حدث خطأ: ${err.message}</h1>`);
+    res.status(500).send(`<h1>حدث خطأ: ${sanitizeHTML(err.message)}</h1>`);
   }
 });
 
@@ -571,15 +643,17 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
       return res.status(403).send('<h1>خطأ: غير مصرح لك بإجراء هذه العملية</h1>');
     }
 
+    const safeEmail = sanitizeHTML(email || '');
+
     res.send(`
       <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px; direction: rtl;">
         <h1 style="color: red;">❌ تم رفض الطلب</h1>
-        <p>تم رفض طلب المستخدم (${email}) بنجاح.</p>
+        <p>تم تسجيل رفض الطلب (${safeEmail}) بنجاح.</p>
         <script>setTimeout(() => window.close(), 3000);</script>
       </div>
     `);
   } catch (err: any) {
-    res.status(500).send(`<h1>حدث خطأ: ${err.message}</h1>`);
+    res.status(500).send(`<h1>حدث خطأ: ${sanitizeHTML(err.message)}</h1>`);
   }
 });
 
@@ -597,6 +671,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
     if (phone === adminPhone && password === adminPassword) {
       const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
       const token = generateToken('admin', 'ADMIN');
+      setAuthCookie(res, token);
       return res.json({ user, token });
     }
 
@@ -624,6 +699,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
       if (isMatch) {
         const user = { id: dbUser.id, name: dbUser.name, role: dbUser.role, email: dbUser.email, phone: dbUser.phone, coins: dbUser.coins };
         const token = generateToken(dbUser.id, dbUser.role);
+        setAuthCookie(res, token);
         return res.json({ user, token });
       }
     }
@@ -635,7 +711,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
 });
 
 // Google OAuth endpoint — create or find user and return JWT
-app.post('/api/auth/google', async (req, res) => {
+app.post('/api/auth/google', authLimiter, async (req, res) => {
   try {
     const { email, name, picture, googleId } = req.body;
     if (!email) return res.status(400).json({ error: 'email is required' });
@@ -656,6 +732,7 @@ app.post('/api/auth/google', async (req, res) => {
     }
 
     const token = generateToken(dbUser.id, dbUser.role);
+    setAuthCookie(res, token);
     return res.json({
       token,
       user: { id: dbUser.id, name: dbUser.name, email: dbUser.email, role: dbUser.role, coins: dbUser.coins, picture }
@@ -665,7 +742,7 @@ app.post('/api/auth/google', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', generalLimiter, authLimiter, async (req, res) => {
 
   try {
     const { phone, password } = req.body;
@@ -675,6 +752,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (phone === adminPhone && password === adminPassword) {
       const user = { id: 'admin', name: 'المدير', role: 'ADMIN', email: 'mock@local.user' };
       const token = generateToken('admin', 'ADMIN');
+      setAuthCookie(res, token);
       return res.json({ user, token });
     }
 
@@ -698,6 +776,7 @@ app.post('/api/auth/login', async (req, res) => {
       if (isMatch) {
         const user = { id: dbUser.id, name: dbUser.name, role: dbUser.role, email: dbUser.email, phone: dbUser.phone, coins: dbUser.coins };
         const token = generateToken(dbUser.id, dbUser.role);
+        setAuthCookie(res, token);
         return res.json({ user, token });
       }
     }

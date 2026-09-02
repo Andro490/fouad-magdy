@@ -1497,14 +1497,29 @@ async function pollTelegramBot() {
                 })
               });
             } else {
-              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                  chat_id: chatId,
-                  text: `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القناة ${channelId} ثم المحاولة مرة أخرى.`
-                })
-              });
+              const videoUrl = settings.telegramWelcomeVideoUrl;
+              const welcomeText = settings.telegramWelcomeText || `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القناة ${channelId} ثم المحاولة مرة أخرى.`;
+
+              if (videoUrl) {
+                await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({
+                    chat_id: chatId,
+                    video: videoUrl,
+                    caption: welcomeText
+                  })
+                });
+              } else {
+                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({
+                    chat_id: chatId,
+                    text: welcomeText
+                  })
+                });
+              }
             }
           }
         }

@@ -8,6 +8,8 @@ const SiteSettings = () => {
   const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
+  const [telegramWelcomeVideoUrl, setTelegramWelcomeVideoUrl] = useState('');
+  const [telegramWelcomeText, setTelegramWelcomeText] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [googleClientId, setGoogleClientId] = useState('');
   const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
@@ -28,6 +30,8 @@ const SiteSettings = () => {
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
+        if (data.telegramWelcomeVideoUrl) setTelegramWelcomeVideoUrl(data.telegramWelcomeVideoUrl);
+        if (data.telegramWelcomeText) setTelegramWelcomeText(data.telegramWelcomeText);
         if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
         if (data.googleClientId) setGoogleClientId(data.googleClientId);
         if (data.teamBuilderVideoUrl) setTeamBuilderVideoUrl(data.teamBuilderVideoUrl);
@@ -47,7 +51,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey, googleClientId, teamBuilderVideoUrl })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
       });
       if (res.ok) {
         setSaved(true);
@@ -202,6 +206,28 @@ const SiteSettings = () => {
                 className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
                 dir="ltr"
                 placeholder="123456789"
+              />
+            </div>
+            <hr className="border-gray-700 my-4" />
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">رابط فيديو الترحيب (اختياري)</label>
+              <input
+                type="url"
+                value={telegramWelcomeVideoUrl}
+                onChange={e => setTelegramWelcomeVideoUrl(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
+                dir="ltr"
+                placeholder="https://example.com/video.mp4"
+              />
+              <p className="text-xs text-gray-500 mt-1">يجب أن يكون رابط مباشر لملف فيديو بصيغة MP4.</p>
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">رسالة الترحيب (أسفل الفيديو)</label>
+              <textarea
+                value={telegramWelcomeText}
+                onChange={e => setTelegramWelcomeText(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none min-h-[80px]"
+                placeholder="أهلاً بك! يرجى الاشتراك في القناة..."
               />
             </div>
           </div>

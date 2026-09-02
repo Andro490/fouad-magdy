@@ -26,6 +26,7 @@ const Login = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [hasGoogleAuth, setHasGoogleAuth] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -57,21 +58,35 @@ const Login = () => {
   };
 
   useEffect(() => {
-    const renderGoogleBtn = () => {
-      if (window.google && document.getElementById("googleSignInDiv")) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '1234567890-mock.apps.googleusercontent.com',
-          callback: handleGoogleResponse
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById("googleSignInDiv"),
-          { theme: "outline", size: "large", text: "continue_with", width: 368, shape: "rectangular" }
-        );
-      } else {
-        setTimeout(renderGoogleBtn, 100);
-      }
-    };
-    renderGoogleBtn();
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+    
+    // Fetch settings to check if Google Auth is enabled
+    fetch(`${API_URL}/api/settings`)
+      .then(res => res.json())
+      .then(data => {
+        const clientId = data.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID;
+        
+        // Only render Google button if a client ID exists and isn't the mock one
+        if (clientId && !clientId.includes('mock.apps')) {
+          setHasGoogleAuth(true);
+          const renderGoogleBtn = () => {
+            if (window.google && document.getElementById("googleSignInDiv")) {
+              window.google.accounts.id.initialize({
+                client_id: clientId,
+                callback: handleGoogleResponse
+              });
+              window.google.accounts.id.renderButton(
+                document.getElementById("googleSignInDiv"),
+                { theme: "outline", size: "large", text: "continue_with", width: 368, shape: "rectangular" }
+              );
+            } else {
+              setTimeout(renderGoogleBtn, 100);
+            }
+          };
+          renderGoogleBtn();
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,16 +185,20 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="relative flex items-center justify-center mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700"></div>
-          </div>
-          <div className="relative px-4 bg-[#141414] text-sm text-gray-400">أو عبر</div>
-        </div>
+        {hasGoogleAuth && (
+          <>
+            <div className="relative flex items-center justify-center mb-6 mt-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700"></div>
+              </div>
+              <div className="relative px-4 bg-[#141414] text-sm text-gray-400">أو عبر</div>
+            </div>
 
-        <div className="flex justify-center w-full mb-6">
-          <div id="googleSignInDiv" className="w-full flex justify-center"></div>
-        </div>
+            <div className="flex justify-center w-full mb-6">
+              <div id="googleSignInDiv" className="w-full flex justify-center"></div>
+            </div>
+          </>
+        )}
 
         <p className="mt-6 text-center text-gray-400">
           ليس لديك حساب؟ <Link to="/register" className="text-primary hover:text-accent transition-colors">إنشاء حساب جديد</Link>

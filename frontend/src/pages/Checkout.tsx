@@ -18,6 +18,7 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState<'manual' | 'visa'>('manual');
   const [paymentPhone, setPaymentPhone] = useState('01000026470');
   const [copied, setCopied] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
@@ -123,8 +124,7 @@ const Checkout = () => {
           if (phone) {
             localStorage.setItem('guest_phone', phone);
           }
-          alert('✅ تم إرسال طلبك بنجاح! سيتم مراجعته وسينفتح لك المحتوى قريباً.');
-          navigate('/store');
+          setShowSuccessModal(true);
         } else {
           alert(`❌ حدث خطأ: ${result.error || 'فشل إرسال الطلب'}`);
         }
@@ -213,6 +213,26 @@ const Checkout = () => {
           </button>
         </form>
       </div>
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-dark border border-green-500/30 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(34,197,94,0.2)] animate-in fade-in zoom-in duration-300">
+            <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCheck className="w-12 h-12 text-green-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">تم إرسال طلبك بنجاح!</h2>
+            <p className="text-gray-300 mb-8 leading-relaxed">
+              سيتم مراجعة الإيصال والتواصل معك على الرقم الذي تركته <strong className="text-white dir-ltr inline-block mx-1">{phone}</strong> لتأكيد الدفع وإتمام الطلب.
+            </p>
+            <button
+              onClick={() => navigate('/store')}
+              className="w-full py-4 bg-green-500 text-dark font-bold text-lg rounded-xl hover:bg-green-400 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.4)]"
+            >
+              حسناً، العودة للمتجر
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

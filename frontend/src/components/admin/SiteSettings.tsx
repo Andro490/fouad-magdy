@@ -9,6 +9,7 @@ const SiteSettings = () => {
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [googleClientId, setGoogleClientId] = useState('');
   const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,6 +29,7 @@ const SiteSettings = () => {
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
         if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
+        if (data.googleClientId) setGoogleClientId(data.googleClientId);
         if (data.teamBuilderVideoUrl) setTeamBuilderVideoUrl(data.teamBuilderVideoUrl);
         setLoading(false);
       })
@@ -45,7 +47,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey, teamBuilderVideoUrl })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey, googleClientId, teamBuilderVideoUrl })
       });
       if (res.ok) {
         setSaved(true);
@@ -225,6 +227,22 @@ const SiteSettings = () => {
           {!geminiApiKey && (
             <p className="text-yellow-400 text-xs">⚠️ بدون مفتاح لن تعمل ميزة تحليل التشكيلات</p>
           )}
+        </div>
+
+        {/* Google Client ID */}
+        <div className="bg-dark/40 border border-blue-500/30 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-blue-500">G</span> مفتاح تسجيل الدخول بجوجل (Google Client ID)
+          </h3>
+          <p className="text-gray-400 text-sm">لإتاحة تسجيل الدخول بحساب جوجل. إذا تركته فارغاً سيتم إخفاء الزر.</p>
+          <input
+            type="text"
+            value={googleClientId}
+            onChange={e => setGoogleClientId(e.target.value)}
+            className="w-full bg-dark border border-blue-500/50 rounded-lg px-4 py-2 text-white text-sm focus:border-blue-400 focus:outline-none"
+            dir="ltr"
+            placeholder="xxxxxx-yyyyyy.apps.googleusercontent.com"
+          />
         </div>
 
         {/* TeamBuilder YouTube Video URL */}

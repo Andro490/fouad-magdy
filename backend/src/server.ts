@@ -404,7 +404,14 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
     const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = settings.telegramChatId || process.env.TELEGRAM_CHAT_ID;
     const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
-    const API_URL = process.env.BACKEND_URL;
+    
+    // Auto-detect the correct domain to avoid SSL errors (hstgr.cloud)
+    let baseUrl = process.env.BACKEND_URL;
+    if (!baseUrl || baseUrl.includes('hstgr.cloud') || baseUrl.includes('localhost')) {
+      // Use the host from the request headers if the environment variable is not set correctly
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+      baseUrl = `${protocol}://${req.get('host')}`;
+    }
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       return res.status(500).json({ error: 'Telegram configuration is missing in backend.' });
@@ -412,10 +419,6 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
 
     if (!TELEGRAM_SECRET) {
       return res.status(500).json({ error: 'TELEGRAM_SECRET is not configured.' });
-    }
-
-    if (!API_URL) {
-      return res.status(500).json({ error: 'BACKEND_URL is not configured for Telegram callbacks.' });
     }
 
     const caption = `💰 <b>طلب شراء جديد (دفع يدوي)</b>\n\n` +
@@ -426,11 +429,13 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
       `💵 <b>السعر:</b> ${price}\n\n` +
       `يرجى مراجعة الإيصال المرفق والموافقة أو الرفض.`;
 
+    const mIdParam = managerId ? `&managerId=${managerId}` : '';
+    
     const replyMarkup = JSON.stringify({
       inline_keyboard: [
         [
-          { text: "✅ تم الدفع (موافقة)", url: `${API_URL}/api/checkout/manual-approve?managerId=${managerId}&email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}` },
-          { text: "❌ لم يتم الدفع (رفض)", url: `${API_URL}/api/checkout/manual-reject?managerId=${managerId}&email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}` }
+          { text: "✅ تم الدفع (موافقة)", url: `${baseUrl}/api/checkout/manual-approve?email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}${mIdParam}` },
+          { text: "❌ لم يتم الدفع (رفض)", url: `${baseUrl}/api/checkout/manual-reject?email=${encodeURIComponent(userEmail)}&secret=${TELEGRAM_SECRET}${mIdParam}` }
         ]
       ]
     });
@@ -499,7 +504,13 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
 
     if (!tgResult.ok) {
       console.error('Telegram API Error:', tgResult);
-      throw new Error(`خطأ من تليجرام: ${tgResult.description}`);
+      let errorMsg = tgResult.description;
+      if (errorMsg.includes('bot was kicked') || errorMsg.includes('bot is not a member')) {
+        errorMsg = 'البوت تم طرده أو إزالته من الجروب/القناة. يرجى الذهاب لتليجرام وإضافته مرة أخرى كأدمن لتتمكن من استقبال الطلبات.';
+      } else if (errorMsg.includes('chat not found')) {
+        errorMsg = 'لم يتم العثور على الجروب/القناة. يرجى التأكد من أن الـ Chat ID صحيح في إعدادات الموقع وأن البوت مضاف هناك.';
+      }
+      throw new Error(errorMsg);
     }
 
     res.json({ success: true, message: 'Request sent to Telegram' });

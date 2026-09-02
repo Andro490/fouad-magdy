@@ -765,6 +765,44 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
+// PATCH /api/users/:id — update user (self or admin)
+app.patch('/api/users/:id', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const requester = req.user;
+
+    // Only allow self-update or admin
+    if (requester?.id !== id && requester?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'غير مصرح لك بتعديل هذا الحساب' });
+    }
+
+    const { role, name, phone, coins } = req.body;
+
+    // Non-admins can only upgrade to STREAMER, not higher roles
+    if (role && requester?.role !== 'ADMIN') {
+      if (!['STREAMER', 'USER'].includes(role)) {
+        return res.status(403).json({ error: 'غير مسموح لك بهذا الدور' });
+      }
+    }
+
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (phone !== undefined) updateData.phone = phone;
+    if (role !== undefined) updateData.role = role;
+    if (coins !== undefined && requester?.role === 'ADMIN') updateData.coins = Number(coins);
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: updateData
+    });
+
+    return res.json({ id: updated.id, name: updated.name, role: updated.role, email: updated.email, phone: updated.phone, coins: updated.coins });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+
 // ─────────────────────────────────────────
 // RESET ALL USERS POINTS (Admin only - Monthly Competition Reset)
 // ─────────────────────────────────────────

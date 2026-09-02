@@ -67,35 +67,32 @@ const Dashboard = () => {
 
   const handleUpgradeToStreamer = async () => {
     const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
-    let users = [];
+    
     try {
-      const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch(`${API_URL}/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role: 'STREAMER' })
+      });
+
       if (res.ok) {
-        users = await res.json();
-        if (users.length === 0) {
-          users = JSON.parse(localStorage.getItem('users') || '[]');
-        }
+        const updatedUser = await res.json();
+        dispatch(loginSuccess({ user: { ...user, role: 'STREAMER' } }));
+        alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
       } else {
-        users = JSON.parse(localStorage.getItem('users') || '[]');
+        const err = await res.json().catch(() => ({}));
+        alert(`حدث خطأ: ${err.error || 'تعذر ترقية الحساب'}`);
       }
     } catch (err) {
-      users = JSON.parse(localStorage.getItem('users') || '[]');
-    }
-
-    const userIndex = users.findIndex((u: any) => u.id === user.id);
-    if (userIndex !== -1) {
-      users[userIndex].role = 'STREAMER';
-      try {
-        await fetch(`${API_URL}/api/users`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(users)
-        });
-      } catch (err) {
+      // Fallback: update localStorage
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      const idx = users.findIndex((u: any) => u.id === user.id);
+      if (idx !== -1) {
+        users[idx].role = 'STREAMER';
         localStorage.setItem('users', JSON.stringify(users));
       }
-      
-      dispatch(loginSuccess({ user: users[userIndex] }));
+      dispatch(loginSuccess({ user: { ...user, role: 'STREAMER' } }));
       alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
     }
   };

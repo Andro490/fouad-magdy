@@ -9,6 +9,7 @@ const SiteSettings = () => {
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -27,6 +28,7 @@ const SiteSettings = () => {
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
         if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
+        if (data.teamBuilderVideoUrl) setTeamBuilderVideoUrl(data.teamBuilderVideoUrl);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -43,7 +45,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, geminiApiKey, teamBuilderVideoUrl })
       });
       if (res.ok) {
         setSaved(true);
@@ -114,7 +116,7 @@ const SiteSettings = () => {
             onChange={e => setTopupPhone(e.target.value)}
             className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-3 text-white text-xl font-bold text-center tracking-widest focus:border-primary focus:outline-none"
             dir="ltr"
-            placeholder="+201xxxxxxxxx أو @username"
+            placeholder="+201xxxxxxxxx أو @username أو رابط مباشر"
           />
         </div>
 
@@ -223,6 +225,22 @@ const SiteSettings = () => {
           {!geminiApiKey && (
             <p className="text-yellow-400 text-xs">⚠️ بدون مفتاح لن تعمل ميزة تحليل التشكيلات</p>
           )}
+        </div>
+
+        {/* TeamBuilder YouTube Video URL */}
+        <div className="bg-dark/40 border border-red-500/30 rounded-xl p-6 space-y-3">
+          <h3 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-red-500">▶️</span> رابط يوتيوب لفيديو (كوّن خطتك)
+          </h3>
+          <p className="text-gray-400 text-sm">أدخل رابط فيديو اليوتيوب الذي سيظهر في صفحة كون خطتك (TeamBuilder). إذا تركته فارغاً سيظهر الفيديو الافتراضي.</p>
+          <input
+            type="url"
+            value={teamBuilderVideoUrl}
+            onChange={e => setTeamBuilderVideoUrl(e.target.value)}
+            className="w-full bg-dark border border-red-500/50 rounded-lg px-4 py-2 text-white text-sm focus:border-red-400 focus:outline-none"
+            dir="ltr"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
         </div>
 
         {/* Save Button */}

@@ -63,15 +63,22 @@ const Store = () => {
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.topupPhone) {
           let formattedPhone = data.topupPhone.trim();
-          if (formattedPhone.startsWith('@')) {
-            formattedPhone = formattedPhone.substring(1);
-          } else if (!/[a-zA-Z]/.test(formattedPhone)) {
-            formattedPhone = formattedPhone.replace(/[^\d+]/g, '');
-            if (!formattedPhone.startsWith('+') && formattedPhone.length > 0) {
-              formattedPhone = `+${formattedPhone}`;
+          let finalLink = '';
+          
+          if (formattedPhone.startsWith('http://') || formattedPhone.startsWith('https://')) {
+            finalLink = formattedPhone;
+          } else {
+            if (formattedPhone.startsWith('@')) {
+              formattedPhone = formattedPhone.substring(1);
+            } else if (!/[a-zA-Z]/.test(formattedPhone)) {
+              formattedPhone = formattedPhone.replace(/[^\d+]/g, '');
+              if (!formattedPhone.startsWith('+') && formattedPhone.length > 0) {
+                formattedPhone = `+${formattedPhone}`;
+              }
             }
+            finalLink = `https://t.me/${formattedPhone}`;
           }
-          setTopupPhone(formattedPhone);
+          setTopupPhone(finalLink);
         }
       })
       .catch(console.error);
@@ -120,7 +127,7 @@ const Store = () => {
         {showTopupButton && topupPhone && (
           <div className="mb-12 flex justify-center">
             <a
-              href={`https://t.me/${topupPhone}`}
+              href={topupPhone}
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold text-xl rounded-full overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all duration-300 hover:-translate-y-1"

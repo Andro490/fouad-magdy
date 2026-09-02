@@ -72,7 +72,18 @@ const TeamBuilder = () => {
   const [telegramVerified, setTelegramVerified] = useState(localStorage.getItem('telegram_verified') === 'true');
   const [botInfo, setBotInfo] = useState({ enabled: false, botUsername: '', channelUsername: '' });
   const [sessionId, setSessionId] = useState('');
+  const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+
+  // Helper to extract YouTube video ID and generate embed URL
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11)
+      ? `https://www.youtube.com/embed/${match[2]}?autoplay=1&mute=1&loop=1&playlist=${match[2]}`
+      : null;
+  };
 
   useEffect(() => {
     let sid = localStorage.getItem('telegram_session_id');
@@ -85,6 +96,13 @@ const TeamBuilder = () => {
     fetch(`${API_URL}/api/telegram/bot-info`)
       .then(r => r.json())
       .then(d => setBotInfo(d))
+      .catch(console.error);
+
+    fetch(`${API_URL}/api/settings`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.teamBuilderVideoUrl) setTeamBuilderVideoUrl(d.teamBuilderVideoUrl);
+      })
       .catch(console.error);
   }, [API_URL]);
 
@@ -364,16 +382,29 @@ const TeamBuilder = () => {
           transition={{ delay: 0.15 }}
           className="mb-10 rounded-3xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(34,197,94,0.12)] max-w-4xl mx-auto"
         >
-          <video
-            src={foudVideo}
-            controls
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full object-cover"
-            style={{ maxHeight: '480px' }}
-          />
+          {teamBuilderVideoUrl && getYouTubeEmbedUrl(teamBuilderVideoUrl) ? (
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={getYouTubeEmbedUrl(teamBuilderVideoUrl)!}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <video
+              src={foudVideo}
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full object-cover"
+              style={{ maxHeight: '480px' }}
+            />
+          )}
         </motion.div>
 
         {/* ─── Pricing Plans ─── */}

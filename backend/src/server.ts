@@ -422,7 +422,6 @@ app.post('/api/checkout/manual', async (req: express.Request, res) => {
       `👤 <b>الاسم:</b> ${name}\n` +
       `📧 <b>الإيميل:</b> ${userEmail}\n` +
       `📱 <b>الهاتف:</b> ${phone}\n` +
-      `🎮 <b>لعبة ID:</b> ${gameId}\n` +
       `🛍️ <b>المنتج:</b> ${productName}\n` +
       `💵 <b>السعر:</b> ${price}\n\n` +
       `يرجى مراجعة الإيصال المرفق والموافقة أو الرفض.`;

@@ -13,7 +13,6 @@ const Checkout = () => {
 
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [gameId, setGameId] = useState('');
   const [receipt, setReceipt] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'manual' | 'visa'>('manual');
@@ -102,7 +101,6 @@ const Checkout = () => {
         const payload = {
           name,
           phone,
-          gameId,
           productName: product.name,
           price: product.price,
           receiptBase64: base64data,
@@ -175,11 +173,6 @@ const Checkout = () => {
             <label className="block text-sm font-medium text-gray-300 mb-2">رقم الهاتف (للتواصل)</label>
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required
               className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">الـ ID الخاص بك في اللعبة (eFootball ID)</label>
-            <input type="text" value={gameId} onChange={e => setGameId(e.target.value)} required
-              className="w-full bg-dark/50 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none" dir="ltr" />
           </div>
           
           {paymentMethod === 'manual' && (

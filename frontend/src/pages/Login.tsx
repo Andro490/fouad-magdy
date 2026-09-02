@@ -30,32 +30,35 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleGoogleResponse = (response: any) => {
+  const handleGoogleResponse = async (response: any) => {
     const data = decodeJwt(response.credential);
     if (data && data.email) {
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      let user = users.find((u: any) => u.email === data.email);
-      
-      if (!user) {
-        user = {
-          id: 'google_' + Date.now(),
-          name: data.name,
-          email: data.email,
-          phone: '', // Google users might not have a phone number initially
-          role: 'USER',
-          coins: 0,
-          picture: data.picture
-        };
-        users.push(user);
-        localStorage.setItem('users', JSON.stringify(users));
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+      try {
+        // Call backend to create/find user and get a real JWT token
+        const res = await fetch(`${API_URL}/api/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: data.email, name: data.name, picture: data.picture })
+        });
+        if (res.ok) {
+          const result = await res.json();
+          dispatch(loginSuccess({ user: result.user, token: result.token }));
+          navigate('/');
+          return;
+        }
+      } catch (err) {
+        console.error('Backend Google auth failed, falling back:', err);
       }
-      
-      dispatch(loginSuccess({ user }));
+
+      // Fallback: local only (no token)
+      dispatch(loginSuccess({ user: { id: 'google_' + Date.now(), name: data.name, email: data.email, role: 'USER', coins: 0, picture: data.picture } }));
       navigate('/');
     } else {
       setError('فشل تسجيل الدخول عبر جوجل');
     }
   };
+
 
   useEffect(() => {
     const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');

@@ -17,29 +17,30 @@ const Dashboard = () => {
     const fetchUser = async () => {
       if (user?.id) {
         const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
-        let users = [];
+        const token = localStorage.getItem('authToken');
         try {
-          const res = await fetch(`${API_URL}/api/users`);
-          if (res.ok) {
-            users = await res.json();
-            if (users.length === 0) {
-              users = JSON.parse(localStorage.getItem('users') || '[]');
+          // Use /api/auth/me — works for all logged-in users with token
+          if (token) {
+            const res = await fetch(`${API_URL}/api/auth/me`, {
+              headers: { 'Authorization': `Bearer ${token}` },
+              credentials: 'include'
+            });
+            if (res.ok) {
+              const data = await res.json();
+              setCurrentCoins(data.coins || 0);
+              return;
             }
-          } else {
-            users = JSON.parse(localStorage.getItem('users') || '[]');
           }
+          // Fallback to Redux/localStorage coins
+          setCurrentCoins(user?.coins || 0);
         } catch (err) {
-          users = JSON.parse(localStorage.getItem('users') || '[]');
-        }
-        
-        const foundUser = users.find((u: any) => u.id === user.id);
-        if (foundUser) {
-          setCurrentCoins(foundUser.coins || 0);
+          setCurrentCoins(user?.coins || 0);
         }
       }
     };
     fetchUser();
   }, [user]);
+
 
   React.useEffect(() => {
     if (user?.id && user?.role === 'STREAMER') {
@@ -67,31 +68,28 @@ const Dashboard = () => {
 
   const handleUpgradeToStreamer = async () => {
     const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+    const token = localStorage.getItem('authToken');
     
     try {
       const res = await fetch(`${API_URL}/api/users/${user.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         credentials: 'include',
         body: JSON.stringify({ role: 'STREAMER' })
       });
 
       if (res.ok) {
-        const updatedUser = await res.json();
-        dispatch(loginSuccess({ user: { ...user, role: 'STREAMER' } }));
+        dispatch(loginSuccess({ user: { ...user, role: 'STREAMER' }, token: token || undefined }));
         alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
       } else {
         const err = await res.json().catch(() => ({}));
         alert(`حدث خطأ: ${err.error || 'تعذر ترقية الحساب'}`);
       }
     } catch (err) {
-      // Fallback: update localStorage
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      const idx = users.findIndex((u: any) => u.id === user.id);
-      if (idx !== -1) {
-        users[idx].role = 'STREAMER';
-        localStorage.setItem('users', JSON.stringify(users));
-      }
+      // Fallback: update localStorage only
       dispatch(loginSuccess({ user: { ...user, role: 'STREAMER' } }));
       alert('تمت ترقية حسابك إلى صانع محتوى بنجاح!');
     }

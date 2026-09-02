@@ -1,129 +1,160 @@
-# Security Audit and Fixes
+# تقرير أمان الموقع والثغرات المكتشفة
 
-## Summary
+## ملخص سريع
 
-This project had multiple real security issues in the backend and frontend auth flow. The critical issues were fixed in the following files:
+تمت مراجعة أجزاء المشروع الأساسية في الواجهة الأمامية والخلفية، وقد تم اكتشاف عدة ثغرات أمنية حقيقية، بعضها تم إصلاحه بالفعل والبعض الآخر ما زال يحتاج إلى تحسين قبل النشر الإنتاجي.
 
-- `backend/src/middleware/auth.ts`
-- `backend/src/utils/jwt.ts`
-- `backend/src/server.ts`
+أهم النتائج:
 
-## Vulnerabilities Found and Fixed
+- توجد ثغرة في التوثيق/تجهيز JWT تسمح بتجاوز المصادقة عند استخدام رموز وهمية في بيئة التطوير.
+- يوجد خطر في استخدام CORS واسع جدًا أو غير مضبوط.
+- بعض المسارات الإدارية/الحساسة غير محمية بالشكل الصحيح في بعض الحالات.
+- وجود خزّن أو توجيهات إلى متغيرات حساسة دون التحقق من صحتها.
+- استخدام JWT داخل localStorage في الواجهة الأمامية يشكل خطر XSS.
+- لا يوجد في المشروع حاليا حماية واضحة ضد brute-force أو rate limiting على تسجيل الدخول والطلبات الحساسة.
 
-### 1 JWT bypass via mock tokens
+## حالة المشروع
 
-Issue:
+- المصالح الأساسية التي تم فحصها:
+  - [backend/src/server.ts](backend/src/server.ts)
+  - [backend/src/middleware/auth.ts](backend/src/middleware/auth.ts)
+  - [backend/src/controllers/authController.ts](backend/src/controllers/authController.ts)
+  - [backend/src/utils/jwt.ts](backend/src/utils/jwt.ts)
+  - [frontend/src/store/authSlice.ts](frontend/src/store/authSlice.ts)
 
-- The middleware accepted `mock-jwt-token` and `mock-admin-token` as valid authentication tokens.
-- This allowed anyone to bypass JWT validation and access protected routes.
+## الثغرات المكتشفة وحلولها
 
-Fix:
+### 1) تجاوز JWT عبر رموز وهمية (Mock Tokens)
 
-- Mock tokens are now rejected by default.
-- They are allowed only when explicitly enabled for local non-production testing with `ALLOW_MOCK_TOKENS=true`.
+الوصف:
 
-Files:
+- كانت بعض عمليات التحقق تسمح بقيم مثل `mock-jwt-token` و `mock-admin-token` كتوكنات صالحة.
+- هذا يعني أنه يمكن لأي مستخدم أن يرسل هذه القيم ويصل إلى مسارات محمية بدون تسجيل حقيقي.
+- هذا يمثل ثغرة حرجة لأن أي شخص يمكنه التسلل إلى واجهات الإدارة أو الطلبات الخاصة.
 
-- `backend/src/middleware/auth.ts`
+الموقع المعني:
 
-Test:
+- [backend/src/middleware/auth.ts](backend/src/middleware/auth.ts)
 
-- Verify the middleware rejects `Bearer mock-jwt-token`.
+الحل:
 
-Command:
-
-```bash
-cd backend
-npx tsx --test tests/security.test.ts
-```
-
-Expected result:
-
-- `2` tests pass
-- `0` tests fail
-
----
-
-### 2) Hardcoded JWT secret fallback
-
-Issue:
-
-- Default secret used for JWT generation/verification was a hardcoded value.
-- In production, this makes token forgery easier.
-
-Fix:
-
-- JWT is now required to have a real `JWT_SECRET` environment variable.
-- If missing, the server throws an error instead of using a weak built-in secret.
-
-Files:
-
-- `backend/src/utils/jwt.ts`
-- `backend/src/middleware/auth.ts`
-
-Required environment variable:
+- منع هذه الرموز افتراضيًا.
+- السماح بها فقط في بيئة التطوير المحلي فقط عند تعيين:
 
 ```bash
-JWT_SECRET=your_strong_secret_here
+ALLOW_MOCK_TOKENS=true
 ```
+
+- وعدم تفعيلها في الإنتاج مطلقًا.
+
+الحالة:
+
+- تم إصلاحها في معظم التنفيذ الحالي عبر الاعتماد على JWT الحقيقي فقط، مع منع الرموز المزيفة في الوضع الإنتاجي.
 
 ---
 
-### 3) Open CORS configuration
+### 2) JWT secret ضعيف أو مفقود
 
-Issue:
+الوصف:
 
-- `cors` was set to allow all origins with `callback(null, true)`.
-- This opens API access to arbitrary domains.
+- إذا لم يتم تعيين `JWT_SECRET` بشكل صحيح، فإن التطبيق قد يعتمد على قيمة ضعيفة أو غير موجودة.
+- هذا يفتح المجال لتزوير JWT واستخدامه في المصادقة الكاذبة.
 
-Fix:
+الموقع المعني:
 
-- CORS now only allows explicitly listed domains from `ALLOWED_ORIGINS`.
-- Default example:
+- [backend/src/utils/jwt.ts](backend/src/utils/jwt.ts)
+- [backend/src/middleware/auth.ts](backend/src/middleware/auth.ts)
+
+الحل:
+
+- إجبار التطبيق على قراءة قيمة قوية من متغير البيئة.
+- منع التشغيل إذا لم يتم تعيينها.
+
+مثال:
 
 ```bash
-ALLOWED_ORIGINS=http://localhost:5173
+JWT_SECRET=replace_with_a_strong_random_secret
 ```
 
-File:
+نصائح:
 
-- `backend/src/server.ts`
-
----
-
-### 4) Sensitive admin and chat routes were unprotected
-
-Issue:
-
-- `/api/users`
-- `/api/chat/messages`
-- `/api/chat/users`
-
-were publicly accessible or allowed unauthorized users to read private data.
-
-Fix:
-
-- These endpoints now require valid JWT authentication.
-- Admin-only routes now check `req.user.role === 'ADMIN'`.
-
-Files:
-
-- `backend/src/server.ts`
+- استخدم قيمة طولها 32 حرفًا على الأقل.
+- لا تستخدم كلمات ثابتة أو قيم مكررة أو سرًّا مخزنًا داخل الكود.
 
 ---
 
-### 5) Telegram and upload secrets were hardcoded or defaulted
+### 3) إعداد CORS مفتوح أو غير محكم
 
-Issue:
+الوصف:
 
-- Telegram secret (`TELEGRAM_SECRET`) and upload API keys had insecure fallback values.
-- This could let attackers trigger manual approval/rejection routes or upload through known public credentials.
+- في البناء السابق كان `CORS` يسمح بكل الطلبات أو بمعظم المصادر دون فحص دقيق.
+- هذا يفتح API أمام مواقع ويب غير موثوقة، ويمكنها استدعاء endpoints الحساسة من متصفح المستخدم.
 
-Fix:
+الموقع المعني:
 
-- Required env variables are enforced.
+- [backend/src/server.ts](backend/src/server.ts)
 
-Required variables:
+الحل:
+
+- استخدام قائمة محددة للأصول المسموح بها فقط.
+- مثال:
+
+```bash
+ALLOWED_ORIGINS=http://localhost:5173,https://yourdomain.com
+```
+
+- إعداد `credentials: true` فقط مع التحقق الصارم من الأصل.
+
+الحالة:
+
+- تم تحسينه في التنفيذ الحالي عبر السماح فقط بالمصادر المدرجة.
+
+---
+
+### 4) مسارات إدارية أو حساسة قد تكون غير محمية بالكامل
+
+الوصف:
+
+- بعض endpoints الخاصة بالإدارة أو المستخدمين أو المراسلة قد تكون قابلة للوصول دون تحقق كافٍ من الدور.
+- هذا قد يسمح للمستخدم العادي بالوصول إلى بيانات خاصة أو تنفيذ عمليات إدارية.
+
+الموقع المعني:
+
+- [backend/src/server.ts](backend/src/server.ts)
+
+الحل:
+
+- فرض `authenticateToken` على جميع المسارات الحساسة.
+- إضافة فحص `role === 'ADMIN'` على المسارات الإدارية.
+- مثال:
+
+```ts
+if (req.user?.role !== "ADMIN") {
+  return res.status(403).json({ error: "Admins only" });
+}
+```
+
+الحالة:
+
+- تم تقوية هذا الجزء في التنفيذ الحالي، لكنه يستحق مراجعة كل endpoint قبل النشر النهائي.
+
+---
+
+### 5) استخدام secret أو API keys بدون تحقق صارم
+
+الوصف:
+
+- بعض الخدمات مثل Telegram أو upload APIs تعتمد على مفاتيح حساسة أو روابط يمكن أن تؤدي إلى طلبات خارجية غير آمنة إذا لم يتم التحكم فيها.
+- إذا كان هناك fallback أو قيمة افتراضية ضعيفة، يمكن أن يهاجم المهاجم هذه المسارات أو يحاكيها بسهولة.
+
+الموقع المعني:
+
+- [backend/src/server.ts](backend/src/server.ts)
+
+الحل:
+
+- منع التشغيل إذا كانت المتغيرات الأساسية غير موجودة.
+- مثال:
 
 ```bash
 TELEGRAM_BOT_TOKEN=...
@@ -134,122 +165,169 @@ IMGBB_API_KEY=...
 FREEIMAGE_API_KEY=...
 ```
 
-Files:
-
-- `backend/src/server.ts`
+- التحقق من أن الروابط المرسلة إلى Telegram تحتوي على secret صالح، وعدم السماح بالوصول العشوائي.
 
 ---
 
-### 6) Registration/login flow used insecure localStorage tokens
+### 6) تخزين JWT داخل localStorage
 
-Issue:
+الوصف:
 
-- JWT was stored in browser `localStorage`.
-- This is vulnerable to XSS and token theft.
+- في الواجهة الأمامية يتم حفظ بيانات المستخدم أو الرموز داخل `localStorage`.
+- هذا من أصعب الأنماط أمنية، لأن أي XSS ينجح في الصفحة قد يسرق الرمز مباشرة.
 
-Status:
+الموقع المعني:
 
-- This is a remaining architectural risk in the frontend app because the current app design depends on browser-side JWT storage.
-- The proper fix is to move to secure, HttpOnly cookies issued by the backend.
+- [frontend/src/store/authSlice.ts](frontend/src/store/authSlice.ts)
 
-Files:
+الحل المفضل:
 
-- `frontend/src/store/authSlice.ts`
-- `frontend/src/pages/Login.tsx`
-- `frontend/src/pages/Register.tsx`
+- نقل التخزين إلى `HttpOnly` cookie من جانب الخادم.
+- استخدام `Secure`, `SameSite=Lax` أو `SameSite=Strict`.
+- تقصير مدة صلاحية JWT.
+- استخدام refresh token مع rotation.
 
-Recommended production fix:
+مثال:
 
-- Replace localStorage token storage with secure cookies.
-- Set `HttpOnly`, `Secure`, and `SameSite=Lax` or `Strict` cookies.
-- Keep the JWT short-lived and rotate refresh tokens.
+```ts
+res.cookie("auth_token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax",
+  path: "/",
+  maxAge: 60 * 60 * 1000,
+});
+```
+
+الحالة:
+
+- هذا ما زال خطرًا معماريًا في الواجهة الحالية ويحتاج إلى إعادة تصميم كامل للـ auth flow.
 
 ---
 
-## How to Test the Fixes
+### 7) غياب Rate Limiting و Brute Force Protection
 
-### 1) Test JWT protection
+الوصف:
 
-Run:
+- لا يوجد في المشروع حماية واضحة لعدد محاولات تسجيل الدخول أو طلبات OTP أو الطلبات الرسومية.
+- هذا يجعل الهجوم بالتجربة العشوائية (credential stuffing / brute force) أسهل.
+
+الحل:
+
+- تفعيل `express-rate-limit` على:
+  - `/api/auth/login`
+  - `/api/auth/register`
+  - endpoints الحساسة مثل الدفع اليدوي/الطلبات العامة
+- إضافة تأخير أو حظر مؤقت بعد محاولات متعددة.
+
+مثال:
+
+```bash
+npm install express-rate-limit
+```
+
+---
+
+### 8) التحقق من المدخلات غير كافٍ في بعض نقاط الإدخال
+
+الوصف:
+
+- عند استقبال بيانات من المستخدم مثل أسماء المنتجات أو الأرقام أو الرسائل، لا يوجد فحص صارم في بعض أجزاء التطبيق.
+- هذا قد يؤدي إلى:
+  - SQL/NoSQL injection (إذا تم استخدام DB غير محمي في بعض أجزاء التنفيذ)
+  - XSS في النصوص المعروضة
+  - إدخال قيم غير منطقية أو هائلة تسبب استهلاك موارد كبير
+
+الحل:
+
+- Validate schema باستخدام `zod` أو `Joi`.
+- تقييد الطول والأنواع والحقول المسموح بها.
+- Sanitization قبل عرض النصوص HTML/JS.
+
+---
+
+### 9) التحقق من ملفات الصور/الرفع غير محكم
+
+الوصف:
+
+- في بعض نقاط التطبيق قد يتم إرسال ملفات أو صور كـ base64 أو FormData كجزء من الطلبات.
+- إذا لم يتم التحقق من نوع الملف وحجمه ووجوده، فقد يفتح هذا الباب للـ upload abuse أو تحميل ملفات ضارة.
+
+الحل:
+
+- التحقق من MIME type.
+- تقييد الحجم إلى 2-5 MB أو أقل حسب الحاجة.
+- رفض نوع الملفات غير المسموح بها مثل .exe أو .php أو .js.
+- حفظ الملفات في مجلد منفصل وبدون صلاحيات تنفيذ.
+
+---
+
+## نقاط القوة الموجودة
+
+- تم تفعيل `helmet` في الخادم.
+- تم إيقاف `x-powered-by`.
+- تم تقييد بعض cookie بمعلومات مثل `httpOnly` و `sameSite` و `path`.
+- تم استخدام `bcrypt` في تشفير كلمات المرور.
+- تم التحقق من JWT بشكل أساسي عبر `jsonwebtoken.verify`.
+
+هذه نقاط جيدة لكنها ليست كافية لإعلان الموقع آمن 100%، خاصة قبل ضبط جميع الثغرات المتبقية.
+
+## قائمة تحقق سريعة قبل النشر
+
+- [ ] تعيين `JWT_SECRET` قوي في البيئة.
+- [ ] إيقاف `ALLOW_MOCK_TOKENS` في الإنتاج.
+- [ ] مراجعة `ALLOWED_ORIGINS` بدقة.
+- [ ] تأمين جميع endpoints الإدارية بـ authenticate + role check.
+- [ ] إزالة `localStorage` من auth flow في النهاية.
+- [ ] تفعيل rate limiting.
+- [ ] التحقق من حجم/نوع/محتوى الصور المرفوعة.
+- [ ] إضافة logs ومراقبة للأخطاء الأمنية.
+- [ ] مراجعة مجلدات `.env` ونسخ الإنتاج.
+
+## مثال لقيم البيئة الآمنة
+
+```bash
+PORT=5000
+JWT_SECRET=very_long_random_string_here_2026
+ALLOWED_ORIGINS=http://localhost:5173,https://yourdomain.com
+ALLOW_MOCK_TOKENS=false
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+TELEGRAM_SECRET=your_secure_telegram_secret
+BACKEND_URL=https://yourdomain.com
+IMGBB_API_KEY=your_imgbb_key
+FREEIMAGE_API_KEY=your_freeimage_key
+NODE_ENV=production
+```
+
+## اختبار سريع للتحقق
 
 ```bash
 cd backend
 npx tsx --test tests/security.test.ts
 ```
 
-Expected:
+النتيجة المتوقعة:
 
-- `authenticateToken rejects mock tokens used in local development`
-- `authenticateToken requires a real bearer token`
-- Both tests pass.
+- جميع اختبارات المصادقة تمر بنجاح.
+- لا يسمح باستخدام mock tokens في الإنتاج.
+- API يرفض الرمز غير الصحيح أو المفقود.
 
-### 2) Test that the API rejects invalid tokens
+## الخلاصة
 
-Run:
+المشروع في وضع أفضل بكثير من البداية، لكن لا يزال يحتاج إلى تصحيح نهائي في:
 
-```bash
-curl -i -H "Authorization: Bearer mock-jwt-token" http://localhost:5000/api/users
-```
+1. auth storage
+2. rate limiting
+3. validation على المدخلات
+4. مراجعة نهائية لكل endpoint
+5. حماية الخصوصية والإدارة في الإنتاج
 
-Expected:
+أفضل قرار الآن هو اعتبار هذا المشروع "مُصلح جزئيًا لكنه ليس جاهزًا 100% للإنتاج" حتى يتم إكمال الخطوات المذكورة أعلاه.
 
-- HTTP `403` or `401`
-- JSON response with an error message like `Invalid or expired token.`
-
-### 3) Test CORS restriction
-
-Run from a non-allowed domain and check that the browser cannot call the API.
-
-Expected:
-
-- Browser request is blocked by CORS.
-
-### 4) Test admin-only access
-
-Run:
-
-```bash
-curl -i http://localhost:5000/api/users
-```
-
-Expected:
-
-- HTTP `401` without token
-- HTTP `403` with a non-admin token
-
-### 5) Test Telegram callback validation
-
-Call one of the manual approval endpoints without the proper secret.
-
-Example:
-
-```bash
-curl -i "http://localhost:5000/api/checkout/manual-approve?managerId=1&email=test@example.com&secret=wrong-secret"
-```
-
-Expected:
-
-- HTTP `403`
-
----
-
-## Recommended Environment File
-
-Create a `.env` in the backend with at least:
-
-```bash
-PORT=5000
-JWT_SECRET=replace_with_a_strong_random_secret
-ALLOWED_ORIGINS=http://localhost:5173
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHAT_ID=your_chat_id
-TELEGRAM_SECRET=your_telegram_secret
-BACKEND_URL=https://your-public-domain.com
-IMGBB_API_KEY=your_imgbb_key
-FREEIMAGE_API_KEY=your_freeimage_key
-ALLOW_MOCK_TOKENS=false
 ```
 
 ## Final Note
 
 The critical vulnerabilities have been closed in the backend. The remaining frontend token-in-localStorage issue should be addressed as a second phase by switching to secure HttpOnly cookies.
+```

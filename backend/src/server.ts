@@ -634,7 +634,39 @@ app.post('/api/auth/admin-login', async (req, res) => {
   }
 });
 
+// Google OAuth endpoint — create or find user and return JWT
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { email, name, picture, googleId } = req.body;
+    if (!email) return res.status(400).json({ error: 'email is required' });
+
+    let dbUser = await prisma.user.findUnique({ where: { email } });
+
+    if (!dbUser) {
+      dbUser = await prisma.user.create({
+        data: {
+          email,
+          name: name || email,
+          phone: '',
+          password: '',
+          role: 'USER',
+          coins: 0
+        }
+      });
+    }
+
+    const token = generateToken(dbUser.id, dbUser.role);
+    return res.json({
+      token,
+      user: { id: dbUser.id, name: dbUser.name, email: dbUser.email, role: dbUser.role, coins: dbUser.coins, picture }
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/auth/login', async (req, res) => {
+
   try {
     const { phone, password } = req.body;
     const adminPhone = process.env.ADMIN_PHONE || 'Foadmagdy0152020';

@@ -77,24 +77,33 @@ const SupportChat = () => {
     }
   };
 
-  // Reset unread count when chat is opened
+  // Handle unread counts and notifications
   useEffect(() => {
+    let lastRead = Number(localStorage.getItem('chat_lastReadTimestamp')) || 0;
+    const maxServerTime = messages.length > 0 ? Math.max(...messages.map(m => m.timestamp)) : 0;
+    
+    // Auto-fix corrupted future timestamps (from previous clock skew bugs)
+    if (messages.length > 0 && lastRead > maxServerTime + 60000) {
+      lastRead = maxServerTime; // Reset to latest message to avoid being stuck forever
+      localStorage.setItem('chat_lastReadTimestamp', lastRead.toString());
+    }
+
     if (isOpen) {
       setUnreadCount(0);
-    }
-  }, [isOpen]);
-
-  // Handle new messages and notifications based purely on array length
-  useEffect(() => {
-    // Only process if we have already loaded the initial messages
-    if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
-      const newMessages = messages.slice(prevMessagesLength.current);
-      const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
+      if (messages.length > 0) {
+        localStorage.setItem('chat_lastReadTimestamp', maxServerTime.toString());
+      }
+    } else {
+      // Calculate unread count purely based on server timestamps (works on refresh too!)
+      const unreadMsgs = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
+      setUnreadCount(unreadMsgs.length);
       
-      if (!isOpen && newAdminMessages.length > 0) {
-        setUnreadCount(prev => prev + newAdminMessages.length);
+      // Handle browser push notifications ONLY for newly arriving messages while closed
+      if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
+        const newMessages = messages.slice(prevMessagesLength.current);
+        const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
         
-        if ('Notification' in window && Notification.permission === 'granted') {
+        if (newAdminMessages.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
           const latestMsg = newAdminMessages[newAdminMessages.length - 1];
           new Notification('رسالة جديدة من الدعم الفني', {
             body: latestMsg.text,
@@ -104,7 +113,6 @@ const SupportChat = () => {
       }
     }
     
-    // Always update the ref to the current length
     prevMessagesLength.current = messages.length;
   }, [messages, isOpen]);
 

@@ -19,7 +19,9 @@ const SupportChat = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [firstCoach, setFirstCoach] = useState<any>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLength = useRef(0);
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
@@ -36,6 +38,13 @@ const SupportChat = () => {
   const activeUserId = user?.id || guestId;
   const activeUserName = user?.name || (user?.id ? 'مستخدم' : 'زائر');
 
+  // Request notification permission
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   // Fetch the first/top coach to display on the bubble
   useEffect(() => {
     fetch(`${API_URL}/api/managers?page=1`)
@@ -47,17 +56,14 @@ const SupportChat = () => {
       .catch(() => {});
   }, [API_URL]);
 
+  // Poll messages continuously so we get notifications when chat is closed
   useEffect(() => {
-    if (isOpen) {
+    if (activeUserId) {
       fetchMessages();
-      const interval = setInterval(fetchMessages, 3000);
+      const interval = setInterval(fetchMessages, 5000);
       return () => clearInterval(interval);
     }
-  }, [isOpen, activeUserId]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [activeUserId]);
 
   const fetchMessages = async () => {
     try {
@@ -71,6 +77,49 @@ const SupportChat = () => {
     }
   };
 
+  // Handle unread counts and notifications
+  useEffect(() => {
+    const lastRead = Number(localStorage.getItem('chat_lastReadTimestamp')) || 0;
+    
+    if (isOpen) {
+      setUnreadCount(0);
+      if (messages.length > 0) {
+        localStorage.setItem('chat_lastReadTimestamp', Date.now().toString());
+      }
+    } else {
+      // Calculate unread count on initial load
+      if (prevMessagesLength.current === 0 && messages.length > 0) {
+        const unread = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
+        setUnreadCount(unread.length);
+      } 
+      // Handle new messages arriving while closed
+      else if (messages.length > prevMessagesLength.current) {
+        const newMessages = messages.slice(prevMessagesLength.current);
+        const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
+        
+        if (newAdminMessages.length > 0) {
+          setUnreadCount(prev => prev + newAdminMessages.length);
+          
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const latestMsg = newAdminMessages[newAdminMessages.length - 1];
+            new Notification('رسالة جديدة من الدعم الفني', {
+              body: latestMsg.text,
+              icon: '/favicon.ico'
+            });
+          }
+        }
+      }
+    }
+    
+    prevMessagesLength.current = messages.length;
+  }, [messages, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isOpen]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -83,7 +132,8 @@ const SupportChat = () => {
     };
 
     setMessage('');
-    setMessages(prev => [...prev, { ...newMessage, id: Date.now().toString(), timestamp: Date.now(), sender: 'USER' }]);
+    // Optimistic update
+    setMessages(prev => [...prev, { ...newMessage, id: Date.now().toString(), timestamp: Date.now(), sender: 'USER' } as ChatMessage]);
 
     try {
       await fetch(`${API_URL}/api/chat/send`, {
@@ -97,7 +147,6 @@ const SupportChat = () => {
     }
   };
 
-  // Build coach avatar URL using efimg.com coach card images
   const coachAvatarUrl = firstCoach?.id
     ? `https://efimg.com/efootballhub22/images/coach_cards/${firstCoach.id}.png`
     : null;
@@ -109,7 +158,6 @@ const SupportChat = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
       
-      {/* ── Coach Bubble: goes to coaches page ── */}
       {!isOpen && (
         <div className="relative group" title="اكتشف المدربين">
           <button
@@ -134,16 +182,13 @@ const SupportChat = () => {
               </div>
             )}
           </button>
-          {/* Pulsing ring */}
           <span className="absolute inset-0 rounded-full border-2 border-primary animate-ping opacity-40 pointer-events-none" />
-          {/* Tooltip */}
           <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-dark/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-primary/30">
             المدربين
           </span>
         </div>
       )}
 
-      {/* ── Support Chat ── */}
       {isOpen ? (
         <div className="w-80 h-96 bg-dark/95 border border-primary/30 rounded-2xl shadow-[0_0_20px_rgba(0,240,255,0.2)] flex flex-col backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-5">
           <div className="bg-primary/20 p-4 border-b border-primary/20 flex justify-between items-center">
@@ -200,9 +245,15 @@ const SupportChat = () => {
       ) : (
         <button 
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 bg-primary text-dark rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-110 transition-transform group"
+          className="relative w-14 h-14 bg-primary text-dark rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-110 transition-transform group"
         >
           <MessageCircle size={28} className="group-hover:animate-pulse" />
+          
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-dark animate-bounce">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </button>
       )}
     </div>
@@ -210,3 +261,4 @@ const SupportChat = () => {
 };
 
 export default SupportChat;
+

@@ -13,14 +13,17 @@ interface ChatMessage {
   timestamp: number;
 }
 
+const STORAGE_KEY = 'chat_lastReadId_v2'; // v2 = new clean key, ignores old corrupted data
+
 const SupportChat = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [firstCoach, setFirstCoach] = useState<any>(null);
+  // Track the ID of the last message the user has "read" (seen in open chat)
+  const [lastReadId, setLastReadId] = useState<string>(() => localStorage.getItem(STORAGE_KEY) || '');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const prevMessagesLength = useRef(0);
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
@@ -37,14 +40,14 @@ const SupportChat = () => {
   const activeUserId = user?.id || guestId;
   const activeUserName = user?.name || (user?.id ? 'مستخدم' : 'زائر');
 
-  // Request notification permission
+  // Request notification permission on mount
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, []);
 
-  // Fetch the first/top coach to display on the bubble
+  // Fetch the first coach for the bubble avatar
   useEffect(() => {
     fetch(`${API_URL}/api/managers?page=1`)
       .then(r => r.json())
@@ -55,77 +58,64 @@ const SupportChat = () => {
       .catch(() => {});
   }, [API_URL]);
 
-  // Poll messages continuously so we get notifications when chat is closed
+  // Poll messages every 4 seconds regardless of chat open state
   useEffect(() => {
-    if (activeUserId) {
-      fetchMessages();
-      const interval = setInterval(fetchMessages, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [activeUserId]);
+    if (!activeUserId) return;
+    const poll = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}&_t=${Date.now()}`);
+        if (res.ok) {
+          const data: ChatMessage[] = await res.json();
+          setMessages(prev => {
+            // Detect new ADMIN messages that weren't in previous array
+            const prevIds = new Set(prev.map(m => m.id));
+            const newAdminMsgs = data.filter(m => m.sender === 'ADMIN' && !prevIds.has(m.id));
+            if (newAdminMsgs.length > 0 && !isOpen) {
+              // Send browser notification
+              if ('Notification' in window && Notification.permission === 'granted') {
+                const latest = newAdminMsgs[newAdminMsgs.length - 1];
+                new Notification('رسالة جديدة من الدعم الفني', {
+                  body: latest.text,
+                  icon: '/favicon.ico'
+                });
+              }
+            }
+            return data;
+          });
+        }
+      } catch {}
+    };
+    poll();
+    const interval = setInterval(poll, 4000);
+    return () => clearInterval(interval);
+  }, [activeUserId, API_URL, isOpen]);
 
-  const fetchMessages = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}&_t=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
-      }
-    } catch (err) {
-      console.error('Error fetching messages', err);
-    }
-  };
-
-  // State for last read timestamp
-  const [lastRead, setLastRead] = useState(() => Number(localStorage.getItem('chat_lastReadTimestamp')) || 0);
-
-  // Autofix corrupted future timestamps from localStorage
-  useEffect(() => {
-    if (messages.length > 0) {
-      const maxServerTime = Math.max(...messages.map(m => m.timestamp));
-      if (lastRead > maxServerTime + 60000) {
-        setLastRead(maxServerTime);
-        localStorage.setItem('chat_lastReadTimestamp', maxServerTime.toString());
-      }
-    }
-  }, [messages, lastRead]);
-
-  // Mark as read when opened
+  // When chat is OPENED: mark all current messages as read
   useEffect(() => {
     if (isOpen && messages.length > 0) {
-      const maxServerTime = Math.max(...messages.map(m => m.timestamp));
-      setLastRead(maxServerTime);
-      localStorage.setItem('chat_lastReadTimestamp', maxServerTime.toString());
+      const lastId = messages[messages.length - 1].id;
+      setLastReadId(lastId);
+      localStorage.setItem(STORAGE_KEY, lastId);
     }
   }, [isOpen, messages]);
 
-  // --- 🔥 PURE DERIVED STATE FOR BADGE 🔥 ---
-  // If the chat is closed, count all ADMIN messages that are newer than lastRead.
-  // This guarantees the badge will ALWAYS render if there's a new message.
-  const unreadCount = isOpen ? 0 : messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead).length;
-
-  // Handle browser push notifications ONLY for newly arriving messages while closed
-  useEffect(() => {
-    if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
-      const newMessages = messages.slice(prevMessagesLength.current);
-      const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
-      
-      if (!isOpen && newAdminMessages.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
-        const latestMsg = newAdminMessages[newAdminMessages.length - 1];
-        new Notification('رسالة جديدة من الدعم الفني', {
-          body: latestMsg.text,
-          icon: '/favicon.ico'
-        });
-      }
-    }
-    prevMessagesLength.current = messages.length;
-  }, [messages, isOpen]);
-
+  // Scroll to bottom when chat is open and messages change
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
+
+  // ─── BADGE COUNT: count ADMIN messages AFTER lastReadId ───
+  // Find the index of lastReadId in the array, count ADMIN messages after it
+  const unreadCount = (() => {
+    if (isOpen || messages.length === 0) return 0;
+    const lastReadIndex = lastReadId
+      ? messages.findIndex(m => m.id === lastReadId)
+      : -1;
+    const unread = messages.slice(lastReadIndex + 1).filter(m => m.sender === 'ADMIN');
+    return unread.length;
+  })();
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,9 +128,9 @@ const SupportChat = () => {
       sender: 'USER'
     };
 
+    const optimisticId = Date.now().toString();
     setMessage('');
-    // Optimistic update
-    setMessages(prev => [...prev, { ...newMessage, id: Date.now().toString(), timestamp: Date.now(), sender: 'USER' } as ChatMessage]);
+    setMessages(prev => [...prev, { ...newMessage, id: optimisticId, timestamp: Date.now(), sender: 'USER' } as ChatMessage]);
 
     try {
       await fetch(`${API_URL}/api/chat/send`, {
@@ -148,7 +138,6 @@ const SupportChat = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newMessage)
       });
-      fetchMessages();
     } catch (err) {
       console.error('Error sending message', err);
     }
@@ -164,12 +153,13 @@ const SupportChat = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
-      
+
+      {/* Coach Bubble */}
       {!isOpen && (
         <div className="relative group" title="اكتشف المدربين">
           <button
             onClick={() => navigate('/products')}
-            className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(0,240,255,0.5)] hover:scale-110 transition-all duration-300 hover:shadow-[0_0_24px_rgba(0,240,255,0.8)]"
+            className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(0,240,255,0.5)] hover:scale-110 transition-all duration-300"
           >
             {coachAvatarUrl ? (
               <img
@@ -196,8 +186,9 @@ const SupportChat = () => {
         </div>
       )}
 
+      {/* Support Chat Panel */}
       {isOpen ? (
-        <div className="w-80 h-96 bg-dark/95 border border-primary/30 rounded-2xl shadow-[0_0_20px_rgba(0,240,255,0.2)] flex flex-col backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="w-80 h-96 bg-dark/95 border border-primary/30 rounded-2xl shadow-[0_0_20px_rgba(0,240,255,0.2)] flex flex-col backdrop-blur-xl overflow-hidden">
           <div className="bg-primary/20 p-4 border-b border-primary/20 flex justify-between items-center">
             <h3 className="font-bold text-white flex items-center gap-2">
               <MessageCircle size={20} className="text-primary" />
@@ -207,7 +198,7 @@ const SupportChat = () => {
               <X size={20} />
             </button>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
             {messages.length === 0 ? (
               <p className="text-gray-400 text-sm text-center my-auto">مرحباً بك! كيف يمكننا مساعدتك اليوم؟</p>
@@ -216,7 +207,7 @@ const SupportChat = () => {
                 <div key={msg.id} className={`max-w-[80%] rounded-xl p-3 text-sm ${msg.sender === 'USER' ? 'bg-primary text-dark self-start rounded-tr-none' : 'bg-dark-lighter border border-gray-700 text-white self-end rounded-tl-none'}`}>
                   <p>{msg.text}</p>
                   <span className={`text-[10px] block mt-1 ${msg.sender === 'USER' ? 'text-dark/70' : 'text-gray-500'}`}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               ))
@@ -226,8 +217,8 @@ const SupportChat = () => {
 
           {user ? (
             <form onSubmit={handleSend} className="p-3 bg-dark-lighter border-t border-gray-800 flex gap-2">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="اكتب رسالتك..."
@@ -240,7 +231,7 @@ const SupportChat = () => {
           ) : (
             <div className="p-3 bg-dark-lighter border-t border-gray-800 text-center">
               <p className="text-gray-400 text-sm mb-2">يجب تسجيل الدخول أولاً للتواصل معنا</p>
-              <button 
+              <button
                 onClick={() => { setIsOpen(false); navigate('/login'); }}
                 className="bg-primary text-dark text-sm font-bold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors w-full"
               >
@@ -250,14 +241,15 @@ const SupportChat = () => {
           )}
         </div>
       ) : (
-        <button 
+        /* Chat Bubble with Badge */
+        <button
           onClick={() => setIsOpen(true)}
           className="relative w-14 h-14 bg-primary text-dark rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-110 transition-transform group"
         >
           <MessageCircle size={28} className="group-hover:animate-pulse" />
-          
+
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-dark animate-bounce">
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full border-2 border-dark animate-bounce">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -268,4 +260,3 @@ const SupportChat = () => {
 };
 
 export default SupportChat;
-

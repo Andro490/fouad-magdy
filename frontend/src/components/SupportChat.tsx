@@ -19,7 +19,6 @@ const SupportChat = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [firstCoach, setFirstCoach] = useState<any>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const prevMessagesLength = useRef(0);
   const navigate = useNavigate();
@@ -77,42 +76,48 @@ const SupportChat = () => {
     }
   };
 
-  // Handle unread counts and notifications
-  useEffect(() => {
-    let lastRead = Number(localStorage.getItem('chat_lastReadTimestamp')) || 0;
-    const maxServerTime = messages.length > 0 ? Math.max(...messages.map(m => m.timestamp)) : 0;
-    
-    // Auto-fix corrupted future timestamps (from previous clock skew bugs)
-    if (messages.length > 0 && lastRead > maxServerTime + 60000) {
-      lastRead = maxServerTime; // Reset to latest message to avoid being stuck forever
-      localStorage.setItem('chat_lastReadTimestamp', lastRead.toString());
-    }
+  // State for last read timestamp
+  const [lastRead, setLastRead] = useState(() => Number(localStorage.getItem('chat_lastReadTimestamp')) || 0);
 
-    if (isOpen) {
-      setUnreadCount(0);
-      if (messages.length > 0) {
+  // Autofix corrupted future timestamps from localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      const maxServerTime = Math.max(...messages.map(m => m.timestamp));
+      if (lastRead > maxServerTime + 60000) {
+        setLastRead(maxServerTime);
         localStorage.setItem('chat_lastReadTimestamp', maxServerTime.toString());
       }
-    } else {
-      // Calculate unread count purely based on server timestamps (works on refresh too!)
-      const unreadMsgs = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
-      setUnreadCount(unreadMsgs.length);
+    }
+  }, [messages, lastRead]);
+
+  // Mark as read when opened
+  useEffect(() => {
+    if (isOpen && messages.length > 0) {
+      const maxServerTime = Math.max(...messages.map(m => m.timestamp));
+      setLastRead(maxServerTime);
+      localStorage.setItem('chat_lastReadTimestamp', maxServerTime.toString());
+    }
+  }, [isOpen, messages]);
+
+  // --- 🔥 PURE DERIVED STATE FOR BADGE 🔥 ---
+  // If the chat is closed, count all ADMIN messages that are newer than lastRead.
+  // This guarantees the badge will ALWAYS render if there's a new message.
+  const unreadCount = isOpen ? 0 : messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead).length;
+
+  // Handle browser push notifications ONLY for newly arriving messages while closed
+  useEffect(() => {
+    if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
+      const newMessages = messages.slice(prevMessagesLength.current);
+      const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
       
-      // Handle browser push notifications ONLY for newly arriving messages while closed
-      if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
-        const newMessages = messages.slice(prevMessagesLength.current);
-        const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
-        
-        if (newAdminMessages.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
-          const latestMsg = newAdminMessages[newAdminMessages.length - 1];
-          new Notification('رسالة جديدة من الدعم الفني', {
-            body: latestMsg.text,
-            icon: '/favicon.ico'
-          });
-        }
+      if (!isOpen && newAdminMessages.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
+        const latestMsg = newAdminMessages[newAdminMessages.length - 1];
+        new Notification('رسالة جديدة من الدعم الفني', {
+          body: latestMsg.text,
+          icon: '/favicon.ico'
+        });
       }
     }
-    
     prevMessagesLength.current = messages.length;
   }, [messages, isOpen]);
 

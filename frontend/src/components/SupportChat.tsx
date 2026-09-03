@@ -67,7 +67,6 @@ const SupportChat = () => {
 
   const fetchMessages = async () => {
     try {
-      // Add timestamp to prevent browser caching of the chat response
       const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}&_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
@@ -78,39 +77,34 @@ const SupportChat = () => {
     }
   };
 
-  // Handle unread counts and notifications
+  // Reset unread count when chat is opened
   useEffect(() => {
-    const lastRead = Number(localStorage.getItem('chat_lastReadTimestamp')) || 0;
-    
     if (isOpen) {
       setUnreadCount(0);
-      if (messages.length > 0) {
-        // Use the actual server timestamp from the messages to prevent clock skew issues
-        const maxTime = Math.max(...messages.map(m => m.timestamp));
-        localStorage.setItem('chat_lastReadTimestamp', maxTime.toString());
-      }
-    } else {
-      // Calculate unread count purely based on server timestamps
-      const unread = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
-      setUnreadCount(unread.length);
+    }
+  }, [isOpen]);
+
+  // Handle new messages and notifications based purely on array length
+  useEffect(() => {
+    // Only process if we have already loaded the initial messages
+    if (prevMessagesLength.current > 0 && messages.length > prevMessagesLength.current) {
+      const newMessages = messages.slice(prevMessagesLength.current);
+      const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
       
-      // Handle new messages arriving while closed (for browser push notifications)
-      if (messages.length > prevMessagesLength.current) {
-        const newMessages = messages.slice(prevMessagesLength.current);
-        const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
+      if (!isOpen && newAdminMessages.length > 0) {
+        setUnreadCount(prev => prev + newAdminMessages.length);
         
-        if (newAdminMessages.length > 0) {
-          if ('Notification' in window && Notification.permission === 'granted') {
-            const latestMsg = newAdminMessages[newAdminMessages.length - 1];
-            new Notification('رسالة جديدة من الدعم الفني', {
-              body: latestMsg.text,
-              icon: '/favicon.ico'
-            });
-          }
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const latestMsg = newAdminMessages[newAdminMessages.length - 1];
+          new Notification('رسالة جديدة من الدعم الفني', {
+            body: latestMsg.text,
+            icon: '/favicon.ico'
+          });
         }
       }
     }
     
+    // Always update the ref to the current length
     prevMessagesLength.current = messages.length;
   }, [messages, isOpen]);
 

@@ -46,11 +46,15 @@ const SupportChat = () => {
     }
   }, []);
 
+  // In production: connect to same origin (nginx will proxy /socket.io/ to backend)
+  // In dev: connect directly to backend port
+  const SOCKET_URL = import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin;
+
   // ── Socket.io: connect and join user room ──
-  useEffect(() => {
+  useEffect(() => {   
     if (!activeUserId) return;
 
-    const socket = io(API_URL, {
+    const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       withCredentials: true,
     });

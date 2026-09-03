@@ -8,6 +8,8 @@ import path from 'path';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
@@ -43,6 +45,21 @@ const sanitizeHTML = (str: string | undefined | null) => {
 };
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',').map((o) => o.trim()),
+    credentials: true,
+  }
+});
+
+// Socket.io connection: join a room per userId so we can target specific users
+io.on('connection', (socket) => {
+  socket.on('join', (userId: string) => {
+    if (userId) socket.join(`user_${userId}`);
+  });
+});
+
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
@@ -1185,7 +1202,7 @@ app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res
     if (!message.userId || !message.text) {
       return res.status(400).json({ error: 'Missing userId or text' });
     }
-    await prisma.chatMessage.create({
+    const saved = await prisma.chatMessage.create({
       data: {
         userId: sanitizeHTML(String(message.userId)),
         userName: 'Admin',
@@ -1194,6 +1211,14 @@ app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res
         timestamp: Date.now()
       }
     });
+
+    // 🔥 Emit real-time notification to the specific user via Socket.io
+    io.to(`user_${sanitizeHTML(String(message.userId))}`).emit('new_admin_message', {
+      id: saved.id,
+      text: saved.text,
+      timestamp: saved.timestamp,
+    });
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -1708,7 +1733,7 @@ app.get('/api/telegram/verify-session', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, async () => {
-  console.log(`StreamHub API is running on http://localhost:${PORT}`);
+httpServer.listen(PORT, async () => {
+  console.log(`StreamHub API is running on http://localhost:${PORT} 🚀 Socket.io enabled`);
   await seedCoachesIfEmpty();
 });

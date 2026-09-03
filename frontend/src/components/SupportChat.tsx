@@ -67,7 +67,8 @@ const SupportChat = () => {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}`);
+      // Add timestamp to prevent browser caching of the chat response
+      const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}&_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setMessages(data);
@@ -84,22 +85,21 @@ const SupportChat = () => {
     if (isOpen) {
       setUnreadCount(0);
       if (messages.length > 0) {
-        localStorage.setItem('chat_lastReadTimestamp', Date.now().toString());
+        // Use the actual server timestamp from the messages to prevent clock skew issues
+        const maxTime = Math.max(...messages.map(m => m.timestamp));
+        localStorage.setItem('chat_lastReadTimestamp', maxTime.toString());
       }
     } else {
-      // Calculate unread count on initial load
-      if (prevMessagesLength.current === 0 && messages.length > 0) {
-        const unread = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
-        setUnreadCount(unread.length);
-      } 
-      // Handle new messages arriving while closed
-      else if (messages.length > prevMessagesLength.current) {
+      // Calculate unread count purely based on server timestamps
+      const unread = messages.filter(m => m.sender === 'ADMIN' && m.timestamp > lastRead);
+      setUnreadCount(unread.length);
+      
+      // Handle new messages arriving while closed (for browser push notifications)
+      if (messages.length > prevMessagesLength.current) {
         const newMessages = messages.slice(prevMessagesLength.current);
         const newAdminMessages = newMessages.filter(m => m.sender === 'ADMIN');
         
         if (newAdminMessages.length > 0) {
-          setUnreadCount(prev => prev + newAdminMessages.length);
-          
           if ('Notification' in window && Notification.permission === 'granted') {
             const latestMsg = newAdminMessages[newAdminMessages.length - 1];
             new Notification('رسالة جديدة من الدعم الفني', {

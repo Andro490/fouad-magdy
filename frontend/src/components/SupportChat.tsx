@@ -84,13 +84,30 @@ const SupportChat = () => {
       try { navigator.vibrate([200, 100, 200]); } catch {}
     }
 
-    // 4. Browser Notification
+    // 4. Browser Notification (Chrome on Android strictly requires Service Worker showNotification)
     try {
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification('الدعم الفني | رد جديد 💬', {
+        const title = 'الدعم الفني | رد جديد 💬';
+        const options: NotificationOptions = {
           body: msg.text,
           icon: '/favicon.ico',
-        });
+          badge: '/favicon.ico',
+          tag: 'support-message',
+        };
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready
+            .then((registration) => {
+              registration.showNotification(title, options);
+            })
+            .catch(() => {
+              try {
+                new Notification(title, options);
+              } catch {}
+            });
+        } else {
+          new Notification(title, options);
+        }
       }
     } catch {}
 
@@ -100,7 +117,13 @@ const SupportChat = () => {
     } catch {}
   };
 
-  // ── Request browser notification permission safely on user action or load ──
+  // ── Register Service Worker & request permissions safely ──
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  }, []);
+
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window && window.Notification && Notification.permission === 'default') {

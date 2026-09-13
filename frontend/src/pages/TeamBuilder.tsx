@@ -447,7 +447,7 @@ const TeamBuilder = () => {
               </div>
 
               <div className="text-center">
-                <span className="text-3xl font-black text-emerald-400">0 ج</span>
+                <span className="text-3xl font-black text-emerald-400">0 EGP</span>
               </div>
 
               <ul className="space-y-3 flex-1 text-sm text-gray-300">
@@ -492,7 +492,7 @@ const TeamBuilder = () => {
               </div>
 
               <div className="text-center">
-                <span className="text-3xl font-black text-white">199 <span className="text-lg text-gray-400">ج</span></span>
+                <span className="text-3xl font-black text-white">199 <span className="text-lg text-gray-400">EGP</span></span>
               </div>
 
               <p className="text-gray-400 text-xs text-center">
@@ -511,7 +511,7 @@ const TeamBuilder = () => {
               </ul>
 
               <button
-                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الأولى - تواصل تليجرام', price: '199 ج' } } })}
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الأولى - تواصل تليجرام', price: '199 EGP' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-blue-500 hover:bg-blue-400 transition-all text-white text-center block"
               >
                 اشترك الآن ✈
@@ -531,7 +531,7 @@ const TeamBuilder = () => {
               </div>
 
               <div className="text-center">
-                <span className="text-3xl font-black text-green-300">399 <span className="text-lg text-gray-400">ج</span></span>
+                <span className="text-3xl font-black text-green-300">399 <span className="text-lg text-gray-400">EGP</span></span>
               </div>
 
               <p className="text-gray-400 text-xs text-center">
@@ -562,7 +562,7 @@ const TeamBuilder = () => {
               </ul>
 
               <button
-                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثانية - واتساب شخصي', price: '399 ج' } } })}
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثانية - واتساب شخصي', price: '399 EGP' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 transition-all text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] text-center block"
               >
                 اشترك الآن 📲
@@ -588,7 +588,7 @@ const TeamBuilder = () => {
               </div>
 
               <div className="text-center">
-                <span className="text-3xl font-black text-yellow-400">999 <span className="text-lg text-gray-400">ج</span></span>
+                <span className="text-3xl font-black text-yellow-400">999 <span className="text-lg text-gray-400">EGP</span></span>
               </div>
 
               <p className="text-gray-400 text-xs text-center">
@@ -623,7 +623,7 @@ const TeamBuilder = () => {
               </ul>
 
               <button
-                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثالثة - المتابعة الشخصية VIP', price: '999 ج' } } })}
+                onClick={() => navigate('/checkout', { state: { product: { name: 'الباقة الثالثة - المتابعة الشخصية VIP', price: '999 EGP' } } })}
                 className="mt-2 w-full py-3 rounded-xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 transition-all text-black text-center shadow-[0_0_20px_rgba(234,179,8,0.3)] block"
               >
                 اشترك الآن VIP 👑

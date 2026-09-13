@@ -300,6 +300,14 @@ function DesktopHero() {
           {/* CTA Buttons */}
           <motion.div variants={itemUp} className="flex flex-col sm:flex-row items-center md:justify-end gap-4">
             <a
+              href="https://tikalert-eg.com/fouadf999"
+              target="_blank"
+              rel="noreferrer"
+              className="group w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-black text-base border border-amber-400/50 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 text-amber-300 hover:border-amber-400 hover:text-amber-200 transition-all duration-300 shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:shadow-[0_0_25px_rgba(251,191,36,0.4)] hover:-translate-y-1"
+            >
+              💛 الدعم المادي من هنا
+            </a>
+            <a
               href={siteConfig.socials.find(s => s.label === 'Kick')?.url || "#"}
               target="_blank"
               rel="noreferrer"

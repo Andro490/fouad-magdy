@@ -861,12 +861,11 @@ app.post('/api/users', async (req, res) => {
     for (const u of users) {
       const emailToUse = u.email || u.phone || `user_${Date.now()}@mock.com`;
       
-      const updateData: any = {
-        name: u.name,
-        role: u.role,
-        coins: Number(u.coins || 0),
-        phone: u.phone
-      };
+      const updateData: any = {};
+      if (u.name !== undefined) updateData.name = u.name;
+      if (u.role !== undefined) updateData.role = u.role;
+      if (u.coins !== undefined) updateData.coins = Number(u.coins || 0);
+      if (u.phone !== undefined) updateData.phone = u.phone;
 
       if (u.password) {
         if (u.password.startsWith('$2a$') || u.password.startsWith('$2b$')) {
@@ -880,9 +879,9 @@ app.post('/api/users', async (req, res) => {
         where: { email: emailToUse }, // Using email as unique identifier
         update: updateData,
         create: {
-          name: u.name,
+          name: u.name || emailToUse.split('@')[0] || 'User',
           email: emailToUse,
-          phone: u.phone,
+          phone: u.phone || null,
           password: updateData.password ?? undefined,
           role: u.role ?? 'USER',
           coins: Number(u.coins ?? 0)
@@ -890,6 +889,26 @@ app.post('/api/users', async (req, res) => {
       });
     }
     res.json({ success: true, count: users.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/users/:id — delete user (admin only)
+app.delete('/api/users/:id', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const { id } = req.params;
+    const requester = req.user;
+
+    if (requester?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'غير مصرح لك بحذف هذا الحساب' });
+    }
+
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    res.json({ success: true, message: 'تم حذف الحساب بنجاح' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

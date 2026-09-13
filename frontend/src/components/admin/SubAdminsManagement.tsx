@@ -64,32 +64,29 @@ const SubAdminsManagement = () => {
     }
   };
 
-  const handleDeleteSeller = async (id: string, userEmail: string) => {
-    if (!window.confirm('هل أنت متأكد من إزالة هذا الأدمن الفرعي؟ سيتحول إلى مستخدم عادي.')) return;
+  const handleDeleteSeller = async (id: string, _userEmail: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الأدمن الفرعي نهائياً؟')) return;
     
     const token = localStorage.getItem('authToken');
     try {
-      // Demote them to 'USER' instead of deleting them completely, or just send an update
-      const res = await fetch(`${API_URL}/api/users`, {
-        method: 'POST',
+      const res = await fetch(`${API_URL}/api/users/${id}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify([{
-          email: userEmail,
-          role: 'USER'
-        }])
+        }
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        alert('تم إزالة الصلاحية بنجاح');
+        alert('تم حذف الأدمن الفرعي بنجاح ✅');
         fetchSellers();
       } else {
-        alert('حدث خطأ');
+        alert(`حدث خطأ: ${data.error || 'غير معروف'}`);
       }
     } catch (e) {
-      alert('خطأ في الاتصال');
+      alert('خطأ في الاتصال بالسيرفر');
     }
   };
 

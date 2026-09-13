@@ -191,7 +191,7 @@ app.post('/api/settings', authenticateToken, async (req: AuthRequest, res) => {
 
 // ─────────────────────────────────────────
 // MANAGERS API — stored in DB (Manager table)
-// Newest coaches (createdAt DESC) appear first on site.
+// Highest position = appears first on site. New coaches get max+N.
 // ─────────────────────────────────────────
 
 app.get('/api/managers', async (req, res) => {
@@ -202,7 +202,7 @@ app.get('/api/managers', async (req, res) => {
     const rows = await prisma.manager.findMany({
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { position: 'desc' },
     });
     const coaches = rows.map((r: any) => r.data);
     res.json({
@@ -236,17 +236,23 @@ app.post('/api/managers/add', async (req, res) => {
       return res.status(400).json({ error: 'لم يتم العثور على مدربين' });
     }
 
-    // Upsert each coach — update if id exists, insert if new
-    for (const coach of newCoaches) {
+    // Get current max position so new coaches appear at the top
+    const maxRow = await prisma.manager.findFirst({ orderBy: { position: 'desc' } });
+    let nextPosition = ((maxRow as any)?.position ?? 0) + newCoaches.length;
+
+    // Upsert each coach — first in the list gets the highest position (shown first)
+    for (let i = 0; i < newCoaches.length; i++) {
+      const coach = newCoaches[i];
       const id = String(coach.id);
+      const position = nextPosition - i; // first coach gets highest position
       await prisma.manager.upsert({
         where: { id },
-        update: { data: coach },
-        create: { id, data: coach },
+        update: { data: coach as any, position },
+        create: { id, data: coach as any, position },
       });
     }
 
-    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح في قاعدة البيانات!` });
+    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح في أول القائمة!` });
   } catch (err: any) {
     console.error('Error adding coaches:', err);
     res.status(500).json({ error: err.message });

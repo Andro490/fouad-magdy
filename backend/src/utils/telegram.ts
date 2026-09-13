@@ -7,6 +7,9 @@ export const normalizeTelegramTarget = (target?: string) => {
   if (!target) return '';
   const trimmed = String(target).trim();
   if (!trimmed) return '';
+  // A private user ID (positive integer) is for notifications, not a channel/group to join
+  if (/^\d+$/.test(trimmed)) return '';
+  if (/^-\d+$/.test(trimmed)) return trimmed;
   return trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
 };
 

@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 async function main() {
   const data = JSON.parse(fs.readFileSync('./src/data/coaches.json', 'utf8'));
   
+  await prisma.manager.deleteMany({}); // CLEAR DB
+  
   for (let i = 0; i < data.length; i++) {
     const coach = data[i];
     const id = String(coach.id);

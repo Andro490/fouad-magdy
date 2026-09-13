@@ -8,6 +8,7 @@ const SiteSettings = () => {
   const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
+  const [telegramGroupUsername, setTelegramGroupUsername] = useState('@fouadmagdym24');
   const [telegramWelcomeVideoUrl, setTelegramWelcomeVideoUrl] = useState('');
   const [telegramWelcomeText, setTelegramWelcomeText] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
@@ -30,6 +31,7 @@ const SiteSettings = () => {
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
+        if (data.telegramGroupUsername) setTelegramGroupUsername(data.telegramGroupUsername);
         if (data.telegramWelcomeVideoUrl) setTelegramWelcomeVideoUrl(data.telegramWelcomeVideoUrl);
         if (data.telegramWelcomeText) setTelegramWelcomeText(data.telegramWelcomeText);
         if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
@@ -51,7 +53,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
       });
       if (res.ok) {
         setSaved(true);
@@ -206,6 +208,17 @@ const SiteSettings = () => {
                 className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
                 dir="ltr"
                 placeholder="123456789"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Telegram Group Username</label>
+              <input
+                type="text"
+                value={telegramGroupUsername}
+                onChange={e => setTelegramGroupUsername(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
+                dir="ltr"
+                placeholder="@fouadmagdym24"
               />
             </div>
             <hr className="border-gray-700 my-4" />

@@ -13,6 +13,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
+import { getRequiredTelegramTargets, isValidTelegramMembershipStatus } from './utils/telegram';
 
 // Try to import rate-limit (optional - won't crash if not installed yet)
 let rateLimit: any;
@@ -1638,13 +1639,13 @@ let isPollingTelegram = false;
 async function pollTelegramBot() {
   if (isPollingTelegram) return;
   isPollingTelegram = true;
-  
+
   try {
     const settings = readSettings();
     const token = settings.telegramBotToken;
-    const channelId = settings.telegramChatId; // e.g. @fouadmgdym
-    
-    if (token && channelId) {
+    const requiredTargets = getRequiredTelegramTargets(settings.telegramChatId, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');
+
+    if (token && requiredTargets.length > 0) {
       const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${telegramLastUpdateId + 1}&timeout=30`);
       if (res.ok) {
         const data = await res.json();
@@ -1655,12 +1656,21 @@ async function pollTelegramBot() {
             const userId = update.message.from.id;
             const chatId = update.message.chat.id;
 
-            // Check channel membership
-            const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${channelId}&user_id=${userId}`);
-            const memberData = await memberRes.json();
-            const status = memberData.result?.status;
+            let allVerified = true;
+            const membershipChecks = [] as string[];
 
-            if (status === 'member' || status === 'administrator' || status === 'creator') {
+            for (const target of requiredTargets) {
+              const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${encodeURIComponent(target)}&user_id=${userId}`);
+              const memberData = await memberRes.json();
+              const status = memberData.result?.status;
+              membershipChecks.push(`${target}:${status || 'unknown'}`);
+
+              if (!isValidTelegramMembershipStatus(status)) {
+                allVerified = false;
+              }
+            }
+
+            if (allVerified) {
               verifiedSessions.add(sessionId);
               await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
@@ -1672,7 +1682,7 @@ async function pollTelegramBot() {
               });
             } else {
               const videoUrl = settings.telegramWelcomeVideoUrl;
-              const welcomeText = settings.telegramWelcomeText || `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القناة ${channelId} ثم المحاولة مرة أخرى.`;
+              const welcomeText = settings.telegramWelcomeText || `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القنوات والمجموعات التالية ثم المحاولة مرة أخرى:\n${requiredTargets.map((t) => `• ${t}`).join('\n')}`;
 
               if (videoUrl) {
                 await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
@@ -1700,7 +1710,7 @@ async function pollTelegramBot() {
       }
     }
   } catch (err) {}
-  
+
   isPollingTelegram = false;
   setTimeout(pollTelegramBot, 2000);
 }
@@ -1709,14 +1719,21 @@ async function pollTelegramBot() {
 setTimeout(pollTelegramBot, 2000);
 
 app.get('/api/telegram/bot-info', async (req, res) => {
-  const token = readSettings().telegramBotToken;
-  const channel = readSettings().telegramChatId;
-  if (!token || !channel) return res.json({ enabled: false });
+  const settings = readSettings();
+  const token = settings.telegramBotToken;
+  const requiredTargets = getRequiredTelegramTargets(settings.telegramChatId, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');
+  if (!token || requiredTargets.length === 0) return res.json({ enabled: false });
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/getMe`);
     const d = await r.json();
     if (d.ok) {
-      return res.json({ enabled: true, botUsername: d.result.username, channelUsername: channel });
+      return res.json({
+        enabled: true,
+        botUsername: d.result.username,
+        channelUsername: requiredTargets[0] || '',
+        groupUsername: requiredTargets[1] || '',
+        requiredTargets
+      });
     }
     return res.json({ enabled: false });
   } catch {

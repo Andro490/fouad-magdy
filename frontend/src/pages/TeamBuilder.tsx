@@ -70,7 +70,7 @@ const TeamBuilder = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [telegramVerified, setTelegramVerified] = useState(localStorage.getItem('telegram_verified') === 'true');
-  const [botInfo, setBotInfo] = useState({ enabled: false, botUsername: '', channelUsername: '' });
+  const [botInfo, setBotInfo] = useState({ enabled: false, botUsername: '', channelUsername: '', groupUsername: '', requiredTargets: [] as string[] });
   const [sessionId, setSessionId] = useState('');
   const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
@@ -340,18 +340,32 @@ const TeamBuilder = () => {
                   </svg>
                 </div>
 
-                <h2 className="text-2xl font-bold text-white mb-3">اشترك بقناتنا أول</h2>
+                <h2 className="text-2xl font-bold text-white mb-3">اشترك في القناة والجروب أولاً</h2>
                 <p className="text-gray-400 mb-6 leading-relaxed">
-                  هذه الميزة مجانية، وشرطها الوحيد إنك تكون بقناتنا على تلغرام {botInfo.channelUsername} — منها تجيك الأخبار والتسريبات أول بأول.
+                  هذه الميزة مجانية، وشرطها الوحيد إنك تكون عضو في القناة والجروب التاليين: {botInfo.requiredTargets.join(' + ')}.
                 </p>
+
+                <div className="space-y-3 mb-6 text-right">
+                  {botInfo.requiredTargets.map((target) => (
+                    <a
+                      key={target}
+                      href={`https://t.me/${target.replace(/^@/, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-black font-black text-lg py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(52,211,153,0.4)] hover:scale-[1.01]"
+                    >
+                      {target}
+                    </a>
+                  ))}
+                </div>
 
                 <a
                   href={`https://t.me/${botInfo.botUsername}?start=${sessionId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-black font-black text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(52,211,153,0.4)] hover:scale-105"
+                  className="block w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white font-black text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.35)] hover:scale-[1.01]"
                 >
-                  افتح القناة واشترك ✈️
+                  افتح البوت بعد الاشتراك ✅
                 </a>
 
                 <p className="text-xs text-gray-600 mt-6 font-bold">

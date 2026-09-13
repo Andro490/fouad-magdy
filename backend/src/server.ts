@@ -1796,40 +1796,61 @@ async function pollTelegramBot() {
               ? `${customWelcome}\n\n${statusMessage}`
               : statusMessage;
 
-            const isYouTube = videoUrl && (videoUrl.includes('youtu.be') || videoUrl.includes('youtube.com'));
-            const isDirectVideo = videoUrl && /\.(mp4|mov|avi|webm)(\?.*)?$/i.test(videoUrl);
+            // Helper to transform cloud links (Google Drive, Dropbox) into direct video stream URLs
+            let formattedVideoUrl = videoUrl ? videoUrl.trim() : null;
+            if (formattedVideoUrl && formattedVideoUrl.includes('drive.google.com')) {
+              const match = formattedVideoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || formattedVideoUrl.match(/id=([a-zA-Z0-9_-]+)/);
+              if (match && match[1]) {
+                formattedVideoUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+              }
+            } else if (formattedVideoUrl && formattedVideoUrl.includes('dropbox.com')) {
+              formattedVideoUrl = formattedVideoUrl.replace('dl=0', 'dl=1');
+            }
 
-            // 1. If direct MP4 file: try sendVideo
             let videoSent = false;
-            if (isDirectVideo) {
+            if (formattedVideoUrl) {
+              // 1. Try sendVideo so it renders as a native video player box with caption
               try {
                 const vRes = await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
                   body: JSON.stringify({
                     chat_id: chatId,
-                    video: videoUrl,
-                    caption: combinedCaption
+                    video: formattedVideoUrl,
+                    caption: combinedCaption,
+                    supports_streaming: true
                   })
                 });
                 const vData = await vRes.json();
-                if (vData.ok) videoSent = true;
-              } catch {}
+                if (vData.ok) {
+                  videoSent = true;
+                } else {
+                  // If Telegram treats short video as animation/GIF
+                  const aRes = await fetch(`https://api.telegram.org/bot${token}/sendAnimation`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                      chat_id: chatId,
+                      animation: formattedVideoUrl,
+                      caption: combinedCaption
+                    })
+                  });
+                  const aData = await aRes.json();
+                  if (aData.ok) videoSent = true;
+                }
+              } catch (e) {
+                console.warn('sendVideo error:', e);
+              }
             }
 
-            // 2. If YouTube or if sendVideo failed: send via sendMessage with playable rich preview
+            // 2. If no video was sent, send as a clean text message (without raw link)
             if (!videoSent) {
-              const fullText = videoUrl ? `${combinedCaption}\n\n${videoUrl}` : combinedCaption;
               await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                   chat_id: chatId,
-                  text: fullText,
-                  link_preview_options: {
-                    is_disabled: false,
-                    prefer_large_media: true
-                  }
+                  text: combinedCaption
                 })
               }).catch(e => console.warn('Telegram sendMessage error:', e));
             }

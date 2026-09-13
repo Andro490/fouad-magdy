@@ -165,7 +165,7 @@ function MobileProfileCard() {
             </svg>
           </motion.div>
 
-          {/* Support Card */}
+          {/* Support Full-Width Banner (Big Like Kick) */}
           <motion.a
             href="https://tikalert-eg.com/fouadf999"
             target="_blank"
@@ -175,9 +175,39 @@ function MobileProfileCard() {
             transition={{ delay: 0.7 }}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="mt-4 w-full block rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-yellow-500/10 px-4 py-4 text-center shadow-[0_0_18px_rgba(251,191,36,0.15)]"
+            className="mt-4 w-full block rounded-2xl overflow-hidden relative cursor-pointer group border border-amber-500/30 hover:border-amber-400/60 transition-all duration-300 shadow-[0_0_20px_rgba(245,158,11,0.12)] hover:shadow-[0_0_30px_rgba(245,158,11,0.25)]"
+            style={{ background: '#0a0a0a' }}
           >
-            <span className="text-amber-300 font-black text-base md:text-lg tracking-wide">الدعم المادي من هنا</span>
+            {/* Ambient gold glow */}
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-orange-500/5 to-transparent pointer-events-none" />
+
+            {/* Donation Icon top-left */}
+            <div className="absolute top-3 left-3 z-10 w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.6)]">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-black">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+
+            {/* Big Support Text */}
+            <div className="flex items-center justify-center py-9 px-4 relative z-10">
+              <span
+                className="font-black tracking-tight select-none text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-300"
+                style={{
+                  fontSize: 'clamp(2.2rem, 11vw, 3.6rem)',
+                  textShadow: '0 0 30px rgba(251,191,36,0.4), 0 0 60px rgba(245,158,11,0.2)',
+                  lineHeight: 1.2,
+                }}
+              >
+                الدعم المادي
+              </span>
+            </div>
+
+            {/* Subtitle / CTA Label */}
+            <div className="pb-4 text-center relative z-10 flex items-center justify-center gap-2">
+              <span className="text-amber-300/90 font-black text-xs md:text-sm tracking-[0.2em] uppercase">
+                TIKALERT • اضغط هنا للدعم المباشر
+              </span>
+            </div>
           </motion.a>
 
           {/* Kick Full-Width Banner */}

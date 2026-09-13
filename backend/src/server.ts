@@ -14,6 +14,7 @@ import { PrismaClient } from '@prisma/client';
 import { authenticateToken, AuthRequest } from './middleware/auth';
 import { generateToken } from './utils/jwt';
 import { getRequiredTelegramTargets, isValidTelegramMembershipStatus } from './utils/telegram';
+import { removeCoachById } from './utils/coachDelete';
 
 // Try to import rate-limit (optional - won't crash if not installed yet)
 let rateLimit: any;
@@ -252,7 +253,7 @@ app.delete('/api/managers/:id', (req, res) => {
   try {
     const { id } = req.params;
     const existing = readCoachesFile();
-    const filtered = existing.filter((c: any) => String(c.id) !== String(id));
+    const filtered = removeCoachById(existing, id);
     if (filtered.length === existing.length) {
       return res.status(404).json({ error: 'المدرب غير موجود' });
     }

@@ -32,11 +32,11 @@ const AddCoaches = () => {
   };
 
   const handleDeleteCoach = async () => {
-    const idInput = (document.getElementById('deleteCoachIdInput') as HTMLInputElement).value;
+    const idInput = (document.getElementById('deleteCoachIdInput') as HTMLInputElement).value.trim();
     if (!idInput) return alert('يرجى إدخال ID المدرب');
     if (window.confirm('هل أنت متأكد من حذف هذا المدرب نهائياً؟')) {
       try {
-        const res = await fetch(`${API_URL}/api/managers/${idInput}`, { method: 'DELETE' });
+        const res = await fetch(`${API_URL}/api/managers/${encodeURIComponent(idInput)}`, { method: 'DELETE' });
         const result = await res.json();
         if (res.ok) {
           alert('تم حذف المدرب بنجاح!');

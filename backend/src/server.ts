@@ -154,87 +154,73 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────
-// SITE SETTINGS API (banner flags, etc.)
+// SITE SETTINGS API — stored in DB (SiteSettings table)
 // ─────────────────────────────────────────
-const SETTINGS_FILE = path.join(__dirname, '../src/data/settings.json');
+const DEFAULT_SETTINGS = { showComingSoonBanner: true };
 
-const readSettings = () => {
+const readSettings = async (): Promise<Record<string, any>> => {
   try {
-    const raw = fs.readFileSync(SETTINGS_FILE, 'utf-8');
-    return JSON.parse(raw);
+    const row = await (prisma as any).siteSettings.findUnique({ where: { id: 'singleton' } });
+    return (row?.data as Record<string, any>) ?? DEFAULT_SETTINGS;
   } catch {
-    return { showComingSoonBanner: true };
+    return DEFAULT_SETTINGS;
   }
 };
 
-const writeSettings = (data: object) => {
-  const dir = path.dirname(SETTINGS_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(data, null, 2));
+const writeSettings = async (data: Record<string, any>): Promise<void> => {
+  await (prisma as any).siteSettings.upsert({
+    where: { id: 'singleton' },
+    update: { data },
+    create: { id: 'singleton', data },
+  });
 };
 
 // Public: get current settings
-app.get('/api/settings', (req, res) => {
-  res.json(readSettings());
+app.get('/api/settings', async (req, res) => {
+  res.json(await readSettings());
 });
 
 // Admin only: update settings
-app.post('/api/settings', authenticateToken, (req: AuthRequest, res) => {
+app.post('/api/settings', authenticateToken, async (req: AuthRequest, res) => {
   if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
-  const current = readSettings();
+  const current = await readSettings();
   const updated = { ...current, ...req.body };
-  writeSettings(updated);
+  await writeSettings(updated);
   res.json({ success: true, settings: updated });
 });
 
 // ─────────────────────────────────────────
-// MANAGERS API - Serves directly from coaches.json
-// Order in file = order on site. New coaches prepended = appear first.
+// MANAGERS API — stored in DB (Manager table)
+// Newest coaches (createdAt DESC) appear first on site.
 // ─────────────────────────────────────────
-const COACHES_FILE = path.join(__dirname, '../src/data/coaches.json');
 
-const readCoachesFile = (): any[] => {
-  try {
-    const raw = fs.readFileSync(COACHES_FILE, 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-};
-
-const writeCoachesFile = (coaches: any[]) => {
-  fs.writeFileSync(COACHES_FILE, JSON.stringify(coaches, null, 4), 'utf-8');
-};
-
-app.get('/api/managers', (req, res) => {
+app.get('/api/managers', async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = 15;
-    const allCoaches = readCoachesFile();
-    const totalCoaches = allCoaches.length;
-    const start = (page - 1) * limit;
-    const coaches = allCoaches.slice(start, start + limit);
-
+    const totalCoaches = await prisma.manager.count();
+    const rows = await prisma.manager.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    });
+    const coaches = rows.map((r: any) => r.data);
     res.json({
       page,
       totalPages: Math.ceil(totalCoaches / limit),
       totalCoaches,
-      coaches
+      coaches,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/managers/reset', async (req, res) => {
-  try {
-    res.json({ message: 'Reset not needed - coaches served from file' });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
+app.get('/api/managers/reset', async (_req, res) => {
+  res.json({ message: 'Managers are stored in DB — no reset needed.' });
 });
 
-app.post('/api/managers/add', (req, res) => {
+app.post('/api/managers/add', async (req, res) => {
   try {
     let inputData = req.body;
     let newCoaches: any[] = [];
@@ -250,33 +236,32 @@ app.post('/api/managers/add', (req, res) => {
       return res.status(400).json({ error: 'لم يتم العثور على مدربين' });
     }
 
-    const existing = readCoachesFile();
+    // Upsert each coach — update if id exists, insert if new
+    for (const coach of newCoaches) {
+      const id = String(coach.id);
+      await prisma.manager.upsert({
+        where: { id },
+        update: { data: coach },
+        create: { id, data: coach },
+      });
+    }
 
-    // Remove duplicates (same id), then prepend new coaches to the top
-    const withoutDupes = existing.filter(
-      (e: any) => !newCoaches.some((n: any) => String(n.id) === String(e.id))
-    );
-    const updated = [...newCoaches, ...withoutDupes];
-    writeCoachesFile(updated);
-
-    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح في أول القائمة!` });
+    res.json({ success: true, message: `تمت إضافة ${newCoaches.length} مدرب بنجاح في قاعدة البيانات!` });
   } catch (err: any) {
     console.error('Error adding coaches:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete('/api/managers/:id', (req, res) => {
+app.delete('/api/managers/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const existing = readCoachesFile();
-    const filtered = removeCoachById(existing, id);
-    if (filtered.length === existing.length) {
-      return res.status(404).json({ error: 'المدرب غير موجود' });
-    }
-    writeCoachesFile(filtered);
+    await prisma.manager.delete({ where: { id } });
     res.json({ success: true, message: 'تم حذف المدرب بنجاح' });
   } catch (err: any) {
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'المدرب غير موجود' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -498,7 +483,7 @@ app.post('/api/checkout/manual', checkoutLimiter, async (req: express.Request, r
     let userEmail = phone || 'guest@unknown.com';
 
 
-    const settings = readSettings();
+    const settings = await readSettings();
     const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = settings.telegramChatId || process.env.TELEGRAM_CHAT_ID;
     const TELEGRAM_SECRET = process.env.TELEGRAM_SECRET;
@@ -1227,7 +1212,7 @@ app.post('/api/chat/send', async (req: AuthRequest, res) => {
 
       // ── Notify admin via Telegram (once per user per 10 minutes) ──
       try {
-        const settings = readSettings();
+        const settings = await readSettings();
         const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
         // Use the admin's personal Telegram user ID for private notifications
         const ADMIN_TELEGRAM_ID = settings.adminTelegramId || settings.telegramChatId || process.env.ADMIN_TELEGRAM_ID || process.env.TELEGRAM_CHAT_ID;
@@ -1501,7 +1486,7 @@ async function seedCoachesIfEmpty() {
 // ─────────────────────────────────────────
 app.post('/api/analyze-team', async (req, res) => {
   try {
-    const settings = readSettings();
+    const settings = await readSettings();
     const apiKey = settings.geminiApiKey;
 
     if (!apiKey) {
@@ -1577,7 +1562,7 @@ Return ONLY a valid JSON object matching this precise structure, with no extra t
 // ─────────────────────────────────────────
 app.post('/api/tactical-advice', async (req, res) => {
   try {
-    const settings = readSettings();
+    const settings = await readSettings();
     const apiKey = settings.geminiApiKey;
 
     if (!apiKey) {
@@ -1740,7 +1725,7 @@ async function pollTelegramBot() {
   isPollingTelegram = true;
 
   try {
-    const settings = readSettings();
+    const settings = await readSettings();
     const token = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
     const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmgdym');
     const requiredTargets = getRequiredTelegramTargets(channelTarget, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');
@@ -1889,7 +1874,7 @@ async function pollTelegramBot() {
 setTimeout(pollTelegramBot, 2000);
 
 app.get('/api/telegram/bot-info', async (req, res) => {
-  const settings = readSettings();
+  const settings = await readSettings();
   const token = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
   const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmgdym');
   const requiredTargets = getRequiredTelegramTargets(channelTarget, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');

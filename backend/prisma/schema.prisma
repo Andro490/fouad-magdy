@@ -87,3 +87,9 @@ model CoachPurchase {
 
   @@unique([userEmail, managerId])
 }
+
+model SiteSettings {
+  id        String   @id @default("singleton")
+  data      Json
+  updatedAt DateTime @updatedAt
+}

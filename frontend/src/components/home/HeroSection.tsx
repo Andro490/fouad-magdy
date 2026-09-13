@@ -67,11 +67,13 @@ function MobileProfileCard() {
       transition={{ duration: 0.5 }}
     >
         {/* ── Hero Image full width ── */}
-        <div className="relative w-full" style={{ height: '65vh', minHeight: '340px', paddingTop: '4rem' }}>
+        <div className="relative w-full" style={{ height: '65vh', minHeight: '340px', paddingTop: '4rem', background: 'radial-gradient(ellipse at top center, rgba(0, 229, 255, 0.12) 0%, #000 75%)' }}>
           <img
             src={fouadImg}
             alt={siteConfig.name}
             className="w-full h-full object-cover object-top"
+            loading="eager"
+            decoding="async"
           />
           {/* gradient fade into body */}
           <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent" />

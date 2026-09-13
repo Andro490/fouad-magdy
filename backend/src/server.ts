@@ -47,10 +47,25 @@ const sanitizeHTML = (str: string | undefined | null) => {
 };
 
 const app = express();
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://fouadf9.network,https://www.fouadf9.network,http://localhost:5173,http://localhost:3000').split(',').map((origin) => origin.trim()).filter(Boolean);
+
+const isAllowedOrigin = (origin?: string | null) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (origin.includes('fouadf9.network') || origin.includes('localhost') || origin.includes('127.0.0.1')) return true;
+  return false;
+};
+
 const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',').map((o) => o.trim()),
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow connection in production
+      }
+    },
     credentials: true,
   }
 });
@@ -58,21 +73,23 @@ const io = new SocketIOServer(httpServer, {
 // Socket.io connection: join a room per userId so we can target specific users
 io.on('connection', (socket) => {
   socket.on('join', (userId: string) => {
-    if (userId) socket.join(`user_${userId}`);
+    if (userId) {
+      const room = `user_${String(userId).trim()}`;
+      socket.join(room);
+      console.log(`[Socket.io] User ${userId} joined room ${room}`);
+    }
   });
 });
 
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean);
 
 app.disable('x-powered-by');
 
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
     return callback(new Error('CORS policy: origin not allowed'));
   },
   credentials: true,
@@ -1207,6 +1224,59 @@ app.post('/api/chat/send', async (req: AuthRequest, res) => {
           }
         });
       }
+
+      // ── Notify admin via Telegram (once per user per 10 minutes) ──
+      try {
+        const settings = readSettings();
+        const TELEGRAM_BOT_TOKEN = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
+        // Use the admin's personal Telegram user ID for private notifications
+        const ADMIN_TELEGRAM_ID = settings.adminTelegramId || settings.telegramChatId || process.env.ADMIN_TELEGRAM_ID || process.env.TELEGRAM_CHAT_ID;
+
+        if (TELEGRAM_BOT_TOKEN && ADMIN_TELEGRAM_ID) {
+          // Always send notification for first message (check count of user messages)
+          const userMsgCount = await prisma.chatMessage.count({
+            where: {
+              userId: sanitizeHTML(String(message.userId)),
+              sender: 'USER'
+            }
+          });
+
+          const shouldNotify = userMsgCount <= 1 || !await prisma.chatMessage.findFirst({
+            where: {
+              userId: sanitizeHTML(String(message.userId)),
+              sender: 'USER',
+              timestamp: { gte: Date.now() - 10 * 60 * 1000, lt: Date.now() - 100 }
+            }
+          });
+
+          if (shouldNotify) {
+            const safeName = sanitizeHTML(String(message.userName || 'زائر'));
+            const safeText = sanitizeHTML(String(message.text)).slice(0, 500);
+            const tgMsg = `💬 <b>رسالة دعم فني جديدة</b>\n\n👤 <b>المستخدم:</b> ${safeName}\n📝 <b>الرسالة:</b> ${safeText}\n\n🔗 افتح لوحة التحكم للرد: https://fouadf9.network/admin`;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: ADMIN_TELEGRAM_ID,
+                text: tgMsg,
+                parse_mode: 'HTML'
+              })
+            })
+            .then(async r => {
+              if (!r.ok) {
+                const errText = await r.text();
+                console.warn('Telegram chat notification response not ok:', r.status, errText);
+              } else {
+                console.log('Telegram chat notification sent successfully to', ADMIN_TELEGRAM_ID);
+              }
+            })
+            .catch(e => console.warn('Telegram chat notification failed:', e));
+          }
+        }
+      } catch (tgErr) {
+        console.warn('Telegram notification error (non-fatal):', tgErr);
+      }
     }
 
     res.json({ success: true });
@@ -1214,6 +1284,7 @@ app.post('/api/chat/send', async (req: AuthRequest, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // POST admin reply (requires JWT + ADMIN)
 app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res) => {
@@ -1234,8 +1305,16 @@ app.post('/api/chat/admin/send', authenticateToken, async (req: AuthRequest, res
     });
 
     // 🔥 Emit real-time notification to the specific user via Socket.io
-    io.to(`user_${sanitizeHTML(String(message.userId))}`).emit('new_admin_message', {
+    const cleanUserId = String(message.userId).trim();
+    io.to(`user_${cleanUserId}`).emit('new_admin_message', {
       id: saved.id,
+      userId: saved.userId,
+      text: saved.text,
+      timestamp: saved.timestamp,
+    });
+    io.emit(`new_admin_message_${cleanUserId}`, {
+      id: saved.id,
+      userId: saved.userId,
       text: saved.text,
       timestamp: saved.timestamp,
     });

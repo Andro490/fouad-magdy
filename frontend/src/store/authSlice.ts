@@ -6,10 +6,21 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
+const getInitialUser = () => {
+  try {
+    if (typeof window === 'undefined') return null;
+    const raw = localStorage.getItem('user');
+    if (!raw || raw === 'undefined' || raw === 'null') return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
 const initialState: AuthState = {
-  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
+  user: getInitialUser(),
   token: null,
-  isAuthenticated: !!localStorage.getItem('user'),
+  isAuthenticated: !!getInitialUser(),
 };
 
 const authSlice = createSlice({

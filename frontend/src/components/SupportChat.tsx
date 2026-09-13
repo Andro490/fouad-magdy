@@ -21,6 +21,7 @@ const SupportChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [firstCoach, setFirstCoach] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [latestAdminToast, setLatestAdminToast] = useState<{ id: string; text: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const navigate = useNavigate();
@@ -28,26 +29,86 @@ const SupportChat = () => {
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
   const [guestId] = useState(() => {
-    let id = localStorage.getItem('guestId');
-    if (!id) {
-      id = 'guest_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('guestId', id);
+    try {
+      let id = localStorage.getItem('guestId');
+      if (!id) {
+        id = 'guest_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('guestId', id);
+      }
+      return id;
+    } catch {
+      return 'guest_' + Math.random().toString(36).substr(2, 9);
     }
-    return id;
   });
 
   const activeUserId = user?.id || guestId;
   const activeUserName = user?.name || (user?.id ? 'مستخدم' : 'زائر');
 
-  // ── Request browser notification permission ──
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
+  // ── Gentle Notification Audio Chime (Web Audio API - no external file needed) ──
+  const playNotificationSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      // Ding-dong double chime
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08); // A5
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch {
+      // Ignore if autoplay restricted
     }
+  };
+
+  // ── Trigger all alerts for the customer ──
+  const triggerCustomerNotification = (msg: { id: string; text: string }) => {
+    // 1. In-app floating toast banner
+    setLatestAdminToast({ id: msg.id, text: msg.text });
+    // Auto-dismiss toast after 8 seconds
+    setTimeout(() => {
+      setLatestAdminToast(current => current?.id === msg.id ? null : current);
+    }, 8000);
+
+    // 2. Play sound
+    playNotificationSound();
+
+    // 3. Vibration on mobile
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate([200, 100, 200]); } catch {}
+    }
+
+    // 4. Browser Notification
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification('الدعم الفني | رد جديد 💬', {
+          body: msg.text,
+          icon: '/favicon.ico',
+        });
+      }
+    } catch {}
+
+    // 5. Flashing Tab Title
+    try {
+      document.title = '💬 (1) رد جديد من الدعم الفني!';
+    } catch {}
+  };
+
+  // ── Request browser notification permission safely on user action or load ──
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && window.Notification && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+    } catch {}
   }, []);
 
-  // In production: connect to same origin (nginx will proxy /socket.io/ to backend)
-  // In dev: connect directly to backend port
   const SOCKET_URL = import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin;
 
   // ── Socket.io: connect and join user room ──
@@ -61,57 +122,63 @@ const SupportChat = () => {
 
     socketRef.current = socket;
 
-    // Tell the server which room we belong to
     socket.on('connect', () => {
       socket.emit('join', activeUserId);
     });
 
-    // Listen for new admin messages in real-time
-    socket.on('new_admin_message', (msg: { id: string; text: string; timestamp: number }) => {
+    const handleIncomingAdminMsg = (msg: { id: string; text: string; timestamp: number }) => {
       const newMsg: ChatMessage = {
         ...msg,
         userId: activeUserId,
-        userName: 'Admin',
+        userName: 'الدعم الفني',
         sender: 'ADMIN',
       };
 
       setMessages(prev => {
-        // Avoid duplicates
         if (prev.some(m => m.id === newMsg.id)) return prev;
         return [...prev, newMsg];
       });
 
-      // Increment badge only when chat is closed
       setIsOpen(prevOpen => {
         if (!prevOpen) {
           setUnreadCount(prev => prev + 1);
-
-          // Browser push notification
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('رسالة جديدة من الدعم الفني 💬', {
-              body: msg.text,
-              icon: '/favicon.ico',
-            });
-          }
+          triggerCustomerNotification(msg);
         }
         return prevOpen;
       });
-    });
+    };
+
+    socket.on('new_admin_message', handleIncomingAdminMsg);
+    socket.on(`new_admin_message_${activeUserId}`, handleIncomingAdminMsg);
 
     return () => {
       socket.disconnect();
     };
-  }, [activeUserId, API_URL]);
+  }, [activeUserId, SOCKET_URL]);
 
-  // ── Initial fetch of messages ──
+  // ── Initial fetch of messages & calculate unread count ──
   useEffect(() => {
     if (activeUserId) fetchMessages();
+  }, [activeUserId]);
+
+  // ── Background Polling every 10 seconds to ensure mobile customer never misses a reply ──
+  useEffect(() => {
+    if (!activeUserId) return;
+    const interval = setInterval(() => {
+      fetchMessages(true);
+    }, 10000);
+    return () => clearInterval(interval);
   }, [activeUserId]);
 
   // ── Reset unread count when chat is opened ──
   useEffect(() => {
     if (isOpen) {
       setUnreadCount(0);
+      setLatestAdminToast(null);
+      try {
+        localStorage.setItem('chat_last_read', Date.now().toString());
+        document.title = 'FOUAD F9 | متجر حسابات وتكتيكات eFootball';
+      } catch {}
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [isOpen]);
@@ -123,12 +190,38 @@ const SupportChat = () => {
     }
   }, [messages]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (isPolling = false) => {
     try {
       const res = await fetch(`${API_URL}/api/chat/messages?userId=${activeUserId}&_t=${Date.now()}`);
       if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
+        const data: ChatMessage[] = await res.json();
+        setMessages(prev => {
+          // If polling detected a brand new admin message not in previous state
+          if (isPolling && !isOpen && data.length > prev.length) {
+            const lastMsg = data[data.length - 1];
+            if (lastMsg && lastMsg.sender === 'ADMIN') {
+              const alreadyHas = prev.some(p => p.id === lastMsg.id);
+              if (!alreadyHas) {
+                setUnreadCount(c => c + 1);
+                triggerCustomerNotification(lastMsg);
+              }
+            }
+          }
+          return data;
+        });
+
+        // If initial load and chat is closed: calculate unread admin messages
+        if (!isPolling && !isOpen) {
+          try {
+            const lastReadTime = Number(localStorage.getItem('chat_last_read') || 0);
+            const unreadAdmin = data.filter(m => m.sender === 'ADMIN' && m.timestamp > lastReadTime);
+            if (unreadAdmin.length > 0) {
+              setUnreadCount(unreadAdmin.length);
+              const latest = unreadAdmin[unreadAdmin.length - 1];
+              setLatestAdminToast({ id: latest.id, text: latest.text });
+            }
+          } catch {}
+        }
       }
     } catch (err) {
       console.error('Error fetching messages', err);
@@ -189,7 +282,49 @@ const SupportChat = () => {
     : 'MA';
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+    <>
+      {/* ── Real-Time Notification Floating Toast for Customer ── */}
+      {latestAdminToast && !isOpen && (
+        <div
+          dir="rtl"
+          className="fixed top-20 right-4 left-4 md:left-auto md:right-6 md:w-96 z-[9999] bg-[#0d1228]/95 border-2 border-primary rounded-2xl p-4 shadow-[0_0_30px_rgba(255,45,155,0.4)] backdrop-blur-xl animate-in slide-in-from-top duration-300"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-xl flex-shrink-0 animate-pulse">
+                💬
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-white font-bold text-sm">رد جديد من فؤاد مجدي (الدعم الفني)</h4>
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                </div>
+                <p className="text-gray-200 text-xs mt-1 line-clamp-2 leading-relaxed bg-black/30 p-2 rounded-lg border border-white/5">
+                  "{latestAdminToast.text}"
+                </p>
+                <button
+                  onClick={() => {
+                    setIsOpen(true);
+                    setLatestAdminToast(null);
+                  }}
+                  className="mt-2.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary to-accent text-dark font-black text-xs hover:opacity-90 transition-opacity flex items-center gap-1 shadow-[0_0_15px_rgba(0,229,255,0.4)]"
+                >
+                  فتح الشات والرد ↗
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={() => setLatestAdminToast(null)}
+              className="text-gray-400 hover:text-white p-1 transition-colors"
+              title="إغلاق الإشعار"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
 
       {/* ── Coach Bubble ── */}
       {!isOpen && (
@@ -300,6 +435,7 @@ const SupportChat = () => {
         </button>
       )}
     </div>
+    </>
   );
 };
 

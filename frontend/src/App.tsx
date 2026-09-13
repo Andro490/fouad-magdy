@@ -15,12 +15,14 @@ import SellerProfile from './pages/SellerProfile';
 import TeamBuilder from './pages/TeamBuilder';
 import Packages from './pages/Packages';
 import SupportChat from './components/SupportChat';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="min-h-screen bg-transparent overflow-hidden flex flex-col">
-        <Navbar />
+    <ErrorBoundary>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <div className="min-h-screen bg-[#080b1a] overflow-hidden flex flex-col">
+          <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
@@ -40,6 +42,7 @@ function App() {
         <SupportChat />
       </div>
     </Router>
+    </ErrorBoundary>
   )
 }
 

@@ -1,6 +1,6 @@
 export const isValidTelegramMembershipStatus = (status?: string) => {
   if (!status) return false;
-  return ['member', 'administrator', 'creator'].includes(status);
+  return ['member', 'administrator', 'creator', 'restricted'].includes(status.toLowerCase());
 };
 
 export const normalizeTelegramTarget = (target?: string) => {

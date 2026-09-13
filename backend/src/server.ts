@@ -1765,17 +1765,38 @@ async function pollTelegramBot() {
                 const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${encodeURIComponent(target)}&user_id=${userId}`);
                 const memberData = await memberRes.json();
                 const status = memberData.result?.status;
-                membershipChecks.push(`${target}:${status || memberData.description || 'unknown'}`);
+                const errCode = memberData.error_code;
+                const description = memberData.description || '';
+                membershipChecks.push(`${target}:${status || description || 'unknown'}`);
 
-                if (!isValidTelegramMembershipStatus(status)) {
-                  // If bot cannot see member list because it's not an admin in group, don't silently fail
-                  if (memberData.description?.includes('member list is inaccessible')) {
-                    console.warn(`[Telegram Bot] Warning: Bot is not an Admin in group ${target}. Please promote bot to Admin.`);
+                console.log(`[Telegram Bot] Check ${target} for user ${userId}: status=${status}, ok=${memberData.ok}, err=${description}`);
+
+                if (memberData.ok && isValidTelegramMembershipStatus(status)) {
+                  // ✅ User is subscribed — continue
+                } else if (!memberData.ok) {
+                  // Bot can't check this target (not admin, chat not found, etc.) — skip gracefully
+                  if (
+                    errCode === 400 ||
+                    description.includes('member list is inaccessible') ||
+                    description.includes('not enough rights') ||
+                    description.includes('chat not found') ||
+                    description.includes('USER_NOT_PARTICIPANT')
+                  ) {
+                    console.warn(`[Telegram Bot] ⚠️ Cannot verify ${target} (bot not admin or chat inaccessible) — skipping this check.`);
+                    // Don't fail — bot doesn't have rights to check
+                  } else {
+                    // Some other API error — fail the user
+                    console.warn(`[Telegram Bot] ❌ Unknown error for ${target}: ${description}`);
+                    allVerified = false;
                   }
+                } else {
+                  // User is NOT subscribed (status = left, kicked, etc.)
+                  console.log(`[Telegram Bot] ❌ User ${userId} not subscribed to ${target} (status: ${status})`);
                   allVerified = false;
                 }
-              } catch {
-                allVerified = false;
+              } catch (e) {
+                console.warn(`[Telegram Bot] Exception checking ${target}:`, e);
+                // Network error — skip this check, don't block user
               }
             }
 

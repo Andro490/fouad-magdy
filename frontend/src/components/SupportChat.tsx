@@ -306,6 +306,11 @@ const SupportChat = () => {
                   onClick={() => {
                     setIsOpen(true);
                     setLatestAdminToast(null);
+                    try {
+                      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+                        Notification.requestPermission().catch(() => {});
+                      }
+                    } catch {}
                   }}
                   className="mt-2.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary to-accent text-dark font-black text-xs hover:opacity-90 transition-opacity flex items-center gap-1 shadow-[0_0_15px_rgba(0,229,255,0.4)]"
                 >
@@ -422,7 +427,14 @@ const SupportChat = () => {
       ) : (
         /* ── Chat Bubble with Badge ── */
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setIsOpen(true);
+            try {
+              if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().catch(() => {});
+              }
+            } catch {}
+          }}
           className="relative w-14 h-14 bg-primary text-dark rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-110 transition-transform group"
         >
           <MessageCircle size={28} className="group-hover:animate-pulse" />

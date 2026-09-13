@@ -70,6 +70,7 @@ const TeamBuilder = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [telegramVerified, setTelegramVerified] = useState(localStorage.getItem('telegram_verified') === 'true');
+  const [showTelegramVerification, setShowTelegramVerification] = useState(false);
   const [botInfo, setBotInfo] = useState({ enabled: false, botUsername: '', channelUsername: '', groupUsername: '', requiredTargets: [] as string[] });
   const [sessionId, setSessionId] = useState('');
   const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
@@ -95,7 +96,12 @@ const TeamBuilder = () => {
 
     fetch(`${API_URL}/api/telegram/bot-info`)
       .then(r => r.json())
-      .then(d => setBotInfo(d))
+      .then(d => {
+        setBotInfo(d);
+        if (d.enabled && localStorage.getItem('telegram_verified') !== 'true') {
+          setShowTelegramVerification(true);
+        }
+      })
       .catch(console.error);
 
     fetch(`${API_URL}/api/settings`)
@@ -115,6 +121,7 @@ const TeamBuilder = () => {
           if (data.verified) {
             localStorage.setItem('telegram_verified', 'true');
             setTelegramVerified(true);
+            setShowTelegramVerification(false);
             clearInterval(interval);
           }
         } catch (e) {}
@@ -324,7 +331,7 @@ const TeamBuilder = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Telegram Verification Modal */}
         <AnimatePresence>
-          {!telegramVerified && botInfo.enabled && (
+          {!telegramVerified && botInfo.enabled && showTelegramVerification && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -467,6 +474,12 @@ const TeamBuilder = () => {
 
               <button
                 onClick={() => {
+                  if (!telegramVerified && botInfo.enabled) {
+                    setSelectedPlan('free');
+                    setShowTelegramVerification(true);
+                    return;
+                  }
+
                   setSelectedPlan('free');
                   setTimeout(() => {
                     document.getElementById('team-builder-upload')?.scrollIntoView({ behavior: 'smooth' });

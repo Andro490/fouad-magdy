@@ -165,6 +165,21 @@ function MobileProfileCard() {
             </svg>
           </motion.div>
 
+          {/* Support Card */}
+          <motion.a
+            href="https://tikalert-eg.com/fouadf999"
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="mt-4 w-full block rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-yellow-500/10 px-4 py-4 text-center shadow-[0_0_18px_rgba(251,191,36,0.15)]"
+          >
+            <span className="text-amber-300 font-black text-base md:text-lg tracking-wide">الدعم المادي من هنا</span>
+          </motion.a>
+
           {/* Kick Full-Width Banner */}
           <motion.a
             href={siteConfig.socials.find(s => s.label === 'Kick')?.url || '#'}

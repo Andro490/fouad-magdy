@@ -1644,7 +1644,7 @@ async function pollTelegramBot() {
   try {
     const settings = readSettings();
     const token = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
-    const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmagdym24');
+    const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmgdym');
     const requiredTargets = getRequiredTelegramTargets(channelTarget, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');
 
     if (token && requiredTargets.length > 0) {
@@ -1723,7 +1723,7 @@ setTimeout(pollTelegramBot, 2000);
 app.get('/api/telegram/bot-info', async (req, res) => {
   const settings = readSettings();
   const token = settings.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN;
-  const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmagdym24');
+  const channelTarget = settings.telegramChannelUsername || (settings.telegramChatId && !/^\d+$/.test(settings.telegramChatId) ? settings.telegramChatId : '@fouadmgdym');
   const requiredTargets = getRequiredTelegramTargets(channelTarget, settings.telegramGroupId || settings.telegramGroupUsername || '@fouadmagdym24');
   if (!token || requiredTargets.length === 0) return res.json({ enabled: false });
   try {

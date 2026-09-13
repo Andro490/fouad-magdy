@@ -8,6 +8,7 @@ const SiteSettings = () => {
   const [exchangeRate, setExchangeRate] = useState<number>(50); // كم جنيه = 1 دولار
   const [telegramBotToken, setTelegramBotToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
+  const [telegramChannelUsername, setTelegramChannelUsername] = useState('@fouadmgdym');
   const [telegramGroupUsername, setTelegramGroupUsername] = useState('@fouadmagdym24');
   const [telegramWelcomeVideoUrl, setTelegramWelcomeVideoUrl] = useState('');
   const [telegramWelcomeText, setTelegramWelcomeText] = useState('');
@@ -31,6 +32,7 @@ const SiteSettings = () => {
         if (data.exchangeRate) setExchangeRate(Number(data.exchangeRate));
         if (data.telegramBotToken) setTelegramBotToken(data.telegramBotToken);
         if (data.telegramChatId) setTelegramChatId(data.telegramChatId);
+        if (data.telegramChannelUsername) setTelegramChannelUsername(data.telegramChannelUsername);
         if (data.telegramGroupUsername) setTelegramGroupUsername(data.telegramGroupUsername);
         if (data.telegramWelcomeVideoUrl) setTelegramWelcomeVideoUrl(data.telegramWelcomeVideoUrl);
         if (data.telegramWelcomeText) setTelegramWelcomeText(data.telegramWelcomeText);
@@ -53,7 +55,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramChannelUsername, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
       });
       if (res.ok) {
         setSaved(true);
@@ -211,7 +213,18 @@ const SiteSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-400 text-sm mb-1">Telegram Group Username</label>
+              <label className="block text-gray-400 text-sm mb-1">Telegram Channel Username (قناة الاشتراك الإجباري)</label>
+              <input
+                type="text"
+                value={telegramChannelUsername}
+                onChange={e => setTelegramChannelUsername(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#2AABEE] focus:outline-none"
+                dir="ltr"
+                placeholder="@fouadmgdym"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Telegram Group Username (جروب الاشتراك الإجباري)</label>
               <input
                 type="text"
                 value={telegramGroupUsername}

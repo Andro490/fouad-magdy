@@ -1751,8 +1751,9 @@ async function pollTelegramBot() {
         const data = await res.json();
         for (const update of (data.result || [])) {
           telegramLastUpdateId = update.update_id;
-          if (update.message && update.message.text && update.message.text.startsWith('/start ')) {
-            const sessionId = update.message.text.split(' ')[1];
+          if (update.message && update.message.text && update.message.text.startsWith('/start')) {
+            const parts = update.message.text.split(' ');
+            const sessionId = parts.length > 1 ? parts[1].trim() : null;
             const userId = update.message.from.id;
             const chatId = update.message.chat.id;
 
@@ -1760,50 +1761,77 @@ async function pollTelegramBot() {
             const membershipChecks = [] as string[];
 
             for (const target of requiredTargets) {
-              const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${encodeURIComponent(target)}&user_id=${userId}`);
-              const memberData = await memberRes.json();
-              const status = memberData.result?.status;
-              membershipChecks.push(`${target}:${status || 'unknown'}`);
+              try {
+                const memberRes = await fetch(`https://api.telegram.org/bot${token}/getChatMember?chat_id=${encodeURIComponent(target)}&user_id=${userId}`);
+                const memberData = await memberRes.json();
+                const status = memberData.result?.status;
+                membershipChecks.push(`${target}:${status || memberData.description || 'unknown'}`);
 
-              if (!isValidTelegramMembershipStatus(status)) {
+                if (!isValidTelegramMembershipStatus(status)) {
+                  // If bot cannot see member list because it's not an admin in group, don't silently fail
+                  if (memberData.description?.includes('member list is inaccessible')) {
+                    console.warn(`[Telegram Bot] Warning: Bot is not an Admin in group ${target}. Please promote bot to Admin.`);
+                  }
+                  allVerified = false;
+                }
+              } catch {
                 allVerified = false;
               }
             }
 
-            if (allVerified) {
-              verifiedSessions.add(sessionId);
-              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                  chat_id: chatId,
-                  text: '✅ تمام!\n\nارجع للتطبيق — راح يفتح خلال ثوانٍ.'
-                })
-              });
-            } else {
-              const videoUrl = settings.telegramWelcomeVideoUrl;
-              const welcomeText = settings.telegramWelcomeText || `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القنوات والمجموعات التالية ثم المحاولة مرة أخرى:\n${requiredTargets.map((t) => `• ${t}`).join('\n')}`;
+            const videoUrl = settings.telegramWelcomeVideoUrl;
+            const customWelcome = settings.telegramWelcomeText;
 
-              if (videoUrl) {
-                await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
+            // Prepare status message
+            let statusMessage = '';
+            if (allVerified) {
+              if (sessionId) verifiedSessions.add(sessionId);
+              statusMessage = '✅ تم التحقق من اشتراكك بنجاح!\n\nارجع للموقع — ستفتح لك الصفحة فوراً.';
+            } else {
+              statusMessage = `❌ عذراً، لم نتمكن من التحقق من اشتراكك.\nيرجى الاشتراك في القنوات والمجموعات التالية ثم المحاولة مرة أخرى:\n${requiredTargets.map((t) => `• ${t}`).join('\n')}`;
+            }
+
+            // Combine custom welcome message with the verification status
+            const combinedCaption = customWelcome
+              ? `${customWelcome}\n\n${statusMessage}`
+              : statusMessage;
+
+            const isYouTube = videoUrl && (videoUrl.includes('youtu.be') || videoUrl.includes('youtube.com'));
+            const isDirectVideo = videoUrl && /\.(mp4|mov|avi|webm)(\?.*)?$/i.test(videoUrl);
+
+            // 1. If direct MP4 file: try sendVideo
+            let videoSent = false;
+            if (isDirectVideo) {
+              try {
+                const vRes = await fetch(`https://api.telegram.org/bot${token}/sendVideo`, {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
                   body: JSON.stringify({
                     chat_id: chatId,
                     video: videoUrl,
-                    caption: welcomeText
+                    caption: combinedCaption
                   })
                 });
-              } else {
-                await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({
-                    chat_id: chatId,
-                    text: welcomeText
-                  })
-                });
-              }
+                const vData = await vRes.json();
+                if (vData.ok) videoSent = true;
+              } catch {}
+            }
+
+            // 2. If YouTube or if sendVideo failed: send via sendMessage with playable rich preview
+            if (!videoSent) {
+              const fullText = videoUrl ? `${combinedCaption}\n\n${videoUrl}` : combinedCaption;
+              await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: fullText,
+                  link_preview_options: {
+                    is_disabled: false,
+                    prefer_large_media: true
+                  }
+                })
+              }).catch(e => console.warn('Telegram sendMessage error:', e));
             }
           }
         }

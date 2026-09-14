@@ -30,6 +30,14 @@ export default function Footer() {
         </div>
         <div className="border-t border-gray-900 pt-8 text-center">
           <p className="text-gray-600 text-xs font-medium">© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <a
+        href="https://andro-cv.netlify.app/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-primary transition-colors duration-200 underline underline-offset-4"
+      >
+        Andro Emil ©2026
+      </a>
         </div>
       </div>
     </footer>

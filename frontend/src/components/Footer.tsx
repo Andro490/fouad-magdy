@@ -34,7 +34,7 @@ export default function Footer() {
         href="https://andro-cv.netlify.app/"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:text-primary transition-colors duration-200 underline underline-offset-4"
+        className="hover:text-primary transition-colors duration-200  no-underline"
       >
         Andro Emil ©2026
       </a>

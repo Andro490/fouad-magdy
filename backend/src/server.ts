@@ -98,6 +98,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(helmet({ crossOriginResourcePolicy: false }));
+
+// Serve local uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 app.use(morgan('dev'));
 
 // ─── Rate Limiters ─────────────────────────────────────────────────────────
@@ -1525,38 +1528,40 @@ app.post('/api/upload', async (req, res) => {
 
     const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
     const FREEIMAGE_API_KEY = process.env.FREEIMAGE_API_KEY;
+    const BACKEND_URL = process.env.BACKEND_URL || '';
     let isSuccess = false;
     let uploadedUrl = '';
     let errorMessage = '';
 
-    if (!IMGBB_API_KEY) {
-      return res.status(500).json({ success: false, error: 'IMGBB_API_KEY is not configured' });
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append('image', image);
-      const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData as any
-      });
-      const imgbbData = await imgbbRes.json();
-      if (imgbbData.success) {
-        uploadedUrl = imgbbData.data.url;
-        isSuccess = true;
-      } else {
-        errorMessage = imgbbData.error?.message || 'ImgBB error';
+    // Try ImgBB first
+    if (IMGBB_API_KEY) {
+      try {
+        const formData = new FormData();
+        formData.append('image', image);
+        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+          method: 'POST',
+          body: formData as any
+        });
+        const imgbbData = await imgbbRes.json();
+        if (imgbbData.success) {
+          uploadedUrl = imgbbData.data.url;
+          isSuccess = true;
+        } else {
+          errorMessage = imgbbData.error?.message || 'ImgBB error';
+          console.warn('[Upload] ImgBB failed:', errorMessage);
+        }
+      } catch (e: any) {
+        errorMessage = e.message;
+        console.warn('[Upload] ImgBB exception:', e.message);
       }
-    } catch (e: any) {
-      errorMessage = e.message;
     }
 
+    // Try FreeImage as second fallback
     if (!isSuccess && FREEIMAGE_API_KEY) {
       try {
         const fallbackFormData = new FormData();
         fallbackFormData.append('source', image);
         fallbackFormData.append('key', FREEIMAGE_API_KEY);
-        
         const fallbackRes = await fetch('https://freeimage.host/api/1/upload', {
           method: 'POST',
           body: fallbackFormData as any
@@ -1567,7 +1572,29 @@ app.post('/api/upload', async (req, res) => {
           isSuccess = true;
         }
       } catch (e: any) {
-        console.error('Fallback error:', e);
+        console.warn('[Upload] FreeImage exception:', e.message);
+      }
+    }
+
+    // Local filesystem fallback — always works
+    if (!isSuccess) {
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+        const filename = `img_${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+        const filepath = path.join(uploadDir, filename);
+        const buffer = Buffer.from(image, 'base64');
+        fs.writeFileSync(filepath, buffer);
+        // Build URL
+        const baseUrl = BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+        uploadedUrl = `${baseUrl}/uploads/${filename}`;
+        isSuccess = true;
+        console.log('[Upload] Saved locally:', uploadedUrl);
+      } catch (e: any) {
+        console.error('[Upload] Local save failed:', e.message);
+        errorMessage = 'All upload methods failed: ' + e.message;
       }
     }
 
@@ -1578,6 +1605,7 @@ app.post('/api/upload', async (req, res) => {
     }
   } catch (err: any) {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
+
   }
 });
 

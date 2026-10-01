@@ -21,6 +21,12 @@ const Division1Admin = () => {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
+  // Search existing user to promote
+  const [searchUserQuery, setSearchUserQuery] = useState('');
+  const [foundUser, setFoundUser] = useState<any | null>(null);
+  const [searchingUser, setSearchingUser] = useState(false);
+  const [promoting, setPromoting] = useState(false);
+
   const fetchDiv1Admins = async () => {
     const token = localStorage.getItem('authToken');
     try {
@@ -84,6 +90,67 @@ const Division1Admin = () => {
       alert('تعذر الاتصال بالسيرفر');
     }
   };
+
+  const handleSearchUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchUserQuery.trim()) return;
+    setSearchingUser(true);
+    setFoundUser(null);
+    const token = localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_URL}/api/users`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const users = await res.json();
+        const q = searchUserQuery.trim().toLowerCase();
+        const match = users.find((u: any) =>
+          u.email?.toLowerCase().includes(q) ||
+          u.phone?.includes(q) ||
+          u.name?.toLowerCase().includes(q)
+        );
+        if (match) {
+          setFoundUser(match);
+        } else {
+          alert('لم يُعثر على مستخدم بهذا البريد أو الهاتف أو الاسم');
+        }
+      }
+    } catch (e) {
+      alert('خطأ في الاتصال بالسيرفر');
+    } finally {
+      setSearchingUser(false);
+    }
+  };
+
+  const handlePromoteUser = async () => {
+    if (!foundUser) return;
+    setPromoting(true);
+    const token = localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_URL}/api/users/${foundUser.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ role: 'DIV1_ADMIN' })
+      });
+      if (res.ok) {
+        alert(`✅ تم ترقية ${foundUser.name} إلى أدمن دفجن 1 بنجاح! يمكنه الدخول بحسابه الحالي الآن.`);
+        setFoundUser(null);
+        setSearchUserQuery('');
+        fetchDiv1Admins();
+      } else {
+        const err = await res.json();
+        alert(`خطأ: ${err.error || 'تعذر الترقية'}`);
+      }
+    } catch (e) {
+      alert('خطأ في الاتصال بالسيرفر');
+    } finally {
+      setPromoting(false);
+    }
+  };
+
 
   const handleDeleteDiv1Admin = async (id: string) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا الأدمن نهائياً؟')) return;
@@ -366,80 +433,126 @@ const Division1Admin = () => {
 
       {/* Div1 Admin Management - Only visible for main ADMIN */}
       {user?.role === 'ADMIN' && (
-        <div className="mt-12 flex flex-col md:flex-row gap-6">
-          {/* List of Div1 Admins */}
-          <div className="w-full md:w-2/3 glass-panel p-6 rounded-2xl">
-            <h2 className="text-2xl font-bold text-white mb-6">أدمنين وصول دفجن 1</h2>
-            {div1Admins.length === 0 ? (
-              <p className="text-gray-400">لا يوجد أدمنين حالياً.</p>
-            ) : (
-              <div className="space-y-4">
-                {div1Admins.map((admin) => (
-                  <div key={admin.id} className="bg-dark/40 border border-gray-700 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-white">{admin.name}</h4>
-                      <p className="text-sm text-gray-400">{admin.email}</p>
-                    </div>
-                    <button 
-                      onClick={() => handleDeleteDiv1Admin(admin.id)}
-                      className="bg-red-500/20 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors font-bold text-sm"
-                    >
-                      إزالة الصلاحية
-                    </button>
-                  </div>
-                ))}
+        <div className="mt-12 flex flex-col gap-6">
+
+          {/* === PROMOTE EXISTING USER === */}
+          <div className="glass-panel p-6 rounded-2xl border border-primary/30">
+            <h2 className="text-xl font-bold text-white mb-2">⬆️ ترقية مستخدم موجود إلى أدمن دفجن 1</h2>
+            <p className="text-gray-400 text-sm mb-4">ابحث عن المستخدم بالاسم أو الإيميل أو رقم الهاتف — وسيحتفظ بحسابه الحالي مع صلاحيات دفجن 1</p>
+            <form onSubmit={handleSearchUser} className="flex gap-3 mb-4">
+              <input
+                type="text"
+                value={searchUserQuery}
+                onChange={(e) => setSearchUserQuery(e.target.value)}
+                placeholder="اسم المستخدم أو إيميله أو هاتفه..."
+                className="flex-1 bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                dir="ltr"
+              />
+              <button
+                type="submit"
+                disabled={searchingUser}
+                className="px-6 py-2 bg-primary text-dark font-bold rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              >
+                {searchingUser ? <Loader2 className="animate-spin w-4 h-4" /> : <Search className="w-4 h-4" />}
+                بحث
+              </button>
+            </form>
+
+            {foundUser && (
+              <div className="bg-dark/60 border border-green-500/30 rounded-xl p-4 flex justify-between items-center gap-4">
+                <div>
+                  <p className="text-white font-bold">{foundUser.name}</p>
+                  <p className="text-gray-400 text-sm">{foundUser.email} — {foundUser.phone}</p>
+                  <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded mt-1 inline-block">الدور الحالي: {foundUser.role}</span>
+                </div>
+                <button
+                  onClick={handlePromoteUser}
+                  disabled={promoting || foundUser.role === 'DIV1_ADMIN'}
+                  className="px-5 py-2 bg-green-500/20 text-green-400 border border-green-500/40 font-bold rounded-lg hover:bg-green-500 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  {promoting ? <Loader2 className="animate-spin w-4 h-4" /> : foundUser.role === 'DIV1_ADMIN' ? '✅ لديه الصلاحية' : 'ترقية لأدمن دفجن 1'}
+                </button>
               </div>
             )}
           </div>
 
-          {/* Add New Div1 Admin */}
-          <div className="w-full md:w-1/3 glass-panel p-6 rounded-2xl h-fit">
-            <h2 className="text-2xl font-bold text-white mb-6">إضافة أدمن دفجن 1</h2>
-            <form onSubmit={handleAddDiv1Admin} className="space-y-4">
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">اسم الأدمن</label>
-                <input 
-                  type="text" 
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">رقم الهاتف (الآيدي لسهولة الدخول)</label>
-                <input 
-                  type="text" 
-                  value={adminEmail}
-                  onChange={(e) => setAdminEmail(e.target.value)}
-                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
-                  required
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">كلمة المرور</label>
-                <input 
-                  type="text" 
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
-                  required
-                  dir="ltr"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="w-full py-3 bg-primary text-dark font-bold rounded-xl hover:bg-accent transition-colors mt-4"
-              >
-                إضافة الصلاحية
-              </button>
-            </form>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* List of Div1 Admins */}
+            <div className="w-full md:w-2/3 glass-panel p-6 rounded-2xl">
+              <h2 className="text-2xl font-bold text-white mb-6">أدمنين وصول دفجن 1</h2>
+              {div1Admins.length === 0 ? (
+                <p className="text-gray-400">لا يوجد أدمنين حالياً.</p>
+              ) : (
+                <div className="space-y-4">
+                  {div1Admins.map((admin) => (
+                    <div key={admin.id} className="bg-dark/40 border border-gray-700 p-4 rounded-xl flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-white">{admin.name}</h4>
+                        <p className="text-sm text-gray-400">{admin.email}</p>
+                      </div>
+                      <button 
+                        onClick={() => handleDeleteDiv1Admin(admin.id)}
+                        className="bg-red-500/20 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors font-bold text-sm"
+                      >
+                        إزالة الصلاحية
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Add New Div1 Admin */}
+            <div className="w-full md:w-1/3 glass-panel p-6 rounded-2xl h-fit">
+              <h2 className="text-xl font-bold text-white mb-2">إنشاء حساب أدمن جديد</h2>
+              <p className="text-gray-500 text-xs mb-4">استخدم هذا فقط إذا لم يكن للشخص حساب مسبق</p>
+              <form onSubmit={handleAddDiv1Admin} className="space-y-4">
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">اسم الأدمن</label>
+                  <input 
+                    type="text" 
+                    value={adminName}
+                    onChange={(e) => setAdminName(e.target.value)}
+                    className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">رقم الهاتف (الآيدي لسهولة الدخول)</label>
+                  <input 
+                    type="text" 
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                    required
+                    dir="ltr"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">كلمة المرور</label>
+                  <input 
+                    type="text" 
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                    required
+                    dir="ltr"
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full py-3 bg-primary text-dark font-bold rounded-xl hover:bg-accent transition-colors mt-4"
+                >
+                  إضافة الصلاحية
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 };
+
 
 export default Division1Admin;

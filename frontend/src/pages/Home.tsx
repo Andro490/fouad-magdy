@@ -13,8 +13,8 @@ export default function Home() {
       <div className="hidden md:block">
         <ExperienceSection />
       </div>
-      <StoreSection />
       <Division1Banner />
+      <StoreSection />
       <MobileSocials />
       <div className="hidden md:block">
         <AboutSection />

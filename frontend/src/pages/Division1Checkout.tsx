@@ -40,21 +40,33 @@ const Division1Checkout = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const uploadFile = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    try {
-      const res = await fetch(`${API_URL}/api/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!res.ok) throw new Error('Upload failed');
-      const data = await res.json();
-      return data.url;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
+  const uploadFile = async (file: File): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        try {
+          // Extract base64 without the data:image/...;base64, prefix
+          const base64 = (reader.result as string).split(',')[1];
+          const res = await fetch(`${API_URL}/api/upload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64 }),
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            resolve(data.url);
+          } else {
+            console.error('Upload error:', data.error);
+            resolve(null);
+          }
+        } catch (err) {
+          console.error('Upload failed:', err);
+          resolve(null);
+        }
+      };
+      reader.onerror = () => resolve(null);
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

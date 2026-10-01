@@ -5,17 +5,13 @@ import { Loader2 } from 'lucide-react';
 import { loginSuccess } from '../store/authSlice';
 import VerifiedBadge from '../components/VerifiedBadge';
 import { useNavigate } from 'react-router-dom';
+import Division1Admin from '../components/admin/Division1Admin';
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
-  // Redirect DIV1_ADMIN directly to their admin panel
-  React.useEffect(() => {
-    if (user?.role === 'DIV1_ADMIN') {
-      navigate('/admin', { replace: true });
-    }
-  }, [user, navigate]);
+  // (Removed redirect to allow DIV1_ADMIN to manage from Dashboard)
 
   const [videoLink, setVideoLink] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -236,8 +232,30 @@ const Dashboard = () => {
     setVideoLink('');
   };
 
+
   if (!user) {
     return <div className="min-h-screen flex items-center justify-center text-white">الرجاء تسجيل الدخول</div>;
+  }
+
+  // If user is DIV1_ADMIN, show the full admin component right here on the dashboard
+  if (user.role === 'DIV1_ADMIN') {
+    return (
+      <div className="flex-1 flex flex-col items-center pt-24 pb-12 px-4 relative min-h-screen bg-dark text-white" dir="rtl">
+        <div className="z-10 w-full max-w-7xl space-y-8 glass-panel p-8 rounded-3xl">
+          <div className="flex flex-col md:flex-row items-center gap-6 mb-8 bg-dark-lighter p-6 rounded-2xl border border-white/5">
+            <img src={`https://ui-avatars.com/api/?name=${user.name}&background=141414&color=FFD700`} alt={user.name} className="w-20 h-20 rounded-full border-2 border-primary" />
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                {user.name}
+                <VerifiedBadge className="w-6 h-6" />
+              </h2>
+              <p className="text-gray-400">أدمن وصول دفجن 1</p>
+            </div>
+          </div>
+          <Division1Admin />
+        </div>
+      </div>
+    );
   }
 
   return (

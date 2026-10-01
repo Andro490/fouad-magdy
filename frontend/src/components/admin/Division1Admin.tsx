@@ -20,6 +20,7 @@ const Division1Admin = () => {
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
+  const [createdCreds, setCreatedCreds] = useState<{name:string; email:string; password:string} | null>(null);
 
   // Search existing user to promote
   const [searchUserQuery, setSearchUserQuery] = useState('');
@@ -78,7 +79,7 @@ const Division1Admin = () => {
       });
 
       if (res.ok) {
-        alert('تم إضافة أدمن دفجن 1 بنجاح');
+        setCreatedCreds({ name: adminName, email: adminEmail, password: adminPassword });
         setAdminName('');
         setAdminEmail('');
         setAdminPassword('');
@@ -510,8 +511,37 @@ const Division1Admin = () => {
 
             {/* Add New Div1 Admin */}
             <div className="w-full md:w-1/3 glass-panel p-6 rounded-2xl h-fit">
-              <h2 className="text-xl font-bold text-white mb-2">إنشاء حساب أدمن جديد</h2>
-              <p className="text-gray-500 text-xs mb-4">استخدم هذا فقط إذا لم يكن للشخص حساب مسبق</p>
+              <h2 className="text-xl font-bold text-white mb-2">➕ إنشاء حساب أدمن جديد</h2>
+              <p className="text-gray-500 text-xs mb-4">سيتم حفظ البيانات في قاعدة البيانات فقط</p>
+
+              {/* Credentials Card shown after creation */}
+              {createdCreds && (
+                <div className="mb-5 p-4 bg-green-500/10 border border-green-500/40 rounded-xl">
+                  <p className="text-green-400 font-bold mb-3 text-sm">✅ تم إنشاء الحساب! ابعت هذه البيانات للشخص:</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center bg-dark/60 rounded-lg px-3 py-2">
+                      <span className="text-gray-400">رابط الدخول:</span>
+                      <button onClick={() => {navigator.clipboard.writeText('https://fouadf9.network/login'); alert('تم النسخ!');}} className="text-primary hover:text-accent font-bold text-xs flex items-center gap-1"><Copy className="w-3 h-3" /> نسخ</button>
+                    </div>
+                    <div className="flex justify-between items-center bg-dark/60 rounded-lg px-3 py-2">
+                      <span className="text-gray-400">الإيميل/الهاتف:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-mono text-xs" dir="ltr">{createdCreds.email}</span>
+                        <button onClick={() => {navigator.clipboard.writeText(createdCreds.email); alert('تم النسخ!');}} className="text-primary hover:text-accent"><Copy className="w-3 h-3" /></button>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center bg-dark/60 rounded-lg px-3 py-2">
+                      <span className="text-gray-400">كلمة المرور:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-mono text-xs" dir="ltr">{createdCreds.password}</span>
+                        <button onClick={() => {navigator.clipboard.writeText(createdCreds.password); alert('تم النسخ!');}} className="text-primary hover:text-accent"><Copy className="w-3 h-3" /></button>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => setCreatedCreds(null)} className="mt-3 text-xs text-gray-500 hover:text-gray-300 w-full text-center">إخفاء البيانات</button>
+                </div>
+              )}
+
               <form onSubmit={handleAddDiv1Admin} className="space-y-4">
                 <div>
                   <label className="block text-gray-400 text-sm mb-2">اسم الأدمن</label>
@@ -524,11 +554,12 @@ const Division1Admin = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-sm mb-2">رقم الهاتف (الآيدي لسهولة الدخول)</label>
+                  <label className="block text-gray-400 text-sm mb-2">الإيميل أو رقم الهاتف (لتسجيل الدخول)</label>
                   <input 
                     type="text" 
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
+                    placeholder="example@email.com أو 01012345678"
                     className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
                     required
                     dir="ltr"
@@ -549,7 +580,7 @@ const Division1Admin = () => {
                   type="submit"
                   className="w-full py-3 bg-primary text-dark font-bold rounded-xl hover:bg-accent transition-colors mt-4"
                 >
-                  إضافة الصلاحية
+                  إنشاء الحساب وإعطاء الصلاحية
                 </button>
               </form>
             </div>

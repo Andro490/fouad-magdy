@@ -718,7 +718,11 @@ app.post('/api/division1/request', async (req, res) => {
 
     // Send to Telegram if configured
     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-      const BACKEND_URL = process.env.BACKEND_URL || 'https://fouad-magdy-production.up.railway.app';
+      // Force the real domain to prevent proxy/hostinger hostname issues
+      const BACKEND_URL = process.env.BACKEND_URL && process.env.BACKEND_URL.includes('fouadf9.network') 
+        ? process.env.BACKEND_URL 
+        : 'https://fouadf9.network';
+        
       const tgSecret = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
       const caption = `🚀 <b>طلب وصول لـ Division 1 جديد</b>\n\n` +
         `👤 <b>الاسم:</b> ${sanitizeHTML(name)}\n` +
@@ -1587,10 +1591,15 @@ app.post('/api/upload', async (req, res) => {
         const filepath = path.join(uploadDir, filename);
         const buffer = Buffer.from(image, 'base64');
         fs.writeFileSync(filepath, buffer);
-        // Build URL dynamically based on the actual request host
+        // Build URL dynamically but force the real domain if it's the hostinger internal one
         const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-        const host = req.headers['x-forwarded-host'] || req.get('host');
-        const baseUrl = `${protocol}://${host}`;
+        let host = req.headers['x-forwarded-host'] || req.get('host') || '';
+        
+        if (host.includes('srv1932803.hstgr.cloud') || host.includes('localhost')) {
+          host = 'fouadf9.network';
+        }
+        
+        const baseUrl = `https://${host}`;
         uploadedUrl = `${baseUrl}/uploads/${filename}`;
         isSuccess = true;
         console.log('[Upload] Saved locally:', uploadedUrl);

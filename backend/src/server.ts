@@ -109,7 +109,7 @@ const createLimiter = (max: number, windowMin: number, message: string) => {
   return rateLimit({ windowMs: windowMin * 60 * 1000, max, message: { error: message }, standardHeaders: true, legacyHeaders: false });
 };
 
-const authLimiter      = createLimiter(10, 15, 'محاولات كثيرة جداً — يرجى الانتظار 15 دقيقة.');
+const authLimiter      = createLimiter(100, 15, 'محاولات كثيرة جداً — يرجى الانتظار 15 دقيقة.');
 const checkoutLimiter  = createLimiter(5,  10, 'محاولات دفع كثيرة — يرجى الانتظار.');
 const generalLimiter   = createLimiter(100, 1, 'طلبات كثيرة جداً — يرجى الانتظار.');
 

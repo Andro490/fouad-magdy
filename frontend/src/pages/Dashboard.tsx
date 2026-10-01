@@ -267,72 +267,40 @@ const Dashboard = () => {
         {/* Division 1 Tracking Section */}
         {divisionOrders.length > 0 && (
           <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8 mb-8">
-            <h3 className="text-xl font-bold mb-4 text-primary">طلبات دفجن 1 الخاصة بك</h3>
-            <div className="space-y-4">
-
+            <h3 className="text-xl font-bold mb-6 text-primary">طلبات دفجن 1 الخاصة بك</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {divisionOrders.map(order => {
-                const daysRemaining = calcDaysRemaining(order.startDate, order.deliveryDays);
                 const remaining = order.totalPrice - order.paidAmount;
                 return (
-                  <div key={order.id} className="bg-dark/50 p-6 rounded-xl border border-gray-700">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h4 className="font-bold text-lg">{order.name}</h4>
-                        <p className="text-gray-500 text-sm mt-1">{new Date(order.createdAt).toLocaleDateString('ar-EG')}</p>
-                      </div>
-                      <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-                        order.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                  <div key={order.id} className="bg-dark/50 border border-gray-700 rounded-xl p-5 hover:border-primary transition-all">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-bold text-white text-lg">{order.name}</h3>
+                      <span className={`px-2 py-1 text-xs font-bold rounded ${
+                        order.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' :
+                        order.status === 'APPROVED' ? 'bg-blue-500/20 text-blue-400' :
                         order.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
                         'bg-yellow-500/20 text-yellow-400'
                       }`}>
-                        {order.status === 'APPROVED' ? 'تمت الموافقة' : order.status === 'REJECTED' ? 'مرفوض' : 'قيد المراجعة'}
+                        {order.status === 'COMPLETED' ? 'مكتمل' :
+                         order.status === 'APPROVED' ? 'تمت الموافقة' :
+                         order.status === 'REJECTED' ? 'مرفوض' : 'قيد المراجعة'}
                       </span>
                     </div>
-
-                    {order.totalPrice > 0 && (
-                      <div className="mb-6">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-gray-400">المدفوع</span>
-                          <span className="text-gray-400">الإجمالي</span>
-                        </div>
-                        <div className="w-full bg-gray-800 rounded-full h-3">
-                          <div
-                            className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-700"
-                            style={{ width: `${Math.min((order.paidAmount / order.totalPrice) * 100, 100)}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-sm mt-2">
-                          <span className="text-green-400 font-bold">{order.paidAmount} ج.م</span>
-                          <span className="text-white font-bold">{order.totalPrice} ج.م</span>
-                        </div>
+                    <p className="text-gray-300 text-sm mb-1">
+                      <span className="text-gray-500">التاريخ:</span> {new Date(order.createdAt).toLocaleDateString('ar-EG')}
+                    </p>
+                    <p className="text-gray-300 text-sm mb-4">
+                      <span className="text-gray-500">مدة التسليم:</span> {order.deliveryTime || order.deliveryDays}
+                    </p>
+                    <div className="flex justify-between items-center bg-black/30 rounded-lg p-3 text-sm">
+                      <div className="text-center">
+                        <p className="text-gray-500 mb-1">تم دفع</p>
+                        <p className="text-green-400 font-bold">{order.paidAmount} ج</p>
                       </div>
-                    )}
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-dark rounded-xl p-3 text-center border border-gray-800">
-                        <p className="text-gray-500 text-xs mb-1">المتبقي</p>
-                        <p className="text-red-400 font-bold">{remaining > 0 ? remaining : 0} ج.م</p>
-                      </div>
-                      <div className="bg-dark rounded-xl p-3 text-center border border-gray-800">
-                        <p className="text-gray-500 text-xs mb-1">المدة المطلوبة</p>
-                        <p className="text-white font-bold text-sm">{order.deliveryTime}</p>
-                      </div>
-                      <div className={`rounded-xl p-3 text-center border ${
-                        daysRemaining === null ? 'bg-dark border-gray-800' :
-                        daysRemaining <= 0 ? 'bg-green-500/10 border-green-500/30' :
-                        daysRemaining <= 2 ? 'bg-red-500/10 border-red-500/30' :
-                        'bg-primary/10 border-primary/30'
-                      }`}>
-                        <p className="text-gray-500 text-xs mb-1">فاضل أيام</p>
-                        {daysRemaining === null ? (
-                          <p className="text-gray-500 font-bold">-</p>
-                        ) : daysRemaining <= 0 ? (
-                          <p className="text-green-400 font-bold text-xs">وقت التسليم</p>
-                        ) : (
-                          <p className={`font-bold ${daysRemaining <= 2 ? 'text-red-400' : 'text-primary'}`}>
-                            {daysRemaining} يوم
-                          </p>
-                        )}
+                      <div className="w-px h-8 bg-gray-700"></div>
+                      <div className="text-center">
+                        <p className="text-gray-500 mb-1">متبقي</p>
+                        <p className="text-red-400 font-bold">{remaining > 0 ? remaining : 0} ج</p>
                       </div>
                     </div>
                   </div>

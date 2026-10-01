@@ -1587,8 +1587,10 @@ app.post('/api/upload', async (req, res) => {
         const filepath = path.join(uploadDir, filename);
         const buffer = Buffer.from(image, 'base64');
         fs.writeFileSync(filepath, buffer);
-        // Build URL
-        const baseUrl = BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+        // Build URL dynamically based on the actual request host
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const host = req.headers['x-forwarded-host'] || req.get('host');
+        const baseUrl = `${protocol}://${host}`;
         uploadedUrl = `${baseUrl}/uploads/${filename}`;
         isSuccess = true;
         console.log('[Upload] Saved locally:', uploadedUrl);

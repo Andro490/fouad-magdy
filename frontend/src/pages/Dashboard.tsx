@@ -13,6 +13,9 @@ const Dashboard = () => {
   const [currentCoins, setCurrentCoins] = useState(user?.coins || 0);
   const [mySubmissions, setMySubmissions] = useState<any[]>([]);
   const [divisionOrders, setDivisionOrders] = useState<any[]>([]);
+  const [searchPhone, setSearchPhone] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -64,11 +67,12 @@ const Dashboard = () => {
       fetchVideos();
     }
 
-    if (user?.phone) {
+    const phoneToUse = user?.phone || localStorage.getItem('div1_phone');
+    if (phoneToUse) {
       const fetchDivisionOrders = async () => {
         const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
         try {
-          const res = await fetch(`${API_URL}/api/division1/status?phone=${encodeURIComponent(user.phone)}`);
+          const res = await fetch(`${API_URL}/api/division1/status?phone=${encodeURIComponent(phoneToUse)}`);
           if (res.ok) {
             const data = await res.json();
             setDivisionOrders(Array.isArray(data) ? data : []);
@@ -78,6 +82,29 @@ const Dashboard = () => {
       fetchDivisionOrders();
     }
   }, [user, result]);
+
+  const handlePhoneSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchPhone.trim()) return;
+    setSearchLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+    try {
+      const res = await fetch(`${API_URL}/api/division1/status?phone=${encodeURIComponent(searchPhone.trim())}`);
+      if (res.ok) {
+        const data = await res.json();
+        setDivisionOrders(Array.isArray(data) ? data : []);
+        if (data.length > 0) {
+          localStorage.setItem('div1_phone', searchPhone.trim());
+        } else {
+          alert('لا توجد طلبات مسجلة بهذا الرقم');
+        }
+      }
+    } catch (err) {
+      alert('حدث خطأ في البحث');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const calcDaysRemaining = (startDate: string | null, deliveryDays: number) => {
     if (!startDate || !deliveryDays) return null;
@@ -232,6 +259,7 @@ const Dashboard = () => {
           <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8 mb-8">
             <h3 className="text-xl font-bold mb-4 text-primary">طلبات دفجن 1 الخاصة بك</h3>
             <div className="space-y-4">
+
               {divisionOrders.map(order => {
                 const daysRemaining = calcDaysRemaining(order.startDate, order.deliveryDays);
                 const remaining = order.totalPrice - order.paidAmount;
@@ -303,7 +331,6 @@ const Dashboard = () => {
             </div>
           </div>
         )}
-
 
         {user.role === 'STREAMER' && (
           <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8">

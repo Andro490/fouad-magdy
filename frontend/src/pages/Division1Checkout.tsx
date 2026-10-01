@@ -109,6 +109,7 @@ const Division1Checkout = () => {
       const result = await response.json();
       
       if (response.ok) {
+        localStorage.setItem('div1_phone', phone);
         setShowSuccessModal(true);
       } else {
         alert(`❌ حدث خطأ: ${result.error || 'فشل إرسال الطلب'}`);

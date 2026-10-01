@@ -23,9 +23,9 @@ const Division1Admin = () => {
 
   // Search existing user to promote
   const [searchUserQuery, setSearchUserQuery] = useState('');
-  const [foundUser, setFoundUser] = useState<any | null>(null);
+  const [foundUsers, setFoundUsers] = useState<any[]>([]);
   const [searchingUser, setSearchingUser] = useState(false);
-  const [promoting, setPromoting] = useState(false);
+  const [promoting, setPromoting] = useState<string | null>(null);
 
   const fetchDiv1Admins = async () => {
     const token = localStorage.getItem('authToken');
@@ -95,7 +95,7 @@ const Division1Admin = () => {
     e.preventDefault();
     if (!searchUserQuery.trim()) return;
     setSearchingUser(true);
-    setFoundUser(null);
+    setFoundUsers([]);
     const token = localStorage.getItem('authToken');
     try {
       const res = await fetch(`${API_URL}/api/users`, {
@@ -104,13 +104,13 @@ const Division1Admin = () => {
       if (res.ok) {
         const users = await res.json();
         const q = searchUserQuery.trim().toLowerCase();
-        const match = users.find((u: any) =>
+        const matches = users.filter((u: any) =>
           u.email?.toLowerCase().includes(q) ||
           u.phone?.includes(q) ||
           u.name?.toLowerCase().includes(q)
         );
-        if (match) {
-          setFoundUser(match);
+        if (matches.length > 0) {
+          setFoundUsers(matches);
         } else {
           alert('لم يُعثر على مستخدم بهذا البريد أو الهاتف أو الاسم');
         }
@@ -122,12 +122,12 @@ const Division1Admin = () => {
     }
   };
 
-  const handlePromoteUser = async () => {
-    if (!foundUser) return;
-    setPromoting(true);
+  const handlePromoteUser = async (targetUser: any) => {
+    if (!targetUser) return;
+    setPromoting(targetUser.id);
     const token = localStorage.getItem('authToken');
     try {
-      const res = await fetch(`${API_URL}/api/users/${foundUser.id}`, {
+      const res = await fetch(`${API_URL}/api/users/${targetUser.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -136,8 +136,8 @@ const Division1Admin = () => {
         body: JSON.stringify({ role: 'DIV1_ADMIN' })
       });
       if (res.ok) {
-        alert(`✅ تم ترقية ${foundUser.name} إلى أدمن دفجن 1 بنجاح! يمكنه الدخول بحسابه الحالي الآن.`);
-        setFoundUser(null);
+        alert(`✅ تم ترقية ${targetUser.name} إلى أدمن دفجن 1 بنجاح!\n\nيجب على ${targetUser.name} عمل Logout ثم Login مجدداً ليرى صلاحياته الجديدة.`);
+        setFoundUsers([]);
         setSearchUserQuery('');
         fetchDiv1Admins();
       } else {
@@ -147,21 +147,22 @@ const Division1Admin = () => {
     } catch (e) {
       alert('خطأ في الاتصال بالسيرفر');
     } finally {
-      setPromoting(false);
+      setPromoting(null);
     }
   };
 
 
   const handleDeleteDiv1Admin = async (id: string) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الأدمن نهائياً؟')) return;
+    if (!window.confirm('هل أنت متأكد من إزالة صلاحية دفجن 1 من هذا الأدمن؟ (الحساب لن يُحذف)')) return;
     const token = localStorage.getItem('authToken');
     try {
       const res = await fetch(`${API_URL}/api/users/${id}`, {
-        method: 'DELETE',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        }
+        },
+        body: JSON.stringify({ role: 'USER' })
       });
       if (res.ok) {
         alert('تم حذف الأدمن بنجاح ✅');
@@ -458,20 +459,25 @@ const Division1Admin = () => {
               </button>
             </form>
 
-            {foundUser && (
-              <div className="bg-dark/60 border border-green-500/30 rounded-xl p-4 flex justify-between items-center gap-4">
-                <div>
-                  <p className="text-white font-bold">{foundUser.name}</p>
-                  <p className="text-gray-400 text-sm">{foundUser.email} — {foundUser.phone}</p>
-                  <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded mt-1 inline-block">الدور الحالي: {foundUser.role}</span>
-                </div>
-                <button
-                  onClick={handlePromoteUser}
-                  disabled={promoting || foundUser.role === 'DIV1_ADMIN'}
-                  className="px-5 py-2 bg-green-500/20 text-green-400 border border-green-500/40 font-bold rounded-lg hover:bg-green-500 hover:text-white transition-colors disabled:opacity-50"
-                >
-                  {promoting ? <Loader2 className="animate-spin w-4 h-4" /> : foundUser.role === 'DIV1_ADMIN' ? '✅ لديه الصلاحية' : 'ترقية لأدمن دفجن 1'}
-                </button>
+            {foundUsers.length > 0 && (
+              <div className="space-y-3 mt-2">
+                <p className="text-gray-400 text-xs">تم العثور على {foundUsers.length} حساب — اختر الحساب الصحيح الذي يستخدمه وائل للدخول:</p>
+                {foundUsers.map((u) => (
+                  <div key={u.id} className="bg-dark/60 border border-green-500/30 rounded-xl p-4 flex justify-between items-center gap-4">
+                    <div>
+                      <p className="text-white font-bold">{u.name}</p>
+                      <p className="text-gray-400 text-sm" dir="ltr">{u.email} {u.phone ? `— ${u.phone}` : ''}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded mt-1 inline-block ${u.role === 'DIV1_ADMIN' ? 'bg-green-600/30 text-green-400' : 'bg-gray-700 text-gray-300'}`}>الدور الحالي: {u.role}</span>
+                    </div>
+                    <button
+                      onClick={() => handlePromoteUser(u)}
+                      disabled={promoting === u.id || u.role === 'DIV1_ADMIN'}
+                      className="px-5 py-2 bg-green-500/20 text-green-400 border border-green-500/40 font-bold rounded-lg hover:bg-green-500 hover:text-white transition-colors disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+                    >
+                      {promoting === u.id ? <Loader2 className="animate-spin w-4 h-4" /> : u.role === 'DIV1_ADMIN' ? '✅ لديه الصلاحية' : 'ترقية لأدمن دفجن 1'}
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>

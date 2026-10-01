@@ -4,9 +4,19 @@ import { RootState } from '../store/store';
 import { Loader2 } from 'lucide-react';
 import { loginSuccess } from '../store/authSlice';
 import VerifiedBadge from '../components/VerifiedBadge';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+
+  // Redirect DIV1_ADMIN directly to their admin panel
+  React.useEffect(() => {
+    if (user?.role === 'DIV1_ADMIN') {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, navigate]);
+
   const [videoLink, setVideoLink] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);

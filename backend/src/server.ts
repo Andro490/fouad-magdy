@@ -807,6 +807,19 @@ app.put('/api/division1/requests/:id', authenticateToken, async (req: AuthReques
   }
 });
 
+app.delete('/api/division1/requests/:id', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const { id } = req.params;
+    await (prisma as any).divisionRequest.delete({
+      where: { id }
+    });
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Public: User checks their order status by phone
 app.get('/api/division1/status', async (req, res) => {
   try {

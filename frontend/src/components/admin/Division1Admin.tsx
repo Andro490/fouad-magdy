@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Trash2 } from 'lucide-react';
 
 const Division1Admin = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -78,6 +78,30 @@ const Division1Admin = () => {
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent opening the modal
+    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟')) return;
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/division1/requests/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      if (res.ok) {
+        setRequests(requests.filter(r => r.id !== id));
+      } else {
+        alert('فشل الحذف');
+      }
+    } catch (err) {
+      alert('حدث خطأ أثناء الاتصال بالسيرفر');
+    }
+  };
+
+
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-12 h-12" /></div>;
   }
@@ -117,9 +141,18 @@ const Division1Admin = () => {
               >
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold text-white text-lg">{req.name}</h3>
-                  <span className={`px-2 py-1 text-xs font-bold rounded ${req.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                    {req.status === 'COMPLETED' ? 'مكتمل' : 'قيد المراجعة'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => handleDelete(e, req.id)}
+                      className="p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500 hover:text-white transition-colors"
+                      title="حذف الطلب"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <span className={`px-2 py-1 text-xs font-bold rounded ${req.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      {req.status === 'COMPLETED' ? 'مكتمل' : 'قيد المراجعة'}
+                    </span>
+                  </div>
                 </div>
                 
                 <p className="text-gray-300 text-sm mb-1"><span className="text-gray-500">الهاتف:</span> <span dir="ltr">{req.phone}</span></p>

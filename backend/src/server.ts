@@ -773,7 +773,7 @@ app.post('/api/division1/request', async (req, res) => {
 
 app.get('/api/division1/requests', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    if (!['ADMIN', 'DIV1_ADMIN'].includes(req.user?.role || '')) return res.status(403).json({ error: 'Admins only' });
     const requests = await (prisma as any).divisionRequest.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -785,7 +785,7 @@ app.get('/api/division1/requests', authenticateToken, async (req: AuthRequest, r
 
 app.put('/api/division1/requests/:id', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    if (!['ADMIN', 'DIV1_ADMIN'].includes(req.user?.role || '')) return res.status(403).json({ error: 'Admins only' });
     const { id } = req.params;
     const { totalPrice, paidAmount, deliveryDays, status, startDate } = req.body;
     const updateData: any = {
@@ -809,7 +809,7 @@ app.put('/api/division1/requests/:id', authenticateToken, async (req: AuthReques
 
 app.delete('/api/division1/requests/:id', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    if (!['ADMIN', 'DIV1_ADMIN'].includes(req.user?.role || '')) return res.status(403).json({ error: 'Admins only' });
     const { id } = req.params;
     await (prisma as any).divisionRequest.delete({
       where: { id }

@@ -715,25 +715,46 @@ app.post('/api/division1/request', async (req, res) => {
 
     // Send to Telegram if configured
     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+      const BACKEND_URL = process.env.BACKEND_URL || 'https://fouad-magdy-production.up.railway.app';
+      const tgSecret = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
       const caption = `🚀 <b>طلب وصول لـ Division 1 جديد</b>\n\n` +
         `👤 <b>الاسم:</b> ${sanitizeHTML(name)}\n` +
         `📱 <b>الهاتف:</b> ${sanitizeHTML(phone)}\n` +
         `⭐ <b>الريت الحالي:</b> ${sanitizeHTML(currentRate)}\n` +
         `⏱️ <b>مدة التسليم المطلوبة:</b> ${sanitizeHTML(deliveryTime)}\n` +
         `💰 <b>العربون المدفوع:</b> ${depositAmount} EGP\n\n` +
-        `🔗 <b>صورة التشكيلة:</b> ${squadImage}\n` +
-        `🔗 <b>صورة الإيصال:</b> ${receiptImage}`;
+        `🖼 <a href="${squadImage}">صورة التشكيلة</a>\n` +
+        `🧾 <a href="${receiptImage}">صورة الإيصال</a>\n\n` +
+        `يرجى مراجعة الإيصال والموافقة أو الرفض.`;
+
+      const approveUrl = `${BACKEND_URL}/api/division1/approve?id=${newRequest.id}&secret=${tgSecret}`;
+      const rejectUrl = `${BACKEND_URL}/api/division1/reject?id=${newRequest.id}&secret=${tgSecret}`;
       
       const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      await fetch(tgUrl, {
+      console.log('[Div1 TG] Sending to chat_id:', TELEGRAM_CHAT_ID);
+      const tgRes = await fetch(tgUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text: caption,
           parse_mode: 'HTML',
+          reply_markup: JSON.stringify({
+            inline_keyboard: [[
+              { text: '✅ تم الدفع (موافقة)', url: approveUrl },
+              { text: '❌ لم يتم الدفع (رفض)', url: rejectUrl }
+            ]]
+          })
         })
       });
+      const tgData = await tgRes.json();
+      if (!tgData.ok) {
+        console.error('[Div1 TG] Telegram error:', JSON.stringify(tgData));
+      } else {
+        console.log('[Div1 TG] Message sent successfully');
+      }
+    } else {
+      console.warn('[Div1 TG] Token or Chat ID not configured. Token set:', !!TELEGRAM_BOT_TOKEN, 'ChatID set:', !!TELEGRAM_CHAT_ID);
     }
 
     res.json({ success: true, request: newRequest });
@@ -759,17 +780,70 @@ app.put('/api/division1/requests/:id', authenticateToken, async (req: AuthReques
   try {
     if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
     const { id } = req.params;
-    const { totalPrice, paidAmount } = req.body;
+    const { totalPrice, paidAmount, deliveryDays, status, startDate } = req.body;
+    const updateData: any = {
+      totalPrice: parseFloat(totalPrice),
+      paidAmount: parseFloat(paidAmount),
+    };
+    if (deliveryDays !== undefined) updateData.deliveryDays = parseInt(deliveryDays);
+    if (status) updateData.status = status;
+    // Set startDate when approving
+    if (status === 'APPROVED' && !startDate) updateData.startDate = new Date();
+    if (startDate) updateData.startDate = new Date(startDate);
     const updated = await (prisma as any).divisionRequest.update({
       where: { id },
-      data: {
-        totalPrice: parseFloat(totalPrice),
-        paidAmount: parseFloat(paidAmount)
-      }
+      data: updateData
     });
     res.json({ success: true, request: updated });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Public: User checks their order status by phone
+app.get('/api/division1/status', async (req, res) => {
+  try {
+    const { phone } = req.query as { phone: string };
+    if (!phone) return res.status(400).json({ error: 'Phone required' });
+    const requests = await (prisma as any).divisionRequest.findMany({
+      where: { phone: String(phone) },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(requests);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Approve via Telegram button
+app.get('/api/division1/approve', async (req, res) => {
+  try {
+    const { id, secret } = req.query as { id: string; secret: string };
+    const tgSecret = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+    if (secret !== tgSecret) return res.status(403).send('<h1>غير مصرح</h1>');
+    await (prisma as any).divisionRequest.update({
+      where: { id },
+      data: { status: 'APPROVED', startDate: new Date() }
+    });
+    res.send('<h1 style="font-family:sans-serif;color:green;text-align:center;margin-top:50px">✅ تمت الموافقة! بدأ العد التنازلي.</h1>');
+  } catch (err: any) {
+    res.status(500).send(`<h1>خطأ: ${err.message}</h1>`);
+  }
+});
+
+// Reject via Telegram button
+app.get('/api/division1/reject', async (req, res) => {
+  try {
+    const { id, secret } = req.query as { id: string; secret: string };
+    const tgSecret = process.env.TELEGRAM_SECRET || 'fouad_secret_123';
+    if (secret !== tgSecret) return res.status(403).send('<h1>غير مصرح</h1>');
+    await (prisma as any).divisionRequest.update({
+      where: { id },
+      data: { status: 'REJECTED' }
+    });
+    res.send('<h1 style="font-family:sans-serif;color:red;text-align:center;margin-top:50px">❌ تم الرفض.</h1>');
+  } catch (err: any) {
+    res.status(500).send(`<h1>خطأ: ${err.message}</h1>`);
   }
 });
 

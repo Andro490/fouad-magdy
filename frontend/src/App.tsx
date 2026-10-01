@@ -17,6 +17,7 @@ import Packages from './pages/Packages';
 import SupportChat from './components/SupportChat';
 import ErrorBoundary from './components/ErrorBoundary';
 import Division1Checkout from './pages/Division1Checkout';
+import Division1Status from './pages/Division1Status';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/division1-checkout" element={<Division1Checkout />} />
+          <Route path="/division1-status" element={<Division1Status />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
           <Route path="/team-builder" element={<TeamBuilder />} />

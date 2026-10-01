@@ -8,7 +8,17 @@ const Division1Admin = () => {
   
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [paidAmount, setPaidAmount] = useState<number>(0);
+  const [deliveryDays, setDeliveryDays] = useState<number>(0);
   const [saving, setSaving] = useState(false);
+
+  const calcDaysRemaining = (startDate: string | null, days: number) => {
+    if (!startDate || !days) return null;
+    const start = new Date(startDate);
+    const deadline = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    const diff = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
 
   const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
@@ -36,6 +46,7 @@ const Division1Admin = () => {
     setSelectedRequest(req);
     setTotalPrice(req.totalPrice);
     setPaidAmount(req.paidAmount);
+    setDeliveryDays(req.deliveryDays || 0);
   };
 
   const handleSave = async () => {
@@ -49,7 +60,7 @@ const Division1Admin = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ totalPrice, paidAmount })
+        body: JSON.stringify({ totalPrice, paidAmount, deliveryDays })
       });
       if (res.ok) {
         alert('تم الحفظ بنجاح');
@@ -154,6 +165,17 @@ const Division1Admin = () => {
                   onChange={e => setPaidAmount(Number(e.target.value))}
                   className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
                 />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">عدد أيام التسليم (يبدأ من الموافقة)</label>
+                <input 
+                  type="number" 
+                  value={deliveryDays} 
+                  onChange={e => setDeliveryDays(Number(e.target.value))}
+                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
+                  placeholder="مثال: 3"
+                />
+                {deliveryDays > 0 && <p className="text-xs text-gray-500 mt-1">بعد الحفظ سيبدأ العد التنازلي ويُعلَم العميل بفاضل {deliveryDays} أيام</p>}
               </div>
               
               <div className="p-3 bg-primary/10 rounded-lg border border-primary/20 text-center">

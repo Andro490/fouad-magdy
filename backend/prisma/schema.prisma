@@ -96,18 +96,20 @@ model SiteSettings {
 }
 
 model DivisionRequest {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   name          String
   phone         String
   squadImage    String
   receiptImage  String
   currentRate   String
   deliveryTime  String
-  status        String   @default("PENDING")
-  depositPaid   Float    @default(0)
-  totalPrice    Float    @default(0)
-  paidAmount    Float    @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String    @default("PENDING")
+  depositPaid   Float     @default(0)
+  totalPrice    Float     @default(0)
+  paidAmount    Float     @default(0)
+  deliveryDays  Int       @default(0)
+  startDate     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 

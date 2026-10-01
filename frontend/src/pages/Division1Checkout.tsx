@@ -219,14 +219,23 @@ const Division1Checkout = () => {
             <p className="text-gray-300 mb-8 leading-relaxed">
               سيتم مراجعة التشكيلة والتواصل معك على الرقم <strong className="text-white dir-ltr inline-block mx-1">{phone}</strong> للاتفاق على باقي المبلغ وموعد البدء.
             </p>
-            <button
-              onClick={() => navigate('/')}
-              className="w-full py-4 bg-green-500 text-dark font-bold text-lg rounded-xl hover:bg-green-400 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.4)]"
-            >
-              العودة للرئيسية
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => navigate(`/division1-status?phone=${encodeURIComponent(phone)}`)}
+                className="w-full py-4 bg-primary text-dark font-bold text-lg rounded-xl hover:bg-accent transition-colors"
+              >
+                📊 تابع حالة طلبك
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="w-full py-3 bg-white/5 border border-gray-700 text-gray-300 font-medium rounded-xl hover:bg-white/10 transition-colors"
+              >
+                العودة للرئيسية
+              </button>
+            </div>
           </div>
         </div>
+
       )}
     </div>
   );

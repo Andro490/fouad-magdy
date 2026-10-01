@@ -149,8 +149,15 @@ const Division1Admin = () => {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <span className={`px-2 py-1 text-xs font-bold rounded ${req.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                      {req.status === 'COMPLETED' ? 'مكتمل' : 'قيد المراجعة'}
+                    <span className={`px-2 py-1 text-xs font-bold rounded ${
+                      req.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : 
+                      req.status === 'APPROVED' ? 'bg-blue-500/20 text-blue-400' :
+                      req.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
+                      'bg-yellow-500/20 text-yellow-400'
+                    }`}>
+                      {req.status === 'COMPLETED' ? 'مكتمل' : 
+                       req.status === 'APPROVED' ? 'تمت الموافقة' :
+                       req.status === 'REJECTED' ? 'مرفوض' : 'قيد المراجعة'}
                     </span>
                   </div>
                 </div>
@@ -184,7 +191,7 @@ const Division1Admin = () => {
               <button onClick={() => setSelectedRequest(null)} className="text-gray-500 hover:text-white">✕</button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <div>
                 <p className="text-gray-400 mb-2">صورة الإيصال (عربون)</p>
                 <a href={selectedRequest.receiptImage} target="_blank" rel="noreferrer">
@@ -196,6 +203,13 @@ const Division1Admin = () => {
                 <a href={selectedRequest.squadImage} target="_blank" rel="noreferrer">
                   <img src={selectedRequest.squadImage} alt="Squad" className="w-full h-40 object-cover rounded-lg border border-gray-700 hover:border-primary transition-colors" />
                 </a>
+              </div>
+            </div>
+            
+            <div className="flex justify-center mb-6">
+              <div className="bg-dark/50 border border-primary/30 px-6 py-3 rounded-xl inline-flex flex-col items-center gap-1">
+                <p className="text-gray-400 text-sm">رقم هاتف العميل للتواصل</p>
+                <p className="text-white font-bold text-xl select-all" dir="ltr">{selectedRequest.phone}</p>
               </div>
             </div>
 

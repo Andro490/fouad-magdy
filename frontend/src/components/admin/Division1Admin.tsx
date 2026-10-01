@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Search, Trash2 } from 'lucide-react';
+import { Loader2, Search, Trash2, Copy, Check } from 'lucide-react';
 
 const Division1Admin = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -11,6 +11,13 @@ const Division1Admin = () => {
   const [deliveryDays, setDeliveryDays] = useState<number>(0);
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (phone: string) => {
+    navigator.clipboard.writeText(phone);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
 
   const calcDaysRemaining = (startDate: string | null, days: number) => {
@@ -207,9 +214,18 @@ const Division1Admin = () => {
             </div>
             
             <div className="flex justify-center mb-6">
-              <div className="bg-dark/50 border border-primary/30 px-6 py-3 rounded-xl inline-flex flex-col items-center gap-1">
+              <div className="bg-dark/50 border border-primary/30 px-6 py-3 rounded-xl inline-flex flex-col items-center gap-2">
                 <p className="text-gray-400 text-sm">رقم هاتف العميل للتواصل</p>
-                <p className="text-white font-bold text-xl select-all" dir="ltr">{selectedRequest.phone}</p>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleCopy(selectedRequest.phone)}
+                    className="flex items-center gap-2 px-3 py-1.5 border border-primary/50 text-primary hover:bg-primary hover:text-dark rounded-lg transition-colors text-sm font-bold"
+                  >
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                    {copied ? 'تم النسخ' : 'نسخ'}
+                  </button>
+                  <p className="text-white font-bold text-xl select-all" dir="ltr">{selectedRequest.phone}</p>
+                </div>
               </div>
             </div>
 

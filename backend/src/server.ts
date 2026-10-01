@@ -686,6 +686,94 @@ app.get('/api/checkout/manual-reject', async (req, res) => {
 
 
 // ─────────────────────────────────────────
+// DIVISION 1 SERVICE API
+// ─────────────────────────────────────────
+app.post('/api/division1/request', async (req, res) => {
+  try {
+    const { name, phone, squadImage, receiptImage, currentRate, deliveryTime } = req.body;
+    
+    // Read settings for Division 1
+    const settings = await readSettings();
+    const TELEGRAM_BOT_TOKEN = settings.div1TelegramToken;
+    const TELEGRAM_CHAT_ID = settings.div1TelegramChatId;
+    const depositAmount = parseFloat(settings.div1DepositAmount) || 100;
+
+    // Save to database
+    const newRequest = await (prisma as any).divisionRequest.create({
+      data: {
+        name: sanitizeHTML(name),
+        phone: sanitizeHTML(phone),
+        squadImage: sanitizeHTML(squadImage),
+        receiptImage: sanitizeHTML(receiptImage),
+        currentRate: sanitizeHTML(currentRate),
+        deliveryTime: sanitizeHTML(deliveryTime),
+        depositPaid: depositAmount,
+        paidAmount: depositAmount, // Initial paid amount is the deposit
+        totalPrice: depositAmount, // Default to deposit, admin updates it later
+      }
+    });
+
+    // Send to Telegram if configured
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+      const caption = `🚀 <b>طلب وصول لـ Division 1 جديد</b>\n\n` +
+        `👤 <b>الاسم:</b> ${sanitizeHTML(name)}\n` +
+        `📱 <b>الهاتف:</b> ${sanitizeHTML(phone)}\n` +
+        `⭐ <b>الريت الحالي:</b> ${sanitizeHTML(currentRate)}\n` +
+        `⏱️ <b>مدة التسليم المطلوبة:</b> ${sanitizeHTML(deliveryTime)}\n` +
+        `💰 <b>العربون المدفوع:</b> ${depositAmount} EGP\n\n` +
+        `🔗 <b>صورة التشكيلة:</b> ${squadImage}\n` +
+        `🔗 <b>صورة الإيصال:</b> ${receiptImage}`;
+      
+      const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      await fetch(tgUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: caption,
+          parse_mode: 'HTML',
+        })
+      });
+    }
+
+    res.json({ success: true, request: newRequest });
+  } catch (err: any) {
+    console.error('Division 1 request error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/division1/requests', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const requests = await (prisma as any).divisionRequest.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(requests);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/division1/requests/:id', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (req.user?.role !== 'ADMIN') return res.status(403).json({ error: 'Admins only' });
+    const { id } = req.params;
+    const { totalPrice, paidAmount } = req.body;
+    const updated = await (prisma as any).divisionRequest.update({
+      where: { id },
+      data: {
+        totalPrice: parseFloat(totalPrice),
+        paidAmount: parseFloat(paidAmount)
+      }
+    });
+    res.json({ success: true, request: updated });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────
 // USERS API
 // ─────────────────────────────────────────
 app.post('/api/auth/admin-login', async (req, res) => {

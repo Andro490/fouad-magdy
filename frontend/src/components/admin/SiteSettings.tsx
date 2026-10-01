@@ -15,6 +15,9 @@ const SiteSettings = () => {
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [googleClientId, setGoogleClientId] = useState('');
   const [teamBuilderVideoUrl, setTeamBuilderVideoUrl] = useState('');
+  const [div1DepositAmount, setDiv1DepositAmount] = useState<number>(100);
+  const [div1TelegramToken, setDiv1TelegramToken] = useState('');
+  const [div1TelegramChatId, setDiv1TelegramChatId] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -39,6 +42,9 @@ const SiteSettings = () => {
         if (data.geminiApiKey) setGeminiApiKey(data.geminiApiKey);
         if (data.googleClientId) setGoogleClientId(data.googleClientId);
         if (data.teamBuilderVideoUrl) setTeamBuilderVideoUrl(data.teamBuilderVideoUrl);
+        if (data.div1DepositAmount) setDiv1DepositAmount(Number(data.div1DepositAmount));
+        if (data.div1TelegramToken) setDiv1TelegramToken(data.div1TelegramToken);
+        if (data.div1TelegramChatId) setDiv1TelegramChatId(data.div1TelegramChatId);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -55,7 +61,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramChannelUsername, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramChannelUsername, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl, div1DepositAmount, div1TelegramToken, div1TelegramChatId })
       });
       if (res.ok) {
         setSaved(true);
@@ -234,7 +240,46 @@ const SiteSettings = () => {
                 placeholder="@fouadmagdym24"
               />
             </div>
+
             <hr className="border-gray-700 my-4" />
+            <h4 className="text-white font-bold mb-2 mt-4 text-[#e06c88]">🤖 بوت وصول دفجن 1</h4>
+            
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">مبلغ العربون (بالجنيه)</label>
+              <input
+                type="number"
+                value={div1DepositAmount}
+                onChange={e => setDiv1DepositAmount(Number(e.target.value))}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#e06c88] focus:outline-none"
+                dir="ltr"
+                placeholder="100"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Bot Token (وصول دفجن 1)</label>
+              <input
+                type="text"
+                value={div1TelegramToken}
+                onChange={e => setDiv1TelegramToken(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#e06c88] focus:outline-none"
+                dir="ltr"
+                placeholder="123456789:ABCdefGHIjklmNOPQRstuvwXYZ"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-1">Admin Chat ID (وصول دفجن 1)</label>
+              <input
+                type="text"
+                value={div1TelegramChatId}
+                onChange={e => setDiv1TelegramChatId(e.target.value)}
+                className="w-full bg-dark border border-gray-600 rounded-lg px-4 py-2 text-white text-sm focus:border-[#e06c88] focus:outline-none"
+                dir="ltr"
+                placeholder="123456789"
+              />
+            </div>
+
+            <hr className="border-gray-700 my-4" />
+
             <div>
               <label className="block text-gray-400 text-sm mb-1">رابط فيديو الترحيب (اختياري)</label>
               <input

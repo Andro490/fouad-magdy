@@ -1,6 +1,7 @@
 import HeroSection, { MobileSocials } from '../components/home/HeroSection';
 import ExperienceSection from '../components/home/ExperienceSection';
 import StoreSection from '../components/home/StoreSection';
+import Division1Banner from '../components/home/Division1Banner';
 import AboutSection from '../components/home/AboutSection';
 import CommunitySection from '../components/home/CommunitySection';
 import Footer from '../components/Footer';
@@ -13,6 +14,7 @@ export default function Home() {
         <ExperienceSection />
       </div>
       <StoreSection />
+      <Division1Banner />
       <MobileSocials />
       <div className="hidden md:block">
         <AboutSection />

@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'كوّن خططك', path: '/team-builder' },
   { label: 'Coaches & Tactics', path: '/products' },
   { label: 'Account Store', path: '/store' },
+  { label: 'اوصل دفجن 1', path: '/division1-checkout' },
   { label: 'Creator Board', path: '/leaderboard' },
 ];
 

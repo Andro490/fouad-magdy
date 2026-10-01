@@ -13,7 +13,16 @@ const SupportChatAdmin = () => {
       const res = await fetch(`${API_URL}/api/chat/users`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      if (res.ok) setChatUsers(await res.json());
+      if (res.ok) {
+        setChatUsers(await res.json());
+      } else if (res.status === 403 || res.status === 401) {
+        // Token is invalid/expired or user is not admin
+        if (window.confirm('انتهت صلاحية الجلسة أو لا تملك صلاحية الوصول. يرجى تسجيل الدخول مجدداً.')) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }
+      }
     } catch (e) {}
   };
 

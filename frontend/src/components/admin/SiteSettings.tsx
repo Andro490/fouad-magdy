@@ -18,6 +18,7 @@ const SiteSettings = () => {
   const [div1DepositAmount, setDiv1DepositAmount] = useState<number>(100);
   const [div1TelegramToken, setDiv1TelegramToken] = useState('');
   const [div1TelegramChatId, setDiv1TelegramChatId] = useState('');
+  const [div1PaymentPhone, setDiv1PaymentPhone] = useState('01000026470');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -45,6 +46,7 @@ const SiteSettings = () => {
         if (data.div1DepositAmount) setDiv1DepositAmount(Number(data.div1DepositAmount));
         if (data.div1TelegramToken) setDiv1TelegramToken(data.div1TelegramToken);
         if (data.div1TelegramChatId) setDiv1TelegramChatId(data.div1TelegramChatId);
+        if (data.div1PaymentPhone) setDiv1PaymentPhone(data.div1PaymentPhone);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -61,7 +63,7 @@ const SiteSettings = () => {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramChannelUsername, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl, div1DepositAmount, div1TelegramToken, div1TelegramChatId })
+        body: JSON.stringify({ showComingSoonBanner, showTopupButton, paymentPhone, topupPhone, exchangeRate, telegramBotToken, telegramChatId, telegramChannelUsername, telegramGroupUsername, telegramWelcomeVideoUrl, telegramWelcomeText, geminiApiKey, googleClientId, teamBuilderVideoUrl, div1DepositAmount, div1TelegramToken, div1TelegramChatId, div1PaymentPhone })
       });
       if (res.ok) {
         setSaved(true);
@@ -356,6 +358,60 @@ const SiteSettings = () => {
             dir="ltr"
             placeholder="https://www.youtube.com/watch?v=..."
           />
+        </div>
+
+        {/* Division 1 Settings */}
+        <div className="bg-dark/40 border border-primary/30 rounded-xl p-6 space-y-4">
+          <h3 className="text-white font-bold text-lg">🚀 إعدادات وصول دفجن 1</h3>
+          <p className="text-gray-400 text-sm mb-4">هذه الإعدادات خاصة بقسم "أوصل دفجن 1" فقط.</p>
+          
+          <div>
+            <label className="block text-gray-400 text-sm mb-2">رقم فودافون كاش الخاص بـ دفجن 1</label>
+            <input
+              type="text"
+              value={div1PaymentPhone}
+              onChange={e => setDiv1PaymentPhone(e.target.value)}
+              className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
+              dir="ltr"
+              placeholder="مثال: 01024577185"
+            />
+            <p className="text-xs text-gray-500 mt-1">هذا الرقم سيظهر للعميل أثناء دفع العربون لخدمة دفجن 1 (منفصل عن رقم الموقع الأساسي).</p>
+          </div>
+
+          <div>
+            <label className="block text-gray-400 text-sm mb-2">مبلغ العربون المطلوب (جنيه)</label>
+            <input
+              type="number"
+              value={div1DepositAmount}
+              onChange={e => setDiv1DepositAmount(Number(e.target.value))}
+              className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none"
+              dir="ltr"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-400 text-sm mb-2">توكن البوت (Telegram Bot Token)</label>
+            <input
+              type="text"
+              value={div1TelegramToken}
+              onChange={e => setDiv1TelegramToken(e.target.value)}
+              className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none text-sm"
+              dir="ltr"
+              placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-400 text-sm mb-2">معرف الجروب (Chat ID)</label>
+            <input
+              type="text"
+              value={div1TelegramChatId}
+              onChange={e => setDiv1TelegramChatId(e.target.value)}
+              className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none text-sm"
+              dir="ltr"
+              placeholder="-1001234567890"
+            />
+          </div>
         </div>
 
         {/* Save Button */}

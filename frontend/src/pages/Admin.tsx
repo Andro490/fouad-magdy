@@ -17,22 +17,22 @@ import Division1Admin from '../components/admin/Division1Admin';
 const Admin = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings' | 'sellerProfile' | 'resetPoints' | 'division1'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'videos' | 'coaches' | 'support' | 'coachVideos' | 'subadmins' | 'settings' | 'sellerProfile' | 'resetPoints' | 'division1'>(user?.role === 'DIV1_ADMIN' ? 'division1' : 'products');
 
   useEffect(() => {
-    // Both ADMIN and SELLER can access this page
-    if (!isAuthenticated || (user?.role !== 'ADMIN' && user?.role !== 'SELLER')) {
+    // ADMIN, SELLER, DIV1_ADMIN can access this page
+    if (!isAuthenticated || !['ADMIN', 'SELLER', 'DIV1_ADMIN'].includes(user?.role || '')) {
       navigate('/');
     }
   }, [isAuthenticated, user, navigate]);
 
-  if (!isAuthenticated || (user?.role !== 'ADMIN' && user?.role !== 'SELLER')) return null;
+  if (!isAuthenticated || !['ADMIN', 'SELLER', 'DIV1_ADMIN'].includes(user?.role || '')) return null;
 
   return (
     <div className="min-h-screen pt-28 px-4 md:px-10 pb-20 relative" style={{ direction: 'rtl' }}>
       <div className="max-w-7xl mx-auto relative z-10">
         <h1 className="text-4xl font-bold text-gradient mb-10 text-center">
-          {user?.role === 'SELLER' ? 'لوحة تحكم البائع' : 'لوحة تحكم الإدارة'}
+          {user?.role === 'SELLER' ? 'لوحة تحكم البائع' : user?.role === 'DIV1_ADMIN' ? 'لوحة تحكم دفجن 1' : 'لوحة تحكم الإدارة'}
         </h1>
         
         {user?.role === 'SELLER' && (
@@ -48,6 +48,17 @@ const Admin = () => {
               className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'sellerProfile' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
             >
               إعدادات حسابي (صور الثقة)
+            </button>
+          </div>
+        )}
+        
+        {user?.role === 'DIV1_ADMIN' && (
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <button 
+              onClick={() => setActiveTab('division1')} 
+              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === 'division1' ? 'bg-primary text-dark shadow-[0_0_15px_rgba(255,215,0,0.4)]' : 'bg-dark-lighter text-gray-400 hover:text-white'}`}
+            >
+              إدارة طلبات وصول دفجن 1
             </button>
           </div>
         )}
@@ -120,6 +131,7 @@ const Admin = () => {
         <div className="mt-8">
           {activeTab === 'products' && <StoreManagement />}
           {activeTab === 'sellerProfile' && <SellerProfileSettings />}
+          {user?.role === 'DIV1_ADMIN' && activeTab === 'division1' && <Division1Admin />}
           {user?.role === 'ADMIN' && (
             <>
               {activeTab === 'videos' && <VideoReview />}

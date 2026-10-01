@@ -28,7 +28,11 @@ const Division1Checkout = () => {
     fetch(`${API_URL}/api/settings`)
       .then(r => r.json())
       .then(data => {
-        if (data.paymentPhone) setPaymentPhone(data.paymentPhone);
+        if (data.div1PaymentPhone) {
+          setPaymentPhone(data.div1PaymentPhone);
+        } else if (data.paymentPhone) {
+          setPaymentPhone(data.paymentPhone);
+        }
         if (data.div1DepositAmount) setDepositAmount(Number(data.div1DepositAmount));
       })
       .catch(() => {});

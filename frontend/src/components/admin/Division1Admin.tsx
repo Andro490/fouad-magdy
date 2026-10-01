@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, Search, Trash2, Copy, Check } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 const Division1Admin = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -11,7 +13,35 @@ const Division1Admin = () => {
   const [deliveryDays, setDeliveryDays] = useState<number>(0);
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useSelector((state: RootState) => state.auth);
   const [copied, setCopied] = useState(false);
+
+  const [div1Admins, setDiv1Admins] = useState<any[]>([]);
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+
+  const fetchDiv1Admins = async () => {
+    const token = localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_URL}/api/users`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        const users = await res.json();
+        setDiv1Admins(users.filter((u: any) => u.role === 'DIV1_ADMIN'));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+    if (user?.role === 'ADMIN') {
+      fetchDiv1Admins();
+    }
+  }, [user]);
 
   const handleCopy = (phone: string) => {
     navigator.clipboard.writeText(phone);
@@ -19,6 +49,63 @@ const Division1Admin = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+
+  const handleAddDiv1Admin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminName || !adminEmail || !adminPassword) return alert('يرجى ملء جميع الحقول');
+
+    const token = localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_URL}/api/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify([{
+          name: adminName,
+          email: adminEmail,
+          password: adminPassword,
+          role: 'DIV1_ADMIN',
+          coins: 0
+        }])
+      });
+
+      if (res.ok) {
+        alert('تم إضافة أدمن دفجن 1 بنجاح');
+        setAdminName('');
+        setAdminEmail('');
+        setAdminPassword('');
+        fetchDiv1Admins();
+      } else {
+        alert('حدث خطأ أثناء الإضافة');
+      }
+    } catch (e) {
+      alert('تعذر الاتصال بالسيرفر');
+    }
+  };
+
+  const handleDeleteDiv1Admin = async (id: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الأدمن نهائياً؟')) return;
+    const token = localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_URL}/api/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      if (res.ok) {
+        alert('تم حذف الأدمن بنجاح ✅');
+        fetchDiv1Admins();
+      } else {
+        alert('حدث خطأ أثناء الحذف');
+      }
+    } catch (e) {
+      alert('خطأ في الاتصال بالسيرفر');
+    }
+  };
 
   const calcDaysRemaining = (startDate: string | null, days: number) => {
     if (!startDate || !days) return null;
@@ -273,6 +360,81 @@ const Division1Admin = () => {
             >
               {saving ? <Loader2 className="animate-spin w-5 h-5" /> : 'حفظ التغييرات'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Div1 Admin Management - Only visible for main ADMIN */}
+      {user?.role === 'ADMIN' && (
+        <div className="mt-12 flex flex-col md:flex-row gap-6">
+          {/* List of Div1 Admins */}
+          <div className="w-full md:w-2/3 glass-panel p-6 rounded-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6">أدمنين وصول دفجن 1</h2>
+            {div1Admins.length === 0 ? (
+              <p className="text-gray-400">لا يوجد أدمنين حالياً.</p>
+            ) : (
+              <div className="space-y-4">
+                {div1Admins.map((admin) => (
+                  <div key={admin.id} className="bg-dark/40 border border-gray-700 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-white">{admin.name}</h4>
+                      <p className="text-sm text-gray-400">{admin.email}</p>
+                    </div>
+                    <button 
+                      onClick={() => handleDeleteDiv1Admin(admin.id)}
+                      className="bg-red-500/20 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors font-bold text-sm"
+                    >
+                      إزالة الصلاحية
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Add New Div1 Admin */}
+          <div className="w-full md:w-1/3 glass-panel p-6 rounded-2xl h-fit">
+            <h2 className="text-2xl font-bold text-white mb-6">إضافة أدمن دفجن 1</h2>
+            <form onSubmit={handleAddDiv1Admin} className="space-y-4">
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">اسم الأدمن</label>
+                <input 
+                  type="text" 
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">رقم الهاتف (الآيدي لسهولة الدخول)</label>
+                <input 
+                  type="text" 
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                  required
+                  dir="ltr"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">كلمة المرور</label>
+                <input 
+                  type="text" 
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary"
+                  required
+                  dir="ltr"
+                />
+              </div>
+              <button 
+                type="submit"
+                className="w-full py-3 bg-primary text-dark font-bold rounded-xl hover:bg-accent transition-colors mt-4"
+              >
+                إضافة الصلاحية
+              </button>
+            </form>
           </div>
         </div>
       )}

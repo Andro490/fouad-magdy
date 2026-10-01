@@ -221,10 +221,10 @@ const Division1Checkout = () => {
             </p>
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => navigate(`/division1-status?phone=${encodeURIComponent(phone)}`)}
+                onClick={() => navigate('/dashboard')}
                 className="w-full py-4 bg-primary text-dark font-bold text-lg rounded-xl hover:bg-accent transition-colors"
               >
-                📊 تابع حالة طلبك
+                📊 تابع طلبك من لوحة التحكم
               </button>
               <button
                 onClick={() => navigate('/')}

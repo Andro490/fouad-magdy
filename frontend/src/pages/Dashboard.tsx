@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [result, setResult] = useState<any>(null);
   const [currentCoins, setCurrentCoins] = useState(user?.coins || 0);
   const [mySubmissions, setMySubmissions] = useState<any[]>([]);
+  const [divisionOrders, setDivisionOrders] = useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -62,7 +63,29 @@ const Dashboard = () => {
       };
       fetchVideos();
     }
+
+    if (user?.phone) {
+      const fetchDivisionOrders = async () => {
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+        try {
+          const res = await fetch(`${API_URL}/api/division1/status?phone=${encodeURIComponent(user.phone)}`);
+          if (res.ok) {
+            const data = await res.json();
+            setDivisionOrders(Array.isArray(data) ? data : []);
+          }
+        } catch (err) {}
+      };
+      fetchDivisionOrders();
+    }
   }, [user, result]);
+
+  const calcDaysRemaining = (startDate: string | null, deliveryDays: number) => {
+    if (!startDate || !deliveryDays) return null;
+    const start = new Date(startDate);
+    const deadline = new Date(start.getTime() + deliveryDays * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    return Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  };
 
   const dispatch = useDispatch();
 
@@ -203,6 +226,84 @@ const Dashboard = () => {
             <p className="text-3xl font-bold text-accent">{currentCoins} <span className="text-sm text-gray-500">كوينز</span></p>
           </div>
         </div>
+
+        {/* Division 1 Tracking Section */}
+        {divisionOrders.length > 0 && (
+          <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8 mb-8">
+            <h3 className="text-xl font-bold mb-4 text-primary">طلبات دفجن 1 الخاصة بك</h3>
+            <div className="space-y-4">
+              {divisionOrders.map(order => {
+                const daysRemaining = calcDaysRemaining(order.startDate, order.deliveryDays);
+                const remaining = order.totalPrice - order.paidAmount;
+                return (
+                  <div key={order.id} className="bg-dark/50 p-6 rounded-xl border border-gray-700">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="font-bold text-lg">{order.name}</h4>
+                        <p className="text-gray-500 text-sm mt-1">{new Date(order.createdAt).toLocaleDateString('ar-EG')}</p>
+                      </div>
+                      <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+                        order.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                        order.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
+                        'bg-yellow-500/20 text-yellow-400'
+                      }`}>
+                        {order.status === 'APPROVED' ? 'تمت الموافقة' : order.status === 'REJECTED' ? 'مرفوض' : 'قيد المراجعة'}
+                      </span>
+                    </div>
+
+                    {order.totalPrice > 0 && (
+                      <div className="mb-6">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-400">المدفوع</span>
+                          <span className="text-gray-400">الإجمالي</span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-3">
+                          <div
+                            className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-700"
+                            style={{ width: `${Math.min((order.paidAmount / order.totalPrice) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-sm mt-2">
+                          <span className="text-green-400 font-bold">{order.paidAmount} ج.م</span>
+                          <span className="text-white font-bold">{order.totalPrice} ج.م</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-dark rounded-xl p-3 text-center border border-gray-800">
+                        <p className="text-gray-500 text-xs mb-1">المتبقي</p>
+                        <p className="text-red-400 font-bold">{remaining > 0 ? remaining : 0} ج.م</p>
+                      </div>
+                      <div className="bg-dark rounded-xl p-3 text-center border border-gray-800">
+                        <p className="text-gray-500 text-xs mb-1">المدة المطلوبة</p>
+                        <p className="text-white font-bold text-sm">{order.deliveryTime}</p>
+                      </div>
+                      <div className={`rounded-xl p-3 text-center border ${
+                        daysRemaining === null ? 'bg-dark border-gray-800' :
+                        daysRemaining <= 0 ? 'bg-green-500/10 border-green-500/30' :
+                        daysRemaining <= 2 ? 'bg-red-500/10 border-red-500/30' :
+                        'bg-primary/10 border-primary/30'
+                      }`}>
+                        <p className="text-gray-500 text-xs mb-1">فاضل أيام</p>
+                        {daysRemaining === null ? (
+                          <p className="text-gray-500 font-bold">-</p>
+                        ) : daysRemaining <= 0 ? (
+                          <p className="text-green-400 font-bold text-xs">وقت التسليم</p>
+                        ) : (
+                          <p className={`font-bold ${daysRemaining <= 2 ? 'text-red-400' : 'text-primary'}`}>
+                            {daysRemaining} يوم
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
 
         {user.role === 'STREAMER' && (
           <div className="bg-dark-lighter p-6 rounded-2xl border border-white/10 mt-8">

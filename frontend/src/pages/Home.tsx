@@ -11,10 +11,10 @@ export default function Home() {
     <div className="min-h-screen bg-black md:bg-[#030510] text-gray-100 font-sans overflow-hidden">
       <HeroSection />
       <div className="hidden md:block">
-        <Division1Banner />
+        
         <ExperienceSection />
       </div>
-      
+      <Division1Banner />
       <StoreSection />
       <MobileSocials />
       <div className="hidden md:block">

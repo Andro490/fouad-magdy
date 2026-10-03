@@ -10,8 +10,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black md:bg-[#030510] text-gray-100 font-sans overflow-hidden">
       <HeroSection />
-      <Division1Banner />
       <div className="hidden md:block">
+        <Division1Banner />
         <ExperienceSection />
       </div>
       
